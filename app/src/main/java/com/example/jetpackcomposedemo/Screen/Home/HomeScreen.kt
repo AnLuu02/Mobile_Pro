@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.Screen.Home.widget.CardSection
 import com.example.jetpackcomposedemo.components.Card.ImageRightCard
 import com.example.jetpackcomposedemo.Screen.Home.widget.LocationSection
 import com.example.jetpackcomposedemo.Screen.Home.widget.ServiceSection
@@ -32,37 +33,48 @@ fun HomeScreen(
         item {
             LocationSection()
             ServiceSection()
+
             Spacer(modifier = Modifier.height(10.dp))
+
+            CardSection(
+                data = dataTest,
+                titleHeader = "GIÁ SỐC ĐÊM NAY",
+                isDiscount = true,
+                hasPrice = true,
+                isSale = true
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            CardSection(
+                data = dataTest,
+                titleHeader = "ƯU ĐÃI ĐẶC BIỆT",
+                isDiscount = true,
+                hasPrice = true
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            CardSection(
+                data = dataTest,
+                titleHeader = "VISA GỢI Ý",
+                hasPrice = true,
+                isImageFull = true,
+                isDiscount = true
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            CardSection(
+                data = dataTest,
+                titleHeader = "KHÁCH SẠN NỔI BẬT"
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
             ImageRightCard(index = 0, dataTest,onOpenDetailCardScreen=onOpenDetailCardScreen)
             ImageRightCard(index = 1, dataTest,isDiscount = true,onOpenDetailCardScreen= onOpenDetailCardScreen)
             ImageRightCard(index = 2, dataTest,onOpenDetailCardScreen=onOpenDetailCardScreen)
-
-//                ImageCard(2)
-//                PriceCardSection(
-//                    data = dataTest,
-//                    titleHeader = "GIÁ SỐC ĐÊM NAY",
-//                    isDiscount = true,
-//                    isPrice = true,
-//                    isSale = true
-//                )
-//                Spacer(modifier = Modifier.height(10.dp))
-//                PriceCardSection(
-//                    data = dataTest,
-//                    titleHeader = "ƯU ĐÃI ĐẶC BIỆT",
-//                    isDiscount = true,
-//                    isPrice = true
-//                )
-//                Spacer(modifier = Modifier.height(10.dp))
-//                PriceCardSection(
-//                    data = dataTest,
-//                    titleHeader = "VISA GỢI Ý",
-//                    isPrice = true,
-//                    isImageFull = true,
-//                    isDiscount = true
-//                )
-//                Spacer(modifier = Modifier.height(10.dp))
-//                PriceCardSection(data = dataTest, titleHeader = "KHÁCH SẠN NỔI BẬT")
-//                Spacer(modifier = Modifier.height(10.dp))
 
         }
 

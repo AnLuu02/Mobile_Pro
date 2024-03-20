@@ -11,7 +11,7 @@ import com.example.jetpackcomposedemo.components.Card.PriceCard
 import com.example.jetpackcomposedemo.components.TitleMain
 
 @Composable
-fun <T> PriceCardSection(
+fun <T> CardSection(
     data: List<T>,
     titleHeader: String,
     isSale: Boolean = false,

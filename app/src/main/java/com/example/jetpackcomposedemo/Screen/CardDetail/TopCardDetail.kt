@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,7 +38,9 @@ fun  TopCardDetail(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+
+        ,
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -47,16 +50,18 @@ fun  TopCardDetail(
             Box(
                 modifier = Modifier
                     .size(36.dp)
-                    .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape),
+                    .background(color = Color.White, shape = CircleShape)
+                    .clickable {
+                        navController.popBackStack()
+                    }
+                ,
                 contentAlignment = Alignment.Center
             ){Icon(
                 imageVector = Icons.Rounded.ArrowBackIosNew,
                 contentDescription = "Back",
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable {
-                        navController.popBackStack()
-                    }
+
             )
             }
 
@@ -65,7 +70,8 @@ fun  TopCardDetail(
             Text(
                 text = "LÒNG ĐỀN ĐỎ HOTEL",
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
         }
 
@@ -75,7 +81,7 @@ fun  TopCardDetail(
             Box(
                 modifier = Modifier
                     .size(36.dp)
-                    .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape),
+                    .background(color = Color.White, shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -91,7 +97,7 @@ fun  TopCardDetail(
             Box(
                 modifier = Modifier
                     .size(36.dp)
-                    .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape),
+                    .background(color = Color.White, shape = CircleShape),
                 contentAlignment = Alignment.Center
             ){Icon(
                 imageVector = Icons.Rounded.Share,

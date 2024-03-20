@@ -55,7 +55,9 @@ fun MainApp(){
                         navController = navController,
                         topBar = { ProposedTopBar() },
                         content = {padding,listState->
-                          ProposedScreen(padding = padding)
+                          ProposedScreen(padding = padding, onOpenDetailCardScreen = {cardId->
+                              navController.navigate("carddetail/$cardId")
+                          })
                     })
                 }
 

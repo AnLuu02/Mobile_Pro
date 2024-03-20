@@ -20,7 +20,8 @@ import com.example.jetpackcomposedemo.Screen.Home.dataTest
 
 @Composable
 fun ProposedScreen(
-    padding:PaddingValues
+    padding:PaddingValues,
+    onOpenDetailCardScreen:(String)->Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -34,10 +35,11 @@ fun ProposedScreen(
                 Text(text = "Khách sạn gần đây bạn có đánh giá tốt nhất", fontSize = 12.sp)
             }
             Spacer(modifier = Modifier.height(10.dp))
-//            ImageRightCard(index = 0, dataTest)
-//            ImageRightCard(index = 1, dataTest,isDiscount = true)
-//            ImageRightCard(index = 2, dataTest)
-//            ImageRightCard(index = 1, dataTest,isDiscount = true)
+            Spacer(modifier = Modifier.height(10.dp))
+
+            ImageRightCard(index = 0, dataTest,onOpenDetailCardScreen=onOpenDetailCardScreen)
+            ImageRightCard(index = 1, dataTest,isDiscount = true,onOpenDetailCardScreen= onOpenDetailCardScreen)
+            ImageRightCard(index = 2, dataTest,onOpenDetailCardScreen=onOpenDetailCardScreen)
 
         }
     }
