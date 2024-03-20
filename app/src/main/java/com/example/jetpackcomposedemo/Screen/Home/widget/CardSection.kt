@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.layouts
+package com.example.jetpackcomposedemo.Screen.Home.widget
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

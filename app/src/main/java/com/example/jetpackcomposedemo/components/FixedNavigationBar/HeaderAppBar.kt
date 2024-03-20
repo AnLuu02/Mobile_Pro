@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.components.fixedNavigationBar
+package com.example.jetpackcomposedemo.components.FixedNavigationBar
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

@@ -4,32 +4,22 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
-import com.example.jetpackcomposedemo.components.fixedNavigationBar.BottomNavigationBar
-import com.example.jetpackcomposedemo.components.fixedNavigationBar.HeaderAppBar
-import com.example.jetpackcomposedemo.ui.theme.CardDetail.CardDetailScreen
-import com.example.jetpackcomposedemo.ui.theme.Home.HomeScreen
-import com.example.jetpackcomposedemo.ui.theme.Home.HomeTopBar
+import com.example.jetpackcomposedemo.Screen.CardDetail.CardDetailScreen
+import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
+import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
-import com.example.jetpackcomposedemo.ui.theme.Proposed.ProposedScreen
-import com.example.jetpackcomposedemo.ui.theme.Proposed.ProposedTopBar
+import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
+import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +42,7 @@ fun MainApp(){
                 composable("home"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
-                        topBar ={listState-> HomeTopBar(listState)} ,
+                        topBar ={listState-> HomeTopBar(listState) } ,
                         content ={ padding,listState->
                             HomeScreen(padding = padding,listState=listState, onOpenDetailCardScreen = {cardId->
                                 navController.navigate("carddetail/$cardId")
@@ -63,7 +53,7 @@ fun MainApp(){
                 composable("proposed"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
-                        topBar = { ProposedTopBar()},
+                        topBar = { ProposedTopBar() },
                         content = {padding,listState->
                           ProposedScreen(padding = padding)
                     })

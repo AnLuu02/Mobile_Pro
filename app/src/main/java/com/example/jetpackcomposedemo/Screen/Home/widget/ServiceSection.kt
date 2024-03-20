@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.layouts
+package com.example.jetpackcomposedemo.Screen.Home.widget
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

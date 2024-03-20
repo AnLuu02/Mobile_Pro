@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.ui.theme.Proposed
+package com.example.jetpackcomposedemo.Screen.Proposed
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

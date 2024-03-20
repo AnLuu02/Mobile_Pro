@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.layouts
+package com.example.jetpackcomposedemo.Screen.Home.widget
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,8 +40,6 @@ fun LocationSection() {
     }
 
 }
-
-
 @Composable
 fun Location() {
     Row(

@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.ui.theme.CardDetail
+package com.example.jetpackcomposedemo.Screen.CardDetail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
