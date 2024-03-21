@@ -42,7 +42,9 @@ import com.example.jetpackcomposedemo.R
 fun UserTopBar() {
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(top=46.dp)
+        ,
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -57,7 +59,7 @@ fun UserTopBar() {
             ClickableBox(modifier = Modifier.padding(12.dp,8.dp))
             Spacer(modifier = Modifier
                 .fillMaxWidth()
-                .height(1.dp)
+                .height(0.5.dp)
                 .border(1.dp, color = Color.LightGray))
         }
 

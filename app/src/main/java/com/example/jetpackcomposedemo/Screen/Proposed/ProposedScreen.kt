@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,13 +31,11 @@ fun ProposedScreen(
     ) {
         item {
             Column(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp)){
-                Text(text = "Khách sạn bạn có thể đến ngay lập tức", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Khách sạn bạn có thể đến ngay lập tức", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(2.dp))
-                Text(text = "Khách sạn gần đây bạn có đánh giá tốt nhất", fontSize = 12.sp)
+                Text(text = "Khách sạn gần đây bạn có đánh giá tốt nhất", style = MaterialTheme.typography.bodySmall)
             }
             Spacer(modifier = Modifier.height(10.dp))
-            Spacer(modifier = Modifier.height(10.dp))
-
             ImageRightCard(index = 0, dataTest,onOpenDetailCardScreen=onOpenDetailCardScreen)
             ImageRightCard(index = 1, dataTest,isDiscount = true,onOpenDetailCardScreen= onOpenDetailCardScreen)
             ImageRightCard(index = 2, dataTest,onOpenDetailCardScreen=onOpenDetailCardScreen)

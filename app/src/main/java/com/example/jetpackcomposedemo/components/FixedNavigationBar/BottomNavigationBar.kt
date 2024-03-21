@@ -58,29 +58,23 @@ val items = listOf(
 fun BottomNavigationBar(
     navController:NavHostController
 ) {
-
-    var selectedBar by remember {
-        mutableStateOf(false)
-    }
-
     NavigationBar {
         val currentRoute = currentRoute(navController)
         Row(
             modifier = Modifier.background(MaterialTheme.colorScheme.inverseOnSurface)
         ) {
             items.forEachIndexed { index, item ->
-                if (currentRoute == item.route) {
-                    selectedBar = true
-                } else {
-                    selectedBar = false
-                }
+                var selected = item.route == currentRoute
                 NavigationBarItem(
-                    selected  = selectedBar,
+                    selected  = selected,
                     onClick = {
-                        if (!selectedBar) {
+                        if (!selected) {
                             navController.navigate(item.route) {
-                                popUpTo(navController.graph.startDestinationId)
+                                popUpTo(navController.graph.startDestinationId){
+                                    saveState = true
+                                }
                                 launchSingleTop = true
+                                restoreState = true
                             }
                         }
                     }
@@ -90,14 +84,14 @@ fun BottomNavigationBar(
                             modifier = Modifier,
                             imageVector = item.icon,
                             contentDescription = item.title,
-                            tint = if (selectedBar) Color.Red else MaterialTheme.colorScheme.onBackground
+                            tint = if (selected) Color.Red else MaterialTheme.colorScheme.onBackground
                         )
 
                     },
                     label = {
                         Text(
                             text = item.title,
-                            color = if (selectedBar) Color.Red else MaterialTheme.colorScheme.onBackground
+                            color = if (selected) Color.Red else MaterialTheme.colorScheme.onBackground
                         )
                     }
                 )

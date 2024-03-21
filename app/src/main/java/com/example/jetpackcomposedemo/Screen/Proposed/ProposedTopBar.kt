@@ -39,11 +39,11 @@ fun ProposedTopBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 46.dp, bottom = 16.dp)
     ) {
         Text(
             text = "Đề xuất",
-            fontSize = 24.sp,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
     }
