@@ -76,7 +76,7 @@ fun HomeTopBar(
             }
 
             Icon(
-                imageVector = Icons.Rounded.Notifications,
+                painter = painterResource(id = R.drawable.outline_notifications_24),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(30.dp),
