@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AddCircle
@@ -42,48 +44,68 @@ import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.R
 
 @Composable
-fun UserScreen(modifier: Modifier = Modifier.padding(12.dp,8.dp)){
-    Column(modifier = Modifier.fillMaxSize()) {
+fun UserScreen(padding: PaddingValues){
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+    ) {
+        item {
+            Column() {
+                Text(
+                    text = "Cài đặt",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(12.dp,16.dp)
+                )
+                SettingElement(Icons.Filled.Notifications,"Thông báo")
+                SettingElement(Icons.Filled.AddCircle,"Ngôn ngữ","Tiếng Việt")
+                SettingElement(Icons.Filled.LocationOn,"Khu vực","Hồ Chí Minh")
 
-        Column() {
-            Text(
-                text = "Đăng ký ngay để nhận nhiều ưu đãi hấp dẫn.",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Light,
-                modifier = modifier
-            )
+                Text(
+                    text = "Thông tin",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(12.dp,16.dp)
+                )
+                SettingElement(Icons.Filled.Phone,"Hỏi đáp")
+                SettingElement(Icons.Filled.DateRange,"Điều khoản & Chính sách bảo mật")
+                SettingElement(Icons.Filled.AccountBox,"Phiên bản","15.35.0")
+                SettingElement(Icons.Filled.Info,"Liên hệ")
 
-            ClickableBox(modifier)
+            }
         }
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .border(1.dp, color = Color.LightGray))
-        Column() {
-            Text(
-                text = "Cài đặt",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(12.dp,16.dp)
-            )
-            SettingElement(Icons.Filled.Notifications,"Thông báo",modifier = modifier)
-            SettingElement(Icons.Filled.AddCircle,"Ngôn ngữ","Tiếng Việt",modifier = modifier)
-            SettingElement(Icons.Filled.LocationOn,"Khu vực","Hồ Chí Minh",modifier = modifier)
-
-            Text(
-                text = "Thông tin",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(12.dp,16.dp)
-            )
-            SettingElement(Icons.Filled.Phone,"Hỏi đáp",modifier = modifier)
-            SettingElement(Icons.Filled.DateRange,"Điều khoản & Chính sách bảo mật",modifier = modifier)
-            SettingElement(Icons.Filled.AccountBox,"Phiên bản","15.35.0",modifier = modifier)
-            SettingElement(Icons.Filled.Info,"Liên hệ",modifier = modifier)
-
-        }
-
     }
+//    Column(modifier = Modifier.fillMaxSize()) {
+//        Spacer(modifier = Modifier
+//            .fillMaxWidth()
+//            .height(1.dp)
+//            .border(1.dp, color = Color.LightGray))
+//        Column() {
+//            Text(
+//                text = "Cài đặt",
+//                style = MaterialTheme.typography.headlineMedium,
+//                fontWeight = FontWeight.Medium,
+//                modifier = Modifier.padding(12.dp,16.dp)
+//            )
+//            SettingElement(Icons.Filled.Notifications,"Thông báo",modifier = modifier)
+//            SettingElement(Icons.Filled.AddCircle,"Ngôn ngữ","Tiếng Việt",modifier = modifier)
+//            SettingElement(Icons.Filled.LocationOn,"Khu vực","Hồ Chí Minh",modifier = modifier)
+//
+//            Text(
+//                text = "Thông tin",
+//                style = MaterialTheme.typography.headlineMedium,
+//                fontWeight = FontWeight.Medium,
+//                modifier = Modifier.padding(12.dp,16.dp)
+//            )
+//            SettingElement(Icons.Filled.Phone,"Hỏi đáp",modifier = modifier)
+//            SettingElement(Icons.Filled.DateRange,"Điều khoản & Chính sách bảo mật",modifier = modifier)
+//            SettingElement(Icons.Filled.AccountBox,"Phiên bản","15.35.0",modifier = modifier)
+//            SettingElement(Icons.Filled.Info,"Liên hệ",modifier = modifier)
+//
+//        }
+//
+//    }
 }
 @Composable
 fun SettingElement(
@@ -129,37 +151,3 @@ fun SettingElement(
         .border(1.dp, color = colorResource(id = R.color.border)))
 }
 
-@Composable
-fun ClickableBox(modifier: Modifier = Modifier) {
-    val isHovered = remember { mutableStateOf(false) }
-    val backgroundColor =
-        if (isHovered.value) colorResource(id = R.color.hoverBackground) else Color.Transparent
-    Box( modifier = Modifier
-        .fillMaxWidth()
-        .clickable(onClick = { /* handle click here */ }) // Thêm padding cho phần tử để hiển thị background
-        .background(backgroundColor)
-        .animateContentSize() // Animation thay đổi kích thước content
-        .pointerInput(Unit) {
-            detectTapGestures(
-                onPress = { // onPress is a suspend function that pauses until the pointer is released
-                    isHovered.value = true
-                    tryAwaitRelease()
-                    isHovered.value = false
-                }
-            )
-        },) {
-        Text(
-            text = "Đăng nhập/ Đăng ký",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Medium,
-            color = colorResource(id = R.color.primary),
-            modifier = modifier
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    UserScreen()
-}

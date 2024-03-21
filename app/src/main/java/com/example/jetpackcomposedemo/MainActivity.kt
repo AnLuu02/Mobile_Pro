@@ -20,6 +20,8 @@ import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
+import com.example.jetpackcomposedemo.Screen.User.UserScreen
+import com.example.jetpackcomposedemo.Screen.User.UserTopBar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,11 +75,14 @@ fun MainApp(){
 //                    })
 //                }
 //
-//                composable("user"){
-//                    ScreenWithBottomNavigationBar(navController = navController, content = {padding,listState->
-//                        UserScreen(padding = padding)
-//                    })
-//                }
+                composable("user"){
+                    ScreenWithBottomNavigationBar(
+                        navController = navController,
+                        topBar = { UserTopBar() },
+                        content = {padding,listState->
+                            UserScreen(padding = padding)
+                        })
+                }
 
                 composable(
                     "carddetail/{cardId}",
