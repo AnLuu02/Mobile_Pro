@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,7 +35,7 @@ fun TitleMain(
             Text(
                 text = title,
                 color = Color.Black,
-                fontSize = 16.sp,
+                style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
             )
 
@@ -43,14 +44,14 @@ fun TitleMain(
                 Text(
                     text = "Xem tất cả",
                     color = Color.Gray,
-                    fontSize = 10.sp
+                    style = MaterialTheme.typography.bodySmall
                 )
 
                 Icon(
                     imageVector = Icons.Rounded.KeyboardArrowRight,
                     contentDescription ="",
                     tint = Color.Gray,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(18.dp)
                     )
 
             }

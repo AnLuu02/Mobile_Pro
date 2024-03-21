@@ -58,7 +58,7 @@ fun Location() {
 
         Text(
             text = "Hồ Chí Minh",
-            fontSize = 24.sp,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = Color.Red
 

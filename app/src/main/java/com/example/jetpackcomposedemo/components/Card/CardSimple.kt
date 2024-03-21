@@ -18,6 +18,7 @@ import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -93,11 +94,9 @@ fun <T> CardSimple(
                     ) {
                         Text(
                             text = "MIDAS HOTEL",
-                            style = TextStyle(
-                                color = Color.White,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
                         )
 
                         Spacer(modifier = Modifier.height(4.dp))
@@ -117,7 +116,8 @@ fun <T> CardSimple(
 
                             Text(
                                 text = "4.8(1079)",
-                                style = TextStyle(color = Color.White, fontSize = 12.sp)
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodySmall
                             )
 
                         }

@@ -43,9 +43,6 @@ import com.example.jetpackcomposedemo.R
 import java.time.format.TextStyle
 
 
-val customTextStyle = androidx.compose.ui.text.TextStyle(
-    color = Color.White,
-)
 
 @Composable
 fun <T> PriceCard(
@@ -129,7 +126,7 @@ fun <T> PriceCard(
                             ) {
                                 Text(
                                     text = "Nổi bật",
-                                    fontSize = 10.sp,
+                                    style = MaterialTheme.typography.bodySmall,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White,
                                     modifier = Modifier.padding(
@@ -147,7 +144,7 @@ fun <T> PriceCard(
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
+                                .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 8.dp),
                             contentAlignment = Alignment.BottomStart
                         ) {
                             Column(
@@ -155,8 +152,8 @@ fun <T> PriceCard(
 
                                 Text(
                                     text = "LỒNG ĐÈN ĐỎ HOTEL",
-                                    fontSize = 16.sp,
-                                    style = if (isImageFull) customTextStyle else androidx.compose.ui.text.TextStyle(),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = if (isImageFull) Color.White else Color.Black,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier
                                 )
@@ -197,14 +194,14 @@ fun <T> PriceCard(
                                     }
                                     Text(
                                         text = "Còn 2 phòng dêm nay",
-                                        fontSize = 12.sp,
+                                        style = MaterialTheme.typography.bodySmall,
                                         color = Color.Blue,
                                         fontWeight = FontWeight.SemiBold,
 
                                         )
                                 }
 
-                                Spacer(modifier = Modifier.height(2.dp))
+                                Spacer(modifier = Modifier.height(4.dp))
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -218,7 +215,7 @@ fun <T> PriceCard(
                                         Text(
                                             text = "Chỉ từ",
                                             color = Color.Gray,
-                                            fontSize = 10.sp,
+                                            style = MaterialTheme.typography.bodySmall,
                                             modifier = Modifier.padding(end = 4.dp),
 
                                             )
@@ -227,7 +224,7 @@ fun <T> PriceCard(
                                             Text(
                                                 text = "900.000đ",
                                                 color = Color.Gray,
-                                                fontSize = 10.sp,
+                                                style = MaterialTheme.typography.bodySmall,
                                                 textDecoration = TextDecoration.LineThrough
                                             )
                                         }
@@ -240,7 +237,7 @@ fun <T> PriceCard(
                                         Text(
                                             text = "Phú Nhuận",
                                             color = if (isImageFull) Color.White else Color.Gray,
-                                            fontSize = 10.sp
+                                            style = MaterialTheme.typography.bodySmall
 
                                         )
 
@@ -265,9 +262,9 @@ fun <T> PriceCard(
                                 ) {
                                     Text(
                                         text = "420.000đ",
-                                        fontSize = 16.sp,
+                                        style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.Bold,
-                                        style = if (isImageFull) customTextStyle else androidx.compose.ui.text.TextStyle(),
+                                        color = if (isImageFull) Color.White else Color.Black,
                                     )
 
                                     Row(
@@ -276,15 +273,15 @@ fun <T> PriceCard(
 
                                         Text(
                                             text = "4.0",
-                                            fontSize = 12.sp,
+                                            style = MaterialTheme.typography.bodyMedium,
                                             fontWeight = FontWeight.Bold,
-                                            style = if (isImageFull) customTextStyle else androidx.compose.ui.text.TextStyle()
+                                            color = if (isImageFull) Color.White else Color.Black
                                         )
 
                                         Text(
                                             text = "(2097)",
                                             color = if (isImageFull) Color.White else Color.Gray,
-                                            fontSize = 12.sp,
+                                            style = MaterialTheme.typography.bodyMedium,
                                         )
 
                                         Icon(
@@ -313,7 +310,7 @@ fun <T> PriceCard(
                                         Spacer(modifier = Modifier.width(2.dp))
                                         Text(
                                             text = "Mã giảm 40k",
-                                            fontSize = 12.sp,
+                                            style = MaterialTheme.typography.bodyMedium,
                                             fontWeight = FontWeight.Bold,
                                             color = Color.Red
                                         )

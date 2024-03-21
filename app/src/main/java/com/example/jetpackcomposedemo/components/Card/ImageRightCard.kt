@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -88,14 +89,14 @@ fun<T> ImageRightCard(
                             ) {
                                 Text(
                                     text = "4.0",
-                                    fontSize = 12.sp,
+                                    style = MaterialTheme.typography.bodySmall,
                                     fontWeight = FontWeight.Bold,
                                 )
 
                                 Text(
                                     text = "(2097)",
                                     color = Color.Gray,
-                                    fontSize = 12.sp,
+                                    style = MaterialTheme.typography.bodySmall,
                                 )
 
                                 Icon(
@@ -112,7 +113,7 @@ fun<T> ImageRightCard(
                             ) {
                                 Text(
                                     text = "Nổi bật",
-                                    fontSize = 10.sp,
+                                    style = MaterialTheme.typography.bodySmall,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White,
                                     modifier = Modifier.padding(
@@ -128,7 +129,7 @@ fun<T> ImageRightCard(
 
                         Text(
                             text = "LỒNG ĐÈN ĐỎ HOTEL",
-                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier
                         )
@@ -137,13 +138,13 @@ fun<T> ImageRightCard(
                             Text(
                                 text = "Chỉ từ",
                                 color = Color.Gray,
-                                fontSize = 10.sp,
+                                style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(end = 4.dp),
                             )
 
                             Text(
                                 text = "420.000đ",
-                                fontSize = 16.sp,
+                                style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Bold,
                             )
                         }
@@ -163,7 +164,7 @@ fun<T> ImageRightCard(
                                 Spacer(modifier = Modifier.width(2.dp))
                                 Text(
                                     text = "Mã giảm 40k",
-                                    fontSize = 12.sp,
+                                    style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.Red
                                 )

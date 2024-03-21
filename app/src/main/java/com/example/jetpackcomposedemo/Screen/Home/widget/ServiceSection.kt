@@ -79,7 +79,7 @@ fun ServiceSection() {
         Text(
             text = "Đặt phòng linh hoạt giá tốt nhất",
             fontWeight = FontWeight.Bold,
-            fontSize = 14.sp
+            style = MaterialTheme.typography.bodyMedium
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -117,7 +117,7 @@ fun ServiceItem(
         Text(
             text = item.title,
             color = Color.Red,
-            fontSize = 10.sp
+            style = MaterialTheme.typography.bodySmall
         )
     }
 
