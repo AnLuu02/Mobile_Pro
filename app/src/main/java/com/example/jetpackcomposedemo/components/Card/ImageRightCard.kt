@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -41,147 +42,151 @@ fun<T> ImageRightCard(
     onOpenDetailCardScreen:(String)->Unit
 ) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
-            .height(120.dp)
-            .clickable {onOpenDetailCardScreen(index.toString())}
-    ) {
-        Box(
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .clickable { onOpenDetailCardScreen(index.toString()) }) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-            ,
+                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
             ) {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(0.5f),
-                    shape = RoundedCornerShape(8.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.hotel_2),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 12.dp, end = 12.dp)
-                ) {
-                    Column(
+                    Surface(
                         modifier = Modifier
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.SpaceBetween
+                            .fillMaxSize()
+                            .weight(0.5f),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                        Image(
+                            painter = painterResource(id = R.drawable.hotel_2),
+                            contentScale = ContentScale.Crop,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 12.dp, end = 12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            verticalArrangement = Arrangement.SpaceBetween
                         ) {
                             Row(
-                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(
-                                    text = "4.0",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    fontWeight = FontWeight.Bold,
-                                )
-
-                                Text(
-                                    text = "(2097)",
-                                    color = Color.Gray,
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-
-                                Icon(
-                                    imageVector = Icons.Rounded.Star,
-                                    contentDescription = "",
-                                    tint = Color.Yellow,
-                                    modifier = Modifier.size(16.dp)
-
-                                )
-                            }
-
-                            Box(
-                                modifier = Modifier .background(Color.Red)
-                            ) {
-                                Text(
-                                    text = "Nổi bật",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    modifier = Modifier.padding(
-                                        top = 2.dp,
-                                        start = 4.dp,
-                                        bottom = 2.dp,
-                                        end = 4.dp
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        text = "4.0",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = FontWeight.Bold,
                                     )
 
-                                )
+                                    Text(
+                                        text = "(2097)",
+                                        color = Color.Gray,
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+
+                                    Icon(
+                                        imageVector = Icons.Rounded.Star,
+                                        contentDescription = "",
+                                        tint = Color.Yellow,
+                                        modifier = Modifier.size(16.dp)
+
+                                    )
+                                }
+
+                                Box(
+                                    modifier = Modifier.background(Color.Red)
+                                ) {
+                                    Text(
+                                        text = "Nổi bật",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White,
+                                        modifier = Modifier.padding(
+                                            top = 2.dp,
+                                            start = 4.dp,
+                                            bottom = 2.dp,
+                                            end = 4.dp
+                                        )
+
+                                    )
+                                }
                             }
-                        }
-
-                        Text(
-                            text = "LỒNG ĐÈN ĐỎ HOTEL",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                        )
-
-                        Column {
-                            Text(
-                                text = "Chỉ từ",
-                                color = Color.Gray,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(end = 4.dp),
-                            )
 
                             Text(
-                                text = "420.000đ",
+                                text = "LỒNG ĐÈN ĐỎ HOTEL",
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Bold,
+                                modifier = Modifier
                             )
-                        }
 
-                        if(isDiscount){
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.outline_local_offer_24),
-                                    contentDescription = "discount",
-                                    tint = Color.Red,
-                                    modifier = Modifier.size(14.dp)
-
-                                )
-                                Spacer(modifier = Modifier.width(2.dp))
+                            Column {
                                 Text(
-                                    text = "Mã giảm 40k",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Red
+                                    text = "Chỉ từ",
+                                    color = Color.Gray,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(end = 4.dp),
                                 )
+
+                                Text(
+                                    text = "420.000đ",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+
+                            if (isDiscount) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.outline_local_offer_24),
+                                        contentDescription = "discount",
+                                        tint = Color.Red,
+                                        modifier = Modifier.size(14.dp)
+
+                                    )
+                                    Spacer(modifier = Modifier.width(2.dp))
+                                    Text(
+                                        text = "Mã giảm 40k",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Red
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
+
+            if (index < 2) {
+                Divider(
+                    modifier = Modifier
+                        .height(0.5.dp)
+                        .fillMaxWidth()
+                        .offset(0.dp,12.dp)
+                    ,
+                    color = Color.LightGray
+                )
+            }
         }
-    }
-    if(index < 2){
-        Divider(
-            modifier = Modifier
-                .height(0.5.dp)   // The divider will fill the height of the Row
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp), // Set the thickness of the divider
-            color = Color.LightGray     // Set the color of the divider
-        )
     }
 }

@@ -31,6 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -52,6 +54,13 @@ fun <T> PriceCard(
     isDiscount: Boolean = false,
     isImageFull: Boolean = false
 ) {
+
+    val screenWidth = with(LocalDensity.current) {
+        LocalConfiguration.current.screenWidthDp.dp
+    }
+
+    val sizeCard = screenWidth*10/12
+
     var lastPaddingEnd = 0.dp
 
     if (index == data.size - 1) {
@@ -69,8 +78,8 @@ fun <T> PriceCard(
         ) {
             Box(
                 modifier = Modifier
-                    .height(270.dp)
-                    .width(350.dp),
+                    .height(sizeCard)
+                    .width(sizeCard),
                 contentAlignment = Alignment.BottomStart
 
             ) {

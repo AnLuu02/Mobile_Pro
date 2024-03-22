@@ -39,7 +39,7 @@ fun HomeTopBar(
 ){
     val showSearchIcon = remember { mutableStateOf(false) }
     LaunchedEffect(listState.firstVisibleItemScrollOffset) {
-        showSearchIcon.value = listState.firstVisibleItemScrollOffset > 0
+        showSearchIcon.value = listState.firstVisibleItemScrollOffset > 150
     }
 
     Row(
