@@ -131,7 +131,7 @@ fun<T> ImageRightCard(
 
                             Text(
                                 text = "LỒNG ĐÈN ĐỎ HOTEL",
-                                style = MaterialTheme.typography.bodyLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                             )

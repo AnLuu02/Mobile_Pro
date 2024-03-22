@@ -35,7 +35,7 @@ fun TitleMain(
             Text(
                 text = title,
                 color = Color.Black,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
             )
 

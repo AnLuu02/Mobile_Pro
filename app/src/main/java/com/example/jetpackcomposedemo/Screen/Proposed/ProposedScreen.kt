@@ -36,9 +36,9 @@ fun ProposedScreen(
                 Text(text = "Khách sạn gần đây bạn có đánh giá tốt nhất", style = MaterialTheme.typography.bodySmall)
             }
             Spacer(modifier = Modifier.height(10.dp))
-            ImageRightCard(index = 0, dataTest,onOpenDetailCardScreen=onOpenDetailCardScreen)
-            ImageRightCard(index = 1, dataTest,isDiscount = true,onOpenDetailCardScreen= onOpenDetailCardScreen)
-            ImageRightCard(index = 2, dataTest,onOpenDetailCardScreen=onOpenDetailCardScreen)
+            ImageRightCard(index = 0, dataTest, onOpenDetailCardScreen =onOpenDetailCardScreen)
+            ImageRightCard(index = 1, dataTest, isDiscount = true, onOpenDetailCardScreen = onOpenDetailCardScreen)
+            ImageRightCard(index = 2, dataTest, onOpenDetailCardScreen =onOpenDetailCardScreen)
 
         }
     }

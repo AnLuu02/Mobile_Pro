@@ -153,7 +153,7 @@ fun <T> PriceCard(
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 8.dp),
+                                .padding(16.dp),
                             contentAlignment = Alignment.BottomStart
                         ) {
                             Column(
@@ -161,13 +161,13 @@ fun <T> PriceCard(
 
                                 Text(
                                     text = "LỒNG ĐÈN ĐỎ HOTEL",
-                                    style = MaterialTheme.typography.bodyLarge,
+                                    style = MaterialTheme.typography.titleLarge,
                                     color = if (isImageFull) Color.White else Color.Black,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier
                                 )
 
-                                Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
 
                                 Row(
                                     modifier = Modifier
