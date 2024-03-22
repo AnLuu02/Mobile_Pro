@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.Screen.Home.widget.AdvCard
 import com.example.jetpackcomposedemo.Screen.Home.widget.CardSection
 import com.example.jetpackcomposedemo.components.Card.ImageRightCard
 import com.example.jetpackcomposedemo.Screen.Home.widget.LocationSection
@@ -18,12 +20,23 @@ import com.example.jetpackcomposedemo.Screen.Home.widget.ServiceSection
 
 val dataTest = listOf(1, 2, 3, 4, 5)
 
+
 @Composable
 fun HomeScreen(
     padding:PaddingValues,
     listState:LazyListState,
     onOpenDetailCardScreen: (String)->Unit
 ) {
+    //test slide adv
+    val sliderList = remember {
+        mutableListOf(
+            "https://www.gstatic.com/webp/gallery/1.webp",
+            "https://www.gstatic.com/webp/gallery/2.webp",
+            "https://www.gstatic.com/webp/gallery/3.webp",
+            "https://www.gstatic.com/webp/gallery/4.webp",
+            "https://www.gstatic.com/webp/gallery/5.webp",
+        )
+    }
     LazyColumn(
         state = listState,
         modifier = Modifier
@@ -33,6 +46,12 @@ fun HomeScreen(
         item {
             LocationSection()
             ServiceSection()
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            AdvCard(
+                sliderList = sliderList
+            )
 
             Spacer(modifier = Modifier.height(10.dp))
 

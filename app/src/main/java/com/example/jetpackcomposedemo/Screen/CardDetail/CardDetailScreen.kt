@@ -85,7 +85,7 @@ fun CardDetailScreen(
                             contentDescription = "",
                             modifier = Modifier
                                 .weight(1f)
-                                .heightIn(min = 200.dp)
+                                .heightIn(min = 180.dp, max = 200.dp)
                                 .padding(end = 1.dp),
                             contentScale = ContentScale.Crop,
 
@@ -96,7 +96,7 @@ fun CardDetailScreen(
                             contentDescription = "",
                             modifier = Modifier
                                 .weight(1f)
-                                .heightIn(min = 200.dp)
+                                .heightIn(min = 180.dp, max = 200.dp)
                                 .padding(start = 1.dp),
                             contentScale = ContentScale.Crop,
                         )

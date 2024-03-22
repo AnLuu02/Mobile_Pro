@@ -84,4 +84,10 @@ dependencies {
 
     // Android Maps Compose composables for the Maps SDK for Android
     implementation ("com.google.maps.android:maps-compose:4.3.3")
+
+//auto slide
+    implementation("io.coil-kt:coil-compose:2.3.0")
+    implementation("com.google.accompanist:accompanist-pager:0.35.0-alpha")
+    implementation("androidx.compose.ui:ui:1.0.0-alpha01")
+
 }
