@@ -17,7 +17,8 @@ fun <T> CardSection(
     isSale: Boolean = false,
     isImageFull: Boolean = false,
     isDiscount: Boolean = false,
-    hasPrice: Boolean = false
+    hasPrice: Boolean = false,
+    onOpenDetailCardScreen:(String)->Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -32,7 +33,8 @@ fun <T> CardSection(
                             data,
                             isSale = isSale,
                             isDiscount = isDiscount,
-                            isImageFull = isImageFull
+                            isImageFull = isImageFull,
+                            onOpenDetailCardScreen = onOpenDetailCardScreen
                         )
                     } else {
                         CardSimple(index = it, data)

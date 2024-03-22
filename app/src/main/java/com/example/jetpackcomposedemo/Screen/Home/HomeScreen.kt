@@ -59,7 +59,8 @@ fun HomeScreen(
                 data = dataTest,
                 titleHeader = "GIÁ SỐC ĐÊM NAY",
                 hasPrice = true,
-                isSale = true
+                isSale = true,
+                onOpenDetailCardScreen = onOpenDetailCardScreen
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -68,7 +69,8 @@ fun HomeScreen(
                 data = dataTest,
                 titleHeader = "ƯU ĐÃI ĐẶC BIỆT",
                 isDiscount = true,
-                hasPrice = true
+                hasPrice = true,
+                onOpenDetailCardScreen = onOpenDetailCardScreen
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -78,19 +80,21 @@ fun HomeScreen(
                 titleHeader = "VISA GỢI Ý",
                 hasPrice = true,
                 isImageFull = true,
-                isDiscount = true
+                isDiscount = true,
+                onOpenDetailCardScreen = onOpenDetailCardScreen
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
             CardSection(
                 data = dataTest,
-                titleHeader = "KHÁCH SẠN NỔI BẬT"
+                titleHeader = "KHÁCH SẠN NỔI BẬT",
+                onOpenDetailCardScreen = onOpenDetailCardScreen
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            ImageRightCard(index = 0, dataTest, onOpenDetailCardScreen =onOpenDetailCardScreen)
+            ImageRightCard(index = 0, dataTest, onOpenDetailCardScreen = onOpenDetailCardScreen)
             ImageRightCard(index = 1, dataTest, isDiscount = true, onOpenDetailCardScreen = onOpenDetailCardScreen)
             ImageRightCard(index = 2, dataTest, onOpenDetailCardScreen =onOpenDetailCardScreen)
 

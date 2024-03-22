@@ -35,7 +35,8 @@ import com.example.jetpackcomposedemo.R
 @Composable
 fun  TopCardDetail(
     navController: NavHostController,
-    listState:LazyListState
+    listState:LazyListState,
+    cardId:String
 ){
 
     val showBackgroundTopBar = remember { mutableStateOf(false) }
@@ -83,7 +84,7 @@ fun  TopCardDetail(
                 Spacer(modifier = Modifier.width(6.dp))
 
                 Text(
-                    text = "LÒNG ĐỀN ĐỎ HOTEL",
+                    text = "LÒNG ĐỀN ĐỎ HOTEL $cardId",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     color = if (showBackgroundTopBar.value) Color.Black else Color.White

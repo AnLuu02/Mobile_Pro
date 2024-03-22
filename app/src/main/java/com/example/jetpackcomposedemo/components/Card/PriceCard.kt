@@ -2,6 +2,7 @@ package com.example.jetpackcomposedemo.components.Card
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,7 +53,8 @@ fun <T> PriceCard(
     data: List<T>,
     isSale: Boolean = false,
     isDiscount: Boolean = false,
-    isImageFull: Boolean = false
+    isImageFull: Boolean = false,
+    onOpenDetailCardScreen: (String)->Unit
 ) {
 
     val screenWidth = with(LocalDensity.current) {
@@ -70,6 +72,7 @@ fun <T> PriceCard(
     Box(
         modifier = Modifier
             .padding(start = 16.dp, end = lastPaddingEnd)
+            .clickable { onOpenDetailCardScreen(index.toString()) }
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),

@@ -1,6 +1,8 @@
 package com.example.jetpackcomposedemo.Screen.CardDetails
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,12 +40,18 @@ fun BottomCardDetail(){
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp)
-                    .background(Color.LightGray, shape = RoundedCornerShape(30.dp))
+                    .border(
+                        BorderStroke(1.dp, Color.Red),
+                        shape = RoundedCornerShape(30.dp)
+                    )
+                    .background(Color.Red.copy(alpha = 0.1f), shape = RoundedCornerShape(30.dp))
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(16.dp)
+
+                    ,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
