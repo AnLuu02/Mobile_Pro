@@ -149,29 +149,31 @@ fun<T> ImageRightCard(
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.Bold,
                                 )
-                            }
 
-                            if (isDiscount) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.outline_local_offer_24),
-                                        contentDescription = "discount",
-                                        tint = Color.Red,
-                                        modifier = Modifier.size(14.dp)
+                                if (isDiscount) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.outline_local_offer_24),
+                                            contentDescription = "discount",
+                                            tint = Color.Red,
+                                            modifier = Modifier.size(14.dp)
 
-                                    )
-                                    Spacer(modifier = Modifier.width(2.dp))
-                                    Text(
-                                        text = "Mã giảm 40k",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.Red
-                                    )
+                                        )
+                                        Spacer(modifier = Modifier.width(2.dp))
+                                        Text(
+                                            text = "Mã giảm 40k",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Red
+                                        )
+                                    }
                                 }
                             }
+
+
                         }
                     }
                 }

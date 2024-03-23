@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -78,14 +80,14 @@ fun <T> PriceCard(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+
         ) {
             Box(
                 modifier = Modifier
-                    .height(sizeCard)
-                    .width(sizeCard),
-                contentAlignment = Alignment.BottomStart
-
-            ) {
+                    .width(sizeCard)
+                    .then(if (isImageFull) Modifier.heightIn(max = sizeCard) else Modifier.wrapContentHeight())
+                ,
+                ) {
                 if (isImageFull) {
                     Image(
                         painter = painterResource(id = R.drawable.hotel_2),
@@ -106,7 +108,6 @@ fun <T> PriceCard(
                                 )
                             )
                     )
-
                 }
                 Box(
                     modifier = Modifier
@@ -119,14 +120,14 @@ fun <T> PriceCard(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(1f)
+
                         ) {
                             if (!isImageFull) {
                                 Image(
                                     painter = painterResource(id = R.drawable.hotel_2),
                                     contentScale = ContentScale.Crop,
                                     contentDescription = null,
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth().height(sizeCard*10/18)
                                 )
                             }
 
@@ -153,180 +154,175 @@ fun <T> PriceCard(
 
                         }
 
-                        Box(
+                        Column(
                             modifier = Modifier
-                                .weight(1f)
                                 .padding(16.dp),
-                            contentAlignment = Alignment.BottomStart
                         ) {
-                            Column(
+
+                            Text(
+                                text = "LỒNG ĐÈN ĐỎ HOTEL",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = if (isImageFull) Color.White else Color.Black,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(18.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
 
-                                Text(
-                                    text = "LỒNG ĐÈN ĐỎ HOTEL",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = if (isImageFull) Color.White else Color.Black,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier
-                                )
+                                if (isSale) {
+                                    Text(
+                                        text = "FLASH SALE",
+                                        fontSize = 14.sp,
+                                        fontStyle = FontStyle.Italic,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Color.Red
 
-                                Spacer(modifier = Modifier.height(12.dp))
+                                    )
+
+
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Divider(
+                                        modifier = Modifier
+                                            .height(12.dp)   // The divider will fill the height of the Row
+                                            .width(1.dp),      // Set the thickness of the divider
+                                        color = Color.Gray     // Set the color of the divider
+                                    )
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                }
+                                Text(
+                                    text = "Còn 2 phòng dêm nay",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.Blue,
+                                    fontWeight = FontWeight.SemiBold,
+
+                                    )
+                            }
+
+                            Spacer(modifier = Modifier.height(4.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
 
                                 Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(18.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
+                                    Text(
+                                        text = "Chỉ từ",
+                                        color = Color.Gray,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.padding(end = 4.dp),
+
+                                        )
 
                                     if (isSale) {
                                         Text(
-                                            text = "FLASH SALE",
-                                            fontSize = 14.sp,
-                                            fontStyle = FontStyle.Italic,
-                                            style = MaterialTheme.typography.titleLarge,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = Color.Red
-
+                                            text = "900.000đ",
+                                            color = Color.Gray,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            textDecoration = TextDecoration.LineThrough
                                         )
-
-
-
-                                        Spacer(modifier = Modifier.width(8.dp))
-
-                                        Divider(
-                                            modifier = Modifier
-                                                .height(12.dp)   // The divider will fill the height of the Row
-                                                .width(1.dp),      // Set the thickness of the divider
-                                            color = Color.Gray     // Set the color of the divider
-                                        )
-
-                                        Spacer(modifier = Modifier.width(8.dp))
-
                                     }
-                                    Text(
-                                        text = "Còn 2 phòng dêm nay",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Color.Blue,
-                                        fontWeight = FontWeight.SemiBold,
 
-                                        )
                                 }
 
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Phú Nhuận",
+                                        color = if (isImageFull) Color.White else Color.Gray,
+                                        style = MaterialTheme.typography.bodySmall
+
+                                    )
+
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.outline_location_on_24),
+                                        contentDescription = "",
+                                        tint = if (isImageFull) Color.White else Color.Black,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+
+                                }
+
+
+                            }
+
+                            Spacer(modifier = Modifier.height(2.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "420.000đ",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isImageFull) Color.White else Color.Black,
+                                )
 
                                 Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+
+                                    Text(
+                                        text = "4.0",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isImageFull) Color.White else Color.Black
+                                    )
+
+                                    Text(
+                                        text = "(2097)",
+                                        color = if (isImageFull) Color.White else Color.Gray,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                    )
+
+                                    Icon(
+                                        imageVector = Icons.Rounded.Star,
+                                        contentDescription = "",
+                                        tint = Color.Yellow,
+                                        modifier = Modifier.size(16.dp)
+
+                                    )
+                                }
+
+                            }
+                            if (isDiscount) {
+                                Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Absolute.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
 
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = "Chỉ từ",
-                                            color = Color.Gray,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier.padding(end = 4.dp),
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.outline_local_offer_24),
+                                        contentDescription = "discount",
+                                        tint = Color.Red,
+                                        modifier = Modifier.size(14.dp)
 
-                                            )
-
-                                        if (isSale) {
-                                            Text(
-                                                text = "900.000đ",
-                                                color = Color.Gray,
-                                                style = MaterialTheme.typography.bodySmall,
-                                                textDecoration = TextDecoration.LineThrough
-                                            )
-                                        }
-
-                                    }
-
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = "Phú Nhuận",
-                                            color = if (isImageFull) Color.White else Color.Gray,
-                                            style = MaterialTheme.typography.bodySmall
-
-                                        )
-
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.outline_location_on_24),
-                                            contentDescription = "",
-                                            tint = if (isImageFull) Color.White else Color.Black,
-                                            modifier = Modifier.size(14.dp)
-                                        )
-
-                                    }
-
-
-                                }
-
-                                Spacer(modifier = Modifier.height(2.dp))
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = "420.000đ",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (isImageFull) Color.White else Color.Black,
                                     )
-
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-
-                                        Text(
-                                            text = "4.0",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (isImageFull) Color.White else Color.Black
-                                        )
-
-                                        Text(
-                                            text = "(2097)",
-                                            color = if (isImageFull) Color.White else Color.Gray,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                        )
-
-                                        Icon(
-                                            imageVector = Icons.Rounded.Star,
-                                            contentDescription = "",
-                                            tint = Color.Yellow,
-                                            modifier = Modifier.size(16.dp)
-
-                                        )
-                                    }
-
-                                }
-                                if (isDiscount) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.outline_local_offer_24),
-                                            contentDescription = "discount",
-                                            tint = Color.Red,
-                                            modifier = Modifier.size(14.dp)
-
-                                        )
-                                        Spacer(modifier = Modifier.width(2.dp))
-                                        Text(
-                                            text = "Mã giảm 40k",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Red
-                                        )
-                                    }
+                                    Spacer(modifier = Modifier.width(2.dp))
+                                    Text(
+                                        text = "Mã giảm 40k",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Red
+                                    )
                                 }
                             }
                         }
