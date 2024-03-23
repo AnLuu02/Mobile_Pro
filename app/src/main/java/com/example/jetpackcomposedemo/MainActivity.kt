@@ -13,6 +13,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.jetpackcomposedemo.Screen.BookQuicklyScreen.BookQuicklyScreen
+import com.example.jetpackcomposedemo.Screen.BookQuicklyScreen.DiscountScreen
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
@@ -64,18 +66,18 @@ fun MainApp(){
                     })
                 }
 
-//                composable("bookquickly"){
-//                    ScreenWithBottomNavigationBar(navController = navController, content = {padding,listState->
-//                        BookQuicklyScreen(padding = padding)
-//                    })
-//                }
-//
-//                composable("discount"){
-//                    ScreenWithBottomNavigationBar(navController = navController, content = {padding,listState->
-//                        DiscountScreen(padding = padding)
-//                    })
-//                }
-//
+                composable("bookquickly"){
+                    ScreenWithBottomNavigationBar(navController = navController, content = {padding,listState->
+                        BookQuicklyScreen(padding = padding)
+                    })
+                }
+
+                composable("discount"){
+                    ScreenWithBottomNavigationBar(navController = navController, content = {padding,listState->
+                        DiscountScreen(padding = padding)
+                    })
+                }
+
                 composable("user"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
