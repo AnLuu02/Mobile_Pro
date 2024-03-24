@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.User
 
+import android.graphics.drawable.shapes.RoundRectShape
 import android.graphics.drawable.shapes.Shape
 import android.widget.Button
 import androidx.compose.foundation.Image
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -56,13 +59,13 @@ fun LoginScreen(navController: NavController,paddingValues: PaddingValues = Padd
         Image(imageVector = Icons.Filled.Close,contentDescription = null,Modifier.padding(16.dp,30.dp).clip(
             Shapes.small).clickable { navController.popBackStack() })
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Go2Joy xin chào!", fontWeight = FontWeight.SemiBold, fontSize = 24.sp, modifier = Modifier.padding(paddingValues))
+        Text(text = "Go2Joy xin chào!", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp))
         Text(text = "Đăng nhập để đặt phòng với những ưu đãi độc quyền dành cho thành viên", textAlign = TextAlign.Start,modifier = Modifier
-            .requiredWidth(300.dp)
+            .fillMaxWidth()
             .padding(16.dp, 0.dp))
         Spacer(modifier = Modifier.height(12.dp))
         var text by remember { mutableStateOf(TextFieldValue("")) }
-        TextField(
+        OutlinedTextField(
             value = text,
             onValueChange = {
                 text = it
@@ -75,7 +78,8 @@ fun LoginScreen(navController: NavController,paddingValues: PaddingValues = Padd
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(paddingValues)
+                .padding(paddingValues),
+            shape = RoundedCornerShape(8.dp)
         )
 
         Spacer(modifier = Modifier.height(64.dp))
