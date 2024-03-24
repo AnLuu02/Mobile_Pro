@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.User
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,14 +38,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.jetpackcomposedemo.R
 
 @Composable
-fun UserTopBar() {
+fun UserTopBar(navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top=46.dp)
+            .padding(top = 46.dp)
         ,
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -56,7 +59,20 @@ fun UserTopBar() {
                 modifier = Modifier.padding(12.dp,8.dp,12.dp,4.dp)
             )
 
-            ClickableBox(modifier = Modifier.padding(12.dp,8.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = { navController.navigate("login") })
+
+            ) {
+                Text(
+                    text = "Đăng nhập/ Đăng ký",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = colorResource(id = R.color.primary),
+                    modifier = Modifier.padding(12.dp,8.dp,12.dp,4.dp)
+                )
+            }
             Spacer(modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)
@@ -66,37 +82,11 @@ fun UserTopBar() {
     }
 
 }
-@Composable
-fun ClickableBox(modifier: Modifier = Modifier) {
-    val isHovered = remember { mutableStateOf(false) }
-    val backgroundColor =
-        if (isHovered.value) colorResource(id = R.color.hoverBackground) else Color.Transparent
-    Box( modifier = Modifier
-        .fillMaxWidth()
-        .clickable(onClick = { /* handle click here */ }) // Thêm padding cho phần tử để hiển thị background
-        .background(backgroundColor)
-        .animateContentSize() // Animation thay đổi kích thước content
-        .pointerInput(Unit) {
-            detectTapGestures(
-                onPress = { // onPress is a suspend function that pauses until the pointer is released
-                    isHovered.value = true
-                    tryAwaitRelease()
-                    isHovered.value = false
-                }
-            )
-        },) {
-        Text(
-            text = "Đăng nhập/ Đăng ký",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Medium,
-            color = colorResource(id = R.color.primary),
-            modifier = modifier
-        )
-    }
-}
+
+
 
 @Preview(showBackground = true)
 @Composable
 fun preview() {
-    UserTopBar()
+
 }

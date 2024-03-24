@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,10 +42,13 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.jetpackcomposedemo.R
 
 @Composable
-fun UserScreen(padding: PaddingValues){
+fun UserScreen(
+    padding: PaddingValues,
+){
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -58,6 +62,8 @@ fun UserScreen(padding: PaddingValues){
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(12.dp,16.dp)
                 )
+                
+
                 SettingElement(Icons.Filled.Notifications,"Thông báo")
                 SettingElement(Icons.Filled.AddCircle,"Ngôn ngữ","Tiếng Việt")
                 SettingElement(Icons.Filled.LocationOn,"Khu vực","Hồ Chí Minh")
@@ -122,18 +128,10 @@ fun SettingElement(
     Box(modifier = modifier
         .fillMaxWidth()
         .clickable(onClick = { /* handle click here */ }) // Thêm padding cho phần tử để hiển thị background
-        .background(backgroundColor)
-        .animateContentSize() // Animation thay đổi kích thước content
-        .pointerInput(Unit) {
-            detectTapGestures(
-                onPress = { // onPress is a suspend function that pauses until the pointer is released
-                    isHovered.value = true
-                    tryAwaitRelease()
-                    isHovered.value = false
-                }
-            )
-        },) {
-        Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(12.dp).fillMaxWidth()) {
+        ) {
+        Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+            .padding(12.dp)
+            .fillMaxWidth()) {
             Icon(imageVector = icon, contentDescription = null,tint = colorResource(id = R.color.primary) , modifier = Modifier.size(32.dp))
             Spacer(modifier = Modifier.width(16.dp))
             Text(text = text, style = MaterialTheme.typography.bodyLarge)

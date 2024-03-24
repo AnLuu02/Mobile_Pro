@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +23,7 @@ import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
+import com.example.jetpackcomposedemo.Screen.User.LoginScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
 
@@ -81,12 +83,15 @@ fun MainApp(){
                 composable("user"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
-                        topBar = { UserTopBar() },
+                        topBar = { UserTopBar(navController = navController) },
                         content = {padding,listState->
-                            UserScreen(padding = padding)
+                            UserScreen(padding = padding, )
                         })
                 }
 
+                composable("login") {
+                    LoginScreen(navController = navController)
+                }
                 composable(
                     "carddetail/{cardId}",
                     arguments = listOf(
@@ -102,3 +107,5 @@ fun MainApp(){
         }
     }
 }
+
+
