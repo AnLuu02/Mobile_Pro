@@ -78,7 +78,7 @@ fun <T> PriceCard(
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
+            shape = MaterialTheme.shapes.small,
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
 
         ) {

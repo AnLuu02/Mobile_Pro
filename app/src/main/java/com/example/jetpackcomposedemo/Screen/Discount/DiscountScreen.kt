@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.Screen.BookQuicklyScreen
+package com.example.jetpackcomposedemo.Screen.BookQuickly
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
@@ -7,9 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun BookQuicklyScreen(
-    padding:PaddingValues
+fun DiscountScreen(
+    padding: PaddingValues
+
 
 ) {
-    Text(text = "Hello đặt nhanh", style = MaterialTheme.typography.titleLarge,color = Color.Red)
+    Text(text = "Hello ưu đãi", style = MaterialTheme.typography.titleLarge,color = Color.Red)
 }

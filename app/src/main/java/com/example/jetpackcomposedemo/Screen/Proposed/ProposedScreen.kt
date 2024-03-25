@@ -1,6 +1,5 @@
 package com.example.jetpackcomposedemo.Screen.Proposed
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.components.Card.ImageRightCard
 import com.example.jetpackcomposedemo.Screen.Home.dataTest
 

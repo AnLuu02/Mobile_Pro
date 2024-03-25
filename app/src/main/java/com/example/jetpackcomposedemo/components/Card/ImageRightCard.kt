@@ -62,7 +62,7 @@ fun<T> ImageRightCard(
                         modifier = Modifier
                             .fillMaxSize()
                             .weight(0.5f),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = MaterialTheme.shapes.small
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.hotel_2),

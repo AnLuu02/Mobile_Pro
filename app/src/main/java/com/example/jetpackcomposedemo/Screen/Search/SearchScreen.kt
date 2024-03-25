@@ -1,20 +1,22 @@
-package com.example.jetpackcomposedemo.Screen.Home.widget
+package com.example.jetpackcomposedemo.Screen.Search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowOutward
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.rounded.ArrowDropDown
-import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -23,61 +25,50 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.Screen.CardDetails.BottomCardDetail
+import com.example.jetpackcomposedemo.Screen.CardDetails.TopCardDetail
 
 @Composable
-fun LocationSection(
-    onOpenScreenSearch:()->Unit
+fun SearchScreen(
+    closeSearchScreen:()->Unit
 ) {
+    Scaffold(
+        topBar = {
+            SearchTopBar(closeSearchScreen)
+        }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Location()
-        TextFieldSearch(onOpenScreenSearch)
-    }
+        ) { padding ->
 
-}
-@Composable
-fun Location() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.LocationOn,
-            contentDescription = "Location",
-            tint = Color.Red,
-
-
-            )
-
-        Text(
-            text = "Hồ Chí Minh",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = Color.Red
-
-        )
-
-        Icon(
-            imageVector = Icons.Rounded.ArrowDropDown,
-            contentDescription = "Arrow Down",
-            tint = Color.Red,
-
+        Box(
             modifier = Modifier
-                .scale(1.5f)
+                .padding(padding)
+                .fillMaxWidth()
+        ) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 32.dp)
+            ) {
+                TextFieldSearch(onOpenScreenSearch = {})
 
-        )
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier.fillMaxWidth(),
+
+                ) {
+                    Text(text = "Tìm kiếm", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                }
+
+            }
+        }
+
+
     }
 }
 
@@ -95,9 +86,8 @@ fun TextFieldSearch(
         shadowElevation = 4.dp, // Độ nâng của đổ bóng
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
             .clip(MaterialTheme.shapes.medium)
-            .clickable (
+            .clickable(
                 interactionSource = interactionSource,
                 indication = rememberRipple(bounded = true),
                 onClick = onOpenScreenSearch
@@ -117,7 +107,14 @@ fun TextFieldSearch(
                     contentDescription = "emailIcon"
                 )
             },
-            placeholder = { Text(text = "Enter your e-mail") },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.ArrowOutward,
+                    contentDescription = "emailIcon"
+                )
+            }
+            ,
+            placeholder = { Text(text = "Tìm địa điểm, khách sạn", fontWeight = FontWeight.Bold) },
 
             modifier = Modifier
                 .fillMaxWidth(),

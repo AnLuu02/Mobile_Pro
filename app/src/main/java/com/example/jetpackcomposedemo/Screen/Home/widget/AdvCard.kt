@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,7 +58,7 @@ fun AdvCard(
             modifier = Modifier
                 .height(270.dp)
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
+                .clip(MaterialTheme.shapes.small)
             ,
         ) {
 
@@ -81,7 +82,7 @@ fun AdvCard(
             ){
                 Box(
                     modifier = Modifier
-                        .background(Color.Black.copy(alpha = 0.3f), shape = RoundedCornerShape(24.dp))
+                        .background(Color.Black.copy(alpha = 0.3f), shape = MaterialTheme.shapes.large)
                     ,
                 ){
                     Row(

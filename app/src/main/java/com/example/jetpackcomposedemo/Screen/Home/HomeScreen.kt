@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.Screen.Home.widget.AdvCard
 import com.example.jetpackcomposedemo.Screen.Home.widget.CardSection
 import com.example.jetpackcomposedemo.components.Card.ImageRightCard
@@ -25,6 +27,7 @@ val dataTest = listOf(1, 2, 3, 4, 5)
 fun HomeScreen(
     padding:PaddingValues,
     listState:LazyListState,
+    onOpenScreenSearch: ()->Unit,
     onOpenDetailCardScreen: (String)->Unit
 ) {
     //test slide adv
@@ -44,7 +47,7 @@ fun HomeScreen(
             .padding(padding)
     ) {
         item {
-            LocationSection()
+            LocationSection(onOpenScreenSearch)
             ServiceSection()
 
             Spacer(modifier = Modifier.height(15.dp))
