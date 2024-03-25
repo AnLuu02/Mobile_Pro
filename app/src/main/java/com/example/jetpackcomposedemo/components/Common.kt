@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun TitleMain(
@@ -52,7 +51,7 @@ fun TitleMain(
                     contentDescription ="",
                     tint = Color.Gray,
                     modifier = Modifier.size(18.dp)
-                    )
+                )
 
             }
         }

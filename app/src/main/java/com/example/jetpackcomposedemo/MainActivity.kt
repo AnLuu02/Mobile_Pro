@@ -15,17 +15,17 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
-import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
-import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
 import com.example.jetpackcomposedemo.Screen.User.LoginScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
+import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
+import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,8 +63,8 @@ fun MainApp(){
                                 },
                                 onOpenDetailCardScreen = {cardId->
                                     navController.navigate("carddetail/$cardId")
+                                })
                         })
-                    })
                 }
 
                 composable("search") {
@@ -79,10 +79,10 @@ fun MainApp(){
                         navController = navController,
                         topBar = { ProposedTopBar() },
                         content = {padding,listState->
-                          ProposedScreen(padding = padding, onOpenDetailCardScreen = {cardId->
-                              navController.navigate("carddetail/$cardId")
-                          })
-                    })
+                            ProposedScreen(padding = padding, onOpenDetailCardScreen = {cardId->
+                                navController.navigate("carddetail/$cardId")
+                            })
+                        })
                 }
 
                 //Đặt phòng nhanh Screen
@@ -122,12 +122,12 @@ fun MainApp(){
                     "carddetail/{cardId}",
                     arguments = listOf(
                         navArgument("cardId") {
-                        type = NavType.StringType
-                    })
+                            type = NavType.StringType
+                        })
                 ) { backStackEntry ->
 
-                        val cardId = backStackEntry.arguments?.getString("cardId")
-                        CardDetailScreen(cardId = cardId,navController)
+                    val cardId = backStackEntry.arguments?.getString("cardId")
+                    CardDetailScreen(cardId = cardId,navController)
                 }
             }
         }

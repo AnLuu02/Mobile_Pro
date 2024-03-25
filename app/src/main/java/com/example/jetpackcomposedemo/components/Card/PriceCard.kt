@@ -3,6 +3,7 @@ package com.example.jetpackcomposedemo.components.Card
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,11 +18,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -29,24 +28,22 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
-import java.time.format.TextStyle
-
 
 
 @Composable
@@ -63,6 +60,9 @@ fun <T> PriceCard(
         LocalConfiguration.current.screenWidthDp.dp
     }
 
+    val interactionSource  = remember {
+        MutableInteractionSource()
+    }
     val sizeCard = screenWidth*10/12
 
     var lastPaddingEnd = 0.dp
@@ -74,20 +74,24 @@ fun <T> PriceCard(
     Box(
         modifier = Modifier
             .padding(start = 16.dp, end = lastPaddingEnd)
-            .clickable { onOpenDetailCardScreen(index.toString()) }
+            .clip(shape = MaterialTheme.shapes.small)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = rememberRipple(bounded = true)
+            ) { onOpenDetailCardScreen(index.toString()) }
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.small,
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            shape = MaterialTheme.shapes.small,
 
-        ) {
+            ) {
             Box(
                 modifier = Modifier
                     .width(sizeCard)
                     .then(if (isImageFull) Modifier.heightIn(max = sizeCard) else Modifier.wrapContentHeight())
                 ,
-                ) {
+            ) {
                 if (isImageFull) {
                     Image(
                         painter = painterResource(id = R.drawable.hotel_2),
@@ -127,7 +131,9 @@ fun <T> PriceCard(
                                     painter = painterResource(id = R.drawable.hotel_2),
                                     contentScale = ContentScale.Crop,
                                     contentDescription = null,
-                                    modifier = Modifier.fillMaxWidth().height(sizeCard*10/18)
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(sizeCard * 10 / 18)
                                 )
                             }
 
