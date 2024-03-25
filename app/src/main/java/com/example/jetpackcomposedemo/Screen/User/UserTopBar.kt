@@ -51,7 +51,7 @@ fun UserTopBar(navController: NavController) {
                     text = "Đăng nhập/ Đăng ký",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Medium,
-                    color = colorResource(id = R.color.primary),
+                    color = Color.Red,
                     modifier = Modifier.padding(12.dp,8.dp,12.dp,4.dp)
                 )
             }

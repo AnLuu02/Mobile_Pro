@@ -55,7 +55,7 @@ fun UserScreen(
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(12.dp,16.dp)
                 )
-                
+
 
                 SettingElement(Icons.Filled.Notifications,"Thông báo")
                 SettingElement(Icons.Filled.AddCircle,"Ngôn ngữ","Tiếng Việt")
@@ -115,24 +115,19 @@ fun SettingElement(
 ) {
 
     val isHovered = remember { mutableStateOf(false) }
-    val backgroundColor =
-        if (isHovered.value) colorResource(id = R.color.hoverBackground) else Color.Transparent
-
     Box(modifier = modifier
         .fillMaxWidth()
-        .clickable(onClick = { /* handle click here */ }) // Thêm padding cho phần tử để hiển thị background
-        ) {
+        .clickable(onClick = { /* handle click here */ })
+    ) {
         Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically, modifier = Modifier
             .padding(12.dp)
             .fillMaxWidth()) {
-            Icon(imageVector = icon, contentDescription = null,tint = colorResource(id = R.color.primary) , modifier = Modifier.size(32.dp))
+            Icon(imageVector = icon, contentDescription = null,tint = Color.Red , modifier = Modifier.size(32.dp))
             Spacer(modifier = Modifier.width(16.dp))
             Text(text = text, style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.weight(1f))
             if(setting != null) {
-                Text(text = setting, style = MaterialTheme.typography.labelMedium,color = colorResource(
-                    id = R.color.primary,
-                ), modifier = Modifier.padding(8.dp))
+                Text(text = setting, style = MaterialTheme.typography.labelMedium,color = Color.Red, modifier = Modifier.padding(8.dp))
             }
         }
     }
