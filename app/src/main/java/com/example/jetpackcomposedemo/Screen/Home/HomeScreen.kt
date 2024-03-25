@@ -18,6 +18,7 @@ import com.example.jetpackcomposedemo.Screen.Home.widget.CardSection
 import com.example.jetpackcomposedemo.components.Card.ImageRightCard
 import com.example.jetpackcomposedemo.Screen.Home.widget.LocationSection
 import com.example.jetpackcomposedemo.Screen.Home.widget.ServiceSection
+import com.example.jetpackcomposedemo.components.TitleMain
 
 
 val dataTest = listOf(1, 2, 3, 4, 5)
@@ -97,6 +98,7 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            TitleMain(title = "KHÁM PHÁ THÊM")
             ImageRightCard(index = 0, dataTest, onOpenDetailCardScreen = onOpenDetailCardScreen)
             ImageRightCard(index = 1, dataTest, isDiscount = true, onOpenDetailCardScreen = onOpenDetailCardScreen)
             ImageRightCard(index = 2, dataTest, onOpenDetailCardScreen =onOpenDetailCardScreen)

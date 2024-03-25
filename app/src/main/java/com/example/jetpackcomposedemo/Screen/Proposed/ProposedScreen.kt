@@ -37,6 +37,9 @@ fun ProposedScreen(
             ImageRightCard(index = 0, dataTest, onOpenDetailCardScreen =onOpenDetailCardScreen)
             ImageRightCard(index = 1, dataTest, isDiscount = true, onOpenDetailCardScreen = onOpenDetailCardScreen)
             ImageRightCard(index = 2, dataTest, onOpenDetailCardScreen =onOpenDetailCardScreen)
+            ImageRightCard(index = 3, dataTest, onOpenDetailCardScreen = onOpenDetailCardScreen)
+            ImageRightCard(index = 4, dataTest, isDiscount = true, onOpenDetailCardScreen = onOpenDetailCardScreen)
+            ImageRightCard(index = 5, dataTest, onOpenDetailCardScreen =onOpenDetailCardScreen)
 
         }
     }
