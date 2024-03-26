@@ -3,6 +3,8 @@ package com.example.jetpackcomposedemo.Screen.User
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -53,105 +55,119 @@ fun RegisterScreen(onCancelButtonClicked: () -> Unit = {},onClickedLoginText: ()
         MutableInteractionSource()
     }
     Column(modifier = Modifier.fillMaxSize()) {
-        Icon(
-            imageVector = Icons.Rounded.ArrowBackIosNew,
-            contentDescription = null,
-            tint = Color.Black,
-            modifier = Modifier
-                .size(30.dp)
-                .offset(16.dp,30.dp)
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = rememberRipple(bounded = false, radius = 24.dp),
-                    onClick = onCancelButtonClicked
-                )
-            ,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Go2Joy xin chào!", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp))
-        Text(text = "Đăng ký để đặt phòng với những ưu đãi độc quyền dành cho thành viên", textAlign = TextAlign.Start,modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp, 0.dp))
-        Spacer(modifier = Modifier.height(12.dp))
-        var phone by remember { mutableStateOf(TextFieldValue("")) }
-        OutlinedTextField(
-            value = phone,
-            onValueChange = {
-                phone = it
-            },
-            prefix ={ PrefixOfTextField()},
-            placeholder = { Text(text = "Số điện thoại",Modifier.height(24.dp)) },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues),
-            shape = RoundedCornerShape(8.dp)
-        )
-        var name by remember { mutableStateOf(TextFieldValue("")) }
-        OutlinedTextField(
-            value = name,
-            onValueChange = {
-                name = it
-            },
-            placeholder = { Text(text = "Tên của bạn",Modifier.height(24.dp)) },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues),
-            shape = RoundedCornerShape(8.dp)
-        )
-        val annotated = buildAnnotatedString {
-            append("Bằng việc đăng ký tài khoản,tôi đồng ý với")
-            // push green text style so that any appended text will be green
-            pushStyle(SpanStyle(color = colorResource(id = R.color.primary), textDecoration = TextDecoration.Underline))
-            // append new text, this text will be rendered as green
-            append(" Điều khoản và Chính sách bảo mật")
-            // pop the green style
-            pop()
-            // append a string without style
-
-
-            toAnnotatedString()
+        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            Icon(
+                imageVector = Icons.Rounded.ArrowBackIosNew,
+                contentDescription = null,
+                tint = Color.Black,
+                modifier = Modifier
+                    .size(20.dp)
+                    .offset(16.dp, 46.dp)
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = rememberRipple(bounded = false, radius = 24.dp),
+                        onClick = onCancelButtonClicked
+                    ),
+            )
         }
-        Text(text = annotated,Modifier.padding(paddingValues))
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier.fillMaxWidth().weight(6f)
+        )  {
+            Text(text = "Go2Joy xin chào!", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp))
+            Text(text = "Đăng ký để đặt phòng với những ưu đãi độc quyền dành cho thành viên", textAlign = TextAlign.Start,modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp, 0.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+            var phone by remember { mutableStateOf(TextFieldValue("")) }
+            OutlinedTextField(
+                value = phone,
+                onValueChange = {
+                    phone = it
+                },
+                prefix ={ PrefixOfTextField()},
+                placeholder = { Text(text = "Số điện thoại",Modifier.height(24.dp)) },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues),
+                shape = RoundedCornerShape(8.dp)
+            )
+            var name by remember { mutableStateOf(TextFieldValue("")) }
+            OutlinedTextField(
+                value = name,
+                onValueChange = {
+                    name = it
+                },
+                placeholder = { Text(text = "Tên của bạn",Modifier.height(24.dp)) },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues),
+                shape = RoundedCornerShape(8.dp)
+            )
+            val annotated = buildAnnotatedString {
+                append("Bằng việc đăng ký tài khoản,tôi đồng ý với")
+                // push green text style so that any appended text will be green
+                pushStyle(SpanStyle(color = Color.Red, textDecoration = TextDecoration.Underline))
+                // append new text, this text will be rendered as green
+                append(" Điều khoản và Chính sách bảo mật")
+                // pop the green style
+                pop()
+                // append a string without style
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(paddingValues)) {
+
+                toAnnotatedString()
+            }
+            Text(text = annotated,Modifier.padding(paddingValues))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(paddingValues)) {
 //            Button(onClick = { /*TODO*/ },modifier = Modifier.fillMaxWidth()) {
 //                Text(
 //                    text = "Đăng nhập & đặt phòng ngay",
 //                    fontSize = 16.sp,
 //                )
 //            }
-            Button(
-                onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.primary),
-                    contentColor = Color.White),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Tiếp tục",
-                    fontSize = 16.sp,
-                )
+                Button(
+                    onClick = { /*TODO*/ },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red,
+                        contentColor = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Tiếp tục",
+                        fontSize = 16.sp,
+                    )
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+                Text(text = "Hoặc đăng nhập bằng")
+                Row {
+                    Image(painter = painterResource(id = R.drawable.ic_fb),contentDescription = null,Modifier.padding(paddingValues))
+                    Image(painter = painterResource(id = R.drawable.ic_gg),contentDescription = null,Modifier.padding(paddingValues))
+                }
+
             }
-            Spacer(modifier = Modifier.height(32.dp))
-            Text(text = "Hoặc đăng nhập bằng")
-            Row {
-                Image(painter = painterResource(id = R.drawable.ic_fb),contentDescription = null,Modifier.padding(paddingValues))
-                Image(painter = painterResource(id = R.drawable.ic_gg),contentDescription = null,Modifier.padding(paddingValues))
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Row {
-                Text(text = "Bạn đã có tài khoản? ")
-                Text(text = "Đăng nhập ngay", color = colorResource(id = R.color.primary), textDecoration = TextDecoration.Underline, modifier = Modifier.clickable(onClick = onClickedLoginText))
-            }
+        }
+
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+            ,
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Bottom
+
+        ) {
+            Text(text = "Bạn đã có tài khoản? ")
+            Text(text = "Đăng nhập ngay", color = Color.Red, textDecoration = TextDecoration.Underline, modifier = Modifier.clickable(onClick = onClickedLoginText))
         }
 
     }
