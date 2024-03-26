@@ -46,7 +46,7 @@ fun MainApp(){
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            NavHost(navController = navController, startDestination = "home" ){
+            NavHost(navController = navController, startDestination = "login" ){
 
                 //Home Screen
                 composable("home"){

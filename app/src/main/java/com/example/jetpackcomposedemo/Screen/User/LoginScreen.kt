@@ -1,9 +1,12 @@
 package com.example.jetpackcomposedemo.Screen.User
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -51,98 +54,114 @@ fun LoginScreen(onCancelButtonClicked: () -> Unit = {},onClickedRegisterText: ()
     val interactionSource = remember{
         MutableInteractionSource()
     }
-    Column(modifier = Modifier.fillMaxSize()) {
-        Icon(
-            imageVector = Icons.Rounded.Close,
-            contentDescription = null,
-            tint = Color.Black,
-            modifier = Modifier
-                .size(30.dp)
-                .offset(16.dp,30.dp)
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = rememberRipple(bounded = false, radius = 24.dp),
-                    onClick = onCancelButtonClicked
-                )
-            ,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Go2Joy xin chào!", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp))
-        Text(text = "Đăng nhập để đặt phòng với những ưu đãi độc quyền dành cho thành viên", textAlign = TextAlign.Start,modifier = Modifier
-            .requiredWidth(300.dp)
-            .fillMaxWidth()
-            .padding(16.dp, 0.dp))
-        Spacer(modifier = Modifier.height(12.dp))
-        var text by remember { mutableStateOf("") }
-        var showError by remember { mutableStateOf(false) }
-        var errorMessage by remember { mutableStateOf<String?>(null) }
-        OutlinedTextField(
-            value = text,
-            onValueChange = {
-                text = it
-                showError = false
-            },
-            isError = showError,
-            prefix ={ PrefixOfTextField()},
-            placeholder = { Text(text = "Số điện thoại",Modifier.height(24.dp)) },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            modifier = Modifier
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+       Box(modifier = Modifier.fillMaxWidth().weight(1f)){
+           Icon(
+               imageVector = Icons.Rounded.Close,
+               contentDescription = null,
+               tint = Color.Black,
+               modifier = Modifier
+                   .size(20.dp)
+                   .offset(16.dp, 46.dp)
+                   .clickable(
+                       interactionSource = interactionSource,
+                       indication = rememberRipple(bounded = false, radius = 24.dp),
+                       onClick = onCancelButtonClicked
+                   )
+               ,
+           )
+       }
+        Column(
+            modifier = Modifier.fillMaxWidth().weight(6f)
+        ) {
+            Text(text = "Go2Joy xin chào!", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
+            Text(text = "Đăng nhập để đặt phòng với những ưu đãi độc quyền dành cho thành viên", textAlign = TextAlign.Start,modifier = Modifier
+                .requiredWidth(300.dp)
                 .fillMaxWidth()
-                .padding(paddingValues),
-            shape = RoundedCornerShape(8.dp)
-        )
-        errorMessage?.let {
-            Text(text = it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(start = 16.dp))
-        }
+                .padding(16.dp, 0.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+            var text by remember { mutableStateOf("") }
+            var showError by remember { mutableStateOf(false) }
+            var errorMessage by remember { mutableStateOf<String?>(null) }
+            OutlinedTextField(
+                value = text,
+                onValueChange = {
+                    text = it
+                    showError = false
+                },
+                isError = showError,
+                prefix ={ PrefixOfTextField()},
+                placeholder = { Text(text = "Số điện thoại",Modifier.height(24.dp)) },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues),
+                shape = RoundedCornerShape(8.dp)
+            )
+            errorMessage?.let {
+                Text(text = it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(start = 16.dp))
+            }
 
-        Spacer(modifier = Modifier.height(64.dp))
+            Spacer(modifier = Modifier.height(64.dp))
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(paddingValues)) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(paddingValues)) {
 //            Button(onClick = { /*TODO*/ },modifier = Modifier.fillMaxWidth()) {
 //                Text(
 //                    text = "Đăng nhập & đặt phòng ngay",
 //                    fontSize = 16.sp,
 //                )
 //            }
-            Button(
-                onClick = { authenticateUser(
-                    text,
-                    onAuthenticated = onCancelButtonClicked,
-                    onTextEmpty = {
-                        errorMessage = "Số điện thoại không được để trống"
-                        showError = true
-                    },
-                    onCredentialsInvalid = {
-                        errorMessage = "Số điện thoại không đúng"
-                        showError = true
-                    }
-                ) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red,
-                    contentColor = Color.White),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Đăng nhập & đặt phòng ngay",
-                    fontSize = 16.sp,
-                )
-            }
-            Spacer(modifier = Modifier.height(32.dp))
-            Text(text = "Hoặc đăng nhập bằng")
-            Row {
-                Image(painter = painterResource(id = R.drawable.ic_fb),contentDescription = null,Modifier.padding(paddingValues))
-                Image(painter = painterResource(id = R.drawable.ic_gg),contentDescription = null,Modifier.padding(paddingValues))
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Row {
-                Text(text = "Bạn chưa có tài khoản? ")
-                Text(text = "Đăng ký ngay", color = colorResource(id = R.color.primary), textDecoration = TextDecoration.Underline, modifier = Modifier.clickable(onClick = onClickedRegisterText))
+                Button(
+                    onClick = { authenticateUser(
+                        text,
+                        onAuthenticated = onCancelButtonClicked,
+                        onTextEmpty = {
+                            errorMessage = "Số điện thoại không được để trống"
+                            showError = true
+                        },
+                        onCredentialsInvalid = {
+                            errorMessage = "Số điện thoại không đúng"
+                            showError = true
+                        }
+                    ) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red,
+                        contentColor = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Đăng nhập & đặt phòng ngay",
+                        fontSize = 16.sp,
+                    )
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+                Text(text = "Hoặc đăng nhập bằng")
+                Row {
+                    Image(painter = painterResource(id = R.drawable.ic_fb),contentDescription = null,Modifier.padding(paddingValues))
+                    Image(painter = painterResource(id = R.drawable.ic_gg),contentDescription = null,Modifier.padding(paddingValues))
+                }
             }
         }
 
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+            ,
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Bottom
+
+        ) {
+            Text(text = "Bạn chưa có tài khoản? ")
+            Text(text = "Đăng ký ngay", color = colorResource(id = R.color.primary), textDecoration = TextDecoration.Underline, modifier = Modifier.clickable(onClick = onClickedRegisterText))
+        }
     }
 }
 val correctTelephoneNumber = "12345789"
