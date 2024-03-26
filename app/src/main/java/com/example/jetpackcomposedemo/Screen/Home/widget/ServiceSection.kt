@@ -110,12 +110,12 @@ fun ServiceItem(
         Icon(
             imageVector = item.icon,
             contentDescription = "",
-            tint = MaterialTheme.colorScheme.primary
+            tint = Color.Red
         )
 
         Text(
             text = item.title,
-            color = Color.Red,
+            color = Color.Black,
             style = MaterialTheme.typography.bodySmall
         )
     }

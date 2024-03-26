@@ -86,7 +86,7 @@ fun LoginScreen(navController: NavController,paddingValues: PaddingValues = Padd
             Button(
                 onClick = { /*TODO*/ },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.primary),
+                    containerColor = Color.Red,
                     contentColor = Color.White),
                 modifier = Modifier.fillMaxWidth()
             ) {

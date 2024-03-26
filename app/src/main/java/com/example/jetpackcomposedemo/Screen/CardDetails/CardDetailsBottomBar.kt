@@ -55,7 +55,10 @@ fun BottomCardDetail(){
                         BorderStroke(1.dp, Color.Red),
                         shape = MaterialTheme.shapes.extraLarge
                     )
-                    .background(Color.Red.copy(alpha = 0.1f), shape = MaterialTheme.shapes.extraLarge)
+                    .background(
+                        Color.Red.copy(alpha = 0.1f),
+                        shape = MaterialTheme.shapes.extraLarge
+                    )
             ) {
                 Row(
                     modifier = Modifier
