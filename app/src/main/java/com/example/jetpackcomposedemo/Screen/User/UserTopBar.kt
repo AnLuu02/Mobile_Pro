@@ -16,12 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.jetpackcomposedemo.R
 
 @Composable
 fun UserTopBar(onLoginButtonClicked: () -> Unit = {} ) {
@@ -33,7 +30,7 @@ fun UserTopBar(onLoginButtonClicked: () -> Unit = {} ) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column() {
+        Column {
             Text(
                 text = "Đăng ký ngay để nhận nhiều ưu đãi hấp dẫn.",
                 style = MaterialTheme.typography.bodyLarge,

@@ -103,7 +103,7 @@ fun RegisterScreen(onCancelButtonClicked: () -> Unit = {},onClickedLoginText: ()
                 },
                 placeholder = { Text(text = "Tên của bạn",Modifier.height(24.dp)) },
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
                 ),
                 modifier = Modifier

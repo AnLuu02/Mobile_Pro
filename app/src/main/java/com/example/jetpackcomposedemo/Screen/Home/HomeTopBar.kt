@@ -53,12 +53,11 @@ fun HomeTopBar(
     ) {
         Box(modifier = Modifier
             .clip(RoundedCornerShape(15.dp))
-            .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(6.dp)
         ){
 
             Image(
-                painter = painterResource(id = R.drawable.ic_visa),
+                painter = painterResource(id = R.drawable.logo_app),
                 contentDescription ="Logo",
                 modifier = Modifier.width(60.dp)
             )
