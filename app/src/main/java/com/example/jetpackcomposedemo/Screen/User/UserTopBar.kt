@@ -49,15 +49,15 @@ fun UserTopBar(onLoginButtonClicked: () -> Unit = {} ) {
             ) {
                 Text(
                     text = "Đăng nhập/ Đăng ký",
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
                     color = Color.Red,
-                    modifier = Modifier.padding(12.dp,8.dp,12.dp,4.dp)
+                    modifier = Modifier.padding(12.dp,8.dp,12.dp,12.dp)
                 )
             }
             Spacer(modifier = Modifier
                 .fillMaxWidth()
-                .height(0.5.dp)
+                .height(1.dp)
                 .border(1.dp, color = Color.LightGray))
         }
 
