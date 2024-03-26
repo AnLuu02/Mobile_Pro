@@ -24,7 +24,7 @@ import androidx.navigation.NavController
 import com.example.jetpackcomposedemo.R
 
 @Composable
-fun UserTopBar(navController: NavController) {
+fun UserTopBar(onLoginButtonClicked: () -> Unit = {} ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -44,7 +44,7 @@ fun UserTopBar(navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = { navController.navigate("login") })
+                    .clickable(onClick =  onLoginButtonClicked )
 
             ) {
                 Text(

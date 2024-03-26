@@ -113,8 +113,6 @@ fun SettingElement(
     setting: String? = null,
     modifier: Modifier = Modifier
 ) {
-
-    val isHovered = remember { mutableStateOf(false) }
     Box(modifier = modifier
         .fillMaxWidth()
         .clickable(onClick = { /* handle click here */ })

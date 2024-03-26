@@ -21,7 +21,9 @@ import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
+import com.example.jetpackcomposedemo.Screen.User.Authentication
 import com.example.jetpackcomposedemo.Screen.User.LoginScreen
+import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
@@ -105,14 +107,19 @@ fun MainApp(){
                 composable("user"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
-                        topBar = { UserTopBar(navController = navController) },
+                        topBar = { UserTopBar(onLoginButtonClicked = { navController.navigate("login") }) },
                         content = {padding,listState->
                             UserScreen(padding = padding, )
                         })
                 }
 
                 composable("login") {
-                    LoginScreen(navController = navController)
+                    LoginScreen(onCancelButtonClicked = { navController.popBackStack("user", inclusive = false) }, onClickedRegisterText = {navController.navigate("register")})
+
+                }
+
+                composable("register") {
+                    RegisterScreen(onCancelButtonClicked = { navController.popBackStack() }, onClickedLoginText = { navController.navigate("login") })
                 }
 
 
