@@ -16,6 +16,7 @@ import androidx.navigation.navArgument
 import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
+import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
@@ -96,7 +97,9 @@ fun MainApp(){
 
                 //Ưu đãi Screen
                 composable("discount"){
-                    ScreenWithBottomNavigationBar(navController = navController, content = {padding,listState->
+                    ScreenWithBottomNavigationBar(navController = navController, topBar = {
+                        DiscountTopBar()
+                    }, content = {padding,listState->
                         DiscountScreen(padding = padding)
                     })
                 }
