@@ -228,7 +228,8 @@ fun DiscountScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(12.dp)
+                        .padding(12.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
 
                     Text(
@@ -241,7 +242,6 @@ fun DiscountScreen(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.Top
                     ) {
 
@@ -263,7 +263,6 @@ fun DiscountScreen(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.Top
 
                     ) {
@@ -286,7 +285,6 @@ fun DiscountScreen(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.Top
                     ) {
 
@@ -371,10 +369,10 @@ fun DiscountScreen(
                         Spacer(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(0.2.dp)
+                                .height(1.dp)
                                 .padding(start = 16.dp, end = 16.dp)
                                 .align(Alignment.BottomCenter)
-                                .background(Color.Gray)
+                                .background(Color.Black.copy(alpha = 0.1f))
                             ,
                         )
                     }
@@ -418,10 +416,10 @@ fun DiscountScreen(
                         Spacer(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(0.2.dp)
+                                .height(1.dp)
                                 .padding(start = 16.dp, end = 16.dp)
                                 .align(Alignment.BottomCenter)
-                                .background(Color.Gray)
+                                .background(Color.Black.copy(alpha = 0.1f))
                             ,
                         )
                     }
@@ -464,10 +462,10 @@ fun DiscountScreen(
                         Spacer(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(0.2.dp)
+                                .height(1.dp)
                                 .padding(start = 16.dp, end = 16.dp)
                                 .align(Alignment.BottomCenter)
-                                .background(Color.Gray)
+                                .background(Color.Black.copy(alpha = 0.1f))
                             ,
                         )
                     }
