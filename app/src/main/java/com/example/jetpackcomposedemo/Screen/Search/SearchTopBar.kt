@@ -62,7 +62,7 @@ fun SearchTopBar(
 ) {
 
     val interactionSource = remember { MutableInteractionSource() }
-    var currentNavItem =     remember { mutableStateOf("hourly") }
+    val currentNavItem =     remember { mutableStateOf("hourly") }
 
     Column(
         modifier = Modifier.fillMaxWidth().shadow(elevation = 2.dp)

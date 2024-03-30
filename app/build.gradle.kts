@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,8 +81,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
     //material 3
-//    implementation ("androidx.compose.material3:material3:$material3_version")
-
+    implementation ("androidx.compose.material3:material3:1.1.0-alpha08")
 
     // Android Maps Compose composables for the Maps SDK for Android
     implementation ("com.google.maps.android:maps-compose:4.3.3")
@@ -90,5 +90,6 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.3.0")
     implementation("com.google.accompanist:accompanist-pager:0.35.0-alpha")
     implementation("androidx.compose.ui:ui:1.0.0-alpha01")
+
 
 }

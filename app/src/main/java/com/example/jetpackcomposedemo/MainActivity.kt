@@ -1,8 +1,10 @@
 package com.example.jetpackcomposedemo
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,19 +28,30 @@ import com.example.jetpackcomposedemo.Screen.User.LoginScreen
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
+import com.example.jetpackcomposedemo.components.CalenderPicker.DateRangePickerScreen
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MainApp()
+//            JetpackComposeDemoTheme {
+//                Surface(
+//                    modifier = Modifier.fillMaxSize(),
+//                    color = MaterialTheme.colorScheme.background
+//                ) {
+//                    DateRangePickerScreen(true)
+//                }
+//            }
         }
     }
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainApp(){
     val navController = rememberNavController()
@@ -137,7 +150,6 @@ fun MainApp(){
                         }
                     )
                 }
-
 
 
                 //handle payload
