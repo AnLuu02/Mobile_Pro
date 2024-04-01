@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.components.CalenderPicker
+package com.example.jetpackcomposedemo.components.CalenderDatePicker
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

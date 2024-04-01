@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.components.CalenderPicker
+package com.example.jetpackcomposedemo.components.CalenderDatePicker
 
 import android.os.Build
 import androidx.annotation.RequiresApi

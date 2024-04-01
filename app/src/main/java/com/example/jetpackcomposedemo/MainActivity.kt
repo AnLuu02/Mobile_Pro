@@ -32,8 +32,8 @@ import com.example.jetpackcomposedemo.Screen.User.LoginScreen
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
-import com.example.jetpackcomposedemo.components.CalenderPicker.DatePickerScreen
-import com.example.jetpackcomposedemo.components.CalenderPicker.DateRangePickerScreen
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerScreen
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DateRangePickerScreen
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 
