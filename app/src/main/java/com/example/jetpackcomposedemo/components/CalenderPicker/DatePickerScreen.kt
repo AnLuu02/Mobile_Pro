@@ -134,14 +134,7 @@ fun DatePickerScreen(
                         }
                     }
 
-
-
-
-
-                    Spacer(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(0.5.dp)
-                        .background(Color.Gray))
+                    Spacer(modifier = Modifier.fillMaxWidth().height(0.5.dp).background(Color.Gray))
 
                     Column(
                         modifier = Modifier
@@ -154,8 +147,9 @@ fun DatePickerScreen(
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(start=12.dp)
                         )
-                        Spacer(modifier = Modifier
-                            .height(12.dp))
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
                         LazyRow {
                             var lastPadding = 0.dp;
                             items(listOf(2,3,4,5,6,7,8,9,10)){
