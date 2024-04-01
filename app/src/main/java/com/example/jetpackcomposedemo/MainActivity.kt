@@ -5,6 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -28,6 +32,7 @@ import com.example.jetpackcomposedemo.Screen.User.LoginScreen
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
+import com.example.jetpackcomposedemo.components.CalenderPicker.DatePickerScreen
 import com.example.jetpackcomposedemo.components.CalenderPicker.DateRangePickerScreen
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
@@ -43,7 +48,7 @@ class MainActivity : ComponentActivity() {
 //                    modifier = Modifier.fillMaxSize(),
 //                    color = MaterialTheme.colorScheme.background
 //                ) {
-//                    DateRangePickerScreen(true)
+//                    DateRangePickerScreen(visible = true, onCloseCalenderScreen = {})
 //                }
 //            }
         }
@@ -82,11 +87,45 @@ fun MainApp(){
                         })
                 }
 
+                // search widget
                 composable("search") {
-                    SearchScreen(closeSearchScreen={
-                        navController.popBackStack()
-                    })
+                    SearchScreen(
+                        onOpenDatePickerScreen = {searchCategory->
+                            navController.navigate("calender/$searchCategory")
+                        }
+                        ,closeSearchScreen={
+                            navController.popBackStack()
+                        })
                 }
+
+                composable(
+                    "calender/{searchCategory}",
+                    arguments = listOf(
+                        navArgument("searchCategory") {
+                            type = NavType.StringType
+                        }),
+                    enterTransition = {
+                        fadeIn(animationSpec = tween(1000)) + slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Up, tween(1000)
+                        )
+                    },
+                    exitTransition ={
+                        fadeOut(animationSpec = tween(1000)) + slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Down, tween(1000)
+                        )
+                    },
+                    popEnterTransition = { fadeIn(animationSpec = tween(1000)) },
+                    popExitTransition = { fadeOut(animationSpec = tween(1000)) }
+                ) { backStackEntry ->
+
+                    val searchCategory = backStackEntry.arguments?.getString("searchCategory")
+                    when(searchCategory){
+                        "hourly"-> DatePickerScreen{navController.popBackStack()}
+                        "overnight"-> DateRangePickerScreen {navController.popBackStack()}
+                        "bydate"-> DateRangePickerScreen {navController.popBackStack()}
+                    }
+                }
+
 
                 // Đề xuất Screen
                 composable("proposed"){

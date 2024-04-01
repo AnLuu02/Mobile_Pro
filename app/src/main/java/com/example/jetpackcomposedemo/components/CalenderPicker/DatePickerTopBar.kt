@@ -42,7 +42,6 @@ fun DatePickerTopBar(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp)
     ) {
 
         Box(
@@ -72,7 +71,7 @@ fun DatePickerTopBar(
             }
             Text(
                 text = "Chọn thời gian",
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.align(Alignment.Center),
                 fontWeight = FontWeight.Bold
             )

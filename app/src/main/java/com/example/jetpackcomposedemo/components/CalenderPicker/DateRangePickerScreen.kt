@@ -3,16 +3,10 @@
 package com.example.jetpackcomposedemo.components.CalenderPicker
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DateRangePicker
@@ -33,7 +27,6 @@ import java.time.ZoneId
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DateRangePickerScreen(
-    visible:Boolean,
     onCloseCalenderScreen:()->Unit
 ) {
     val dateTime = LocalDateTime.now()
@@ -47,30 +40,10 @@ fun DateRangePickerScreen(
         )
     }
 
-    AnimatedVisibility(
-        visible = visible,
-        enter = slideInVertically(
-            initialOffsetY = { fullHeight -> fullHeight },
-            animationSpec = tween(
-                durationMillis = 300,
-                easing = LinearEasing,
-            )
-        ) + fadeIn(
-            animationSpec = tween(
-                durationMillis = 300,
-                easing = LinearEasing
-            ),
-            initialAlpha = 1f),
-        exit = slideOutVertically(targetOffsetY = {fullHeight -> fullHeight },
-            animationSpec = tween(
-                durationMillis = 300,
-                easing = LinearEasing
-            )) + fadeOut(animationSpec = tween(
-            durationMillis = 300,
-            easing = LinearEasing
-        ),
-            targetAlpha = 1f),
-        modifier = Modifier.background(Color.Black.copy(alpha = 0.1f))
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.Black.copy(alpha = 0.1f))
+
     ) {
         Scaffold(
             topBar = {
@@ -78,19 +51,22 @@ fun DateRangePickerScreen(
                     onCloseCalenderScreen()
                 })
             },
+            bottomBar = { DatePickerBottomBar() },
             modifier = Modifier
                 .padding(top = 46.dp)
                 .clip(shape = MaterialTheme.shapes.extraLarge)
 
-
         ) { padding ->
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
                 DateRangePicker(
                     state = dateRangePickerState,
                     title = null,
                     headline = null,
+                    dateValidator = { it >= System.currentTimeMillis() },
                     showModeToggle = false,
                     colors = DatePickerDefaults.colors(
                         dayInSelectionRangeContainerColor = Color.Red,
@@ -107,6 +83,5 @@ fun DateRangePickerScreen(
         }
     }
 }
-
 @RequiresApi(Build.VERSION_CODES.O)
 fun LocalDateTime.toMillis() = this.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()

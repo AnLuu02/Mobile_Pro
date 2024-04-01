@@ -2,8 +2,6 @@ package com.example.jetpackcomposedemo.Screen.Search
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,22 +41,26 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.jetpackcomposedemo.components.CalenderPicker.DateRangePickerScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SearchScreen(
+    onOpenDatePickerScreen:(String)->Unit,
     closeSearchScreen:()->Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val interactionSource1 = remember { MutableInteractionSource() }
-
-    val isVisible = remember {
-        mutableStateOf(false)
+    val searchCategory = remember {
+        mutableStateOf("")
     }
+
     Scaffold(
         topBar = {
-            SearchTopBar(closeSearchScreen)
+            SearchTopBar(
+                searchCategory = {i->
+                    searchCategory.value = i
+                },
+                closeSearchScreen)
         }
 
     ) { padding ->
@@ -95,7 +97,7 @@ fun SearchScreen(
                                 interactionSource = interactionSource1,
                                 indication = rememberRipple(bounded = true)
                             ) {
-                                isVisible.value = !isVisible.value
+                                onOpenDatePickerScreen(searchCategory.value)
                             }
                     ) {
                         Row(
@@ -185,10 +187,6 @@ fun SearchScreen(
         }
 
 
-    }
-
-    DateRangePickerScreen(isVisible.value){
-        isVisible.value = !isVisible.value
     }
 }
 

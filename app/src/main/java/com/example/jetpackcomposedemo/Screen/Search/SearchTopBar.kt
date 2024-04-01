@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.DateRange
-import androidx.compose.material.icons.rounded.HourglassTop
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -37,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.data.SearchSubNav
-import com.example.jetpackcomposedemo.data.ServicesUI
 
 val itemsSubNav = listOf(
     SearchSubNav(
@@ -58,12 +55,13 @@ val itemsSubNav = listOf(
 )
 @Composable
 fun SearchTopBar(
+    searchCategory:(String)->Unit,
     closeSearchScreen:()->Unit
 ) {
 
     val interactionSource = remember { MutableInteractionSource() }
     val currentNavItem =     remember { mutableStateOf("hourly") }
-
+    searchCategory(currentNavItem.value)
     Column(
         modifier = Modifier.fillMaxWidth().shadow(elevation = 2.dp)
     ) {
@@ -115,6 +113,7 @@ fun SearchTopBar(
                 itemsSubNav.forEach {item->
                     SubNavItem(item,currentNavItem.value == item.route, onClick = {
                         currentNavItem.value = item.route
+                        searchCategory(item.route)
                     })
                 }
             }
