@@ -26,6 +26,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -34,11 +35,12 @@ fun DateRangePickerScreen(
     onCloseCalenderScreen:()->Unit
 ) {
     val dateTime = LocalDateTime.now()
+    println(System.currentTimeMillis())
     val dateRangePickerState = remember {
         DateRangePickerState(
             initialSelectedStartDateMillis = dateTime.toMillis(),
             initialDisplayedMonthMillis = null,
-            initialSelectedEndDateMillis = dateTime.plusDays(3).toMillis(),
+            initialSelectedEndDateMillis = dateTime.plusDays(1).toMillis(),
             initialDisplayMode = DisplayMode.Picker,
             yearRange = (dateTime.year..2024)
         )
@@ -66,12 +68,12 @@ fun DateRangePickerScreen(
         Scaffold(
             topBar = {
                 DatePickerTopBar(
-                    dateCheckin = formattedStartDate,
-                    dateCheckout = formattedEndDate,
+                    checkIn = formattedStartDate,
+                    checkOut = formattedEndDate,
                     totalDate = if (totalDaysSelected>0) totalDaysSelected else 0,
                     onCloseCalenderScreen = {
-                    onCloseCalenderScreen()
-                })
+                        onCloseCalenderScreen()
+                    })
             },
             bottomBar = { DatePickerBottomBar(){} },
             modifier = Modifier
@@ -88,7 +90,17 @@ fun DateRangePickerScreen(
                     state = dateRangePickerState,
                     title = null,
                     headline = null,
-                    dateValidator = { it >= System.currentTimeMillis()-100000000 },
+                    dateValidator = {
+                        val calendarNow = Calendar.getInstance()
+                        with(calendarNow) {
+                            set(Calendar.HOUR_OF_DAY, 0)
+                            set(Calendar.MINUTE, 0)
+                            set(Calendar.SECOND, 0)
+                            set(Calendar.MILLISECOND, 0)
+                        }
+                        return@DateRangePicker it >= calendarNow.timeInMillis
+
+                    },
                     showModeToggle = false,
                     colors = DatePickerDefaults.colors(
                         dayInSelectionRangeContainerColor = Color.Red,

@@ -33,9 +33,11 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DatePickerTopBar(
-    dateCheckin:String,
-    dateCheckout:String,
+    isHourly:Boolean = false,
+    checkIn:String,
+    checkOut:String,
     totalDate: Long = 1,
+    totalHourlyCheckin: Long = 1,
     onCloseCalenderScreen: ()->Unit
 ) {
     val interactionSource = remember {
@@ -107,7 +109,7 @@ fun DatePickerTopBar(
                 ) {
                     Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = dateCheckin, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(text = checkIn, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                 }
 
@@ -133,7 +135,7 @@ fun DatePickerTopBar(
                 ) {
                     Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = dateCheckout, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(text = checkOut, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                 }
 
@@ -156,9 +158,9 @@ fun DatePickerTopBar(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(start=12.dp)
                 ) {
-                    Text(text = "Số ngày", style = MaterialTheme.typography.bodySmall)
+                    Text(text = if(isHourly) "Số giờ" else "Số ngày", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = totalDate.toString(), color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(text = if(isHourly) totalHourlyCheckin.toString() else totalDate.toString(), color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                 }
 

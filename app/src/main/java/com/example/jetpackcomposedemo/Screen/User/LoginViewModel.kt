@@ -2,10 +2,8 @@ package com.example.jetpackcomposedemo.Screen.User
 
 import android.app.Activity
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
@@ -77,7 +75,7 @@ class LoginViewModel : ViewModel() {
             }).build()
         PhoneAuthProvider.verifyPhoneNumber(options)
     }
-     fun otpVerification(otp: String,activity: Activity,onSuccess:()->Unit) {
+    fun otpVerification(otp: String,activity: Activity,onSuccess:()->Unit) {
         val credential = PhoneAuthProvider.getCredential(verificationOtp, otp)
         FirebaseAuth.getInstance().signInWithCredential(credential)
             .addOnCompleteListener(activity) { task ->
