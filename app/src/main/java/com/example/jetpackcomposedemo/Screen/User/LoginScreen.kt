@@ -1,5 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.User
 
+import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,10 +50,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackcomposedemo.R
 
 @Composable
-fun LoginScreen(onCancelButtonClicked: () -> Unit = {},onClickedRegisterText: () -> Unit = {},paddingValues: PaddingValues = PaddingValues(16.dp)) {
+fun LoginScreen(loginViewModel : LoginViewModel = viewModel(),
+                onCancelButtonClicked: () -> Unit = {},
+                onClickedRegisterText: () -> Unit = {},
+                paddingValues: PaddingValues = PaddingValues(16.dp),)
+{
+    val activity = LocalContext.current as Activity
     val interactionSource = remember{
         MutableInteractionSource()
     }
@@ -58,7 +67,9 @@ fun LoginScreen(onCancelButtonClicked: () -> Unit = {},onClickedRegisterText: ()
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-       Box(modifier = Modifier.fillMaxWidth().weight(1f)){
+       Box(modifier = Modifier
+           .fillMaxWidth()
+           .weight(1f)){
            Icon(
                imageVector = Icons.Rounded.Close,
                contentDescription = null,
@@ -75,7 +86,9 @@ fun LoginScreen(onCancelButtonClicked: () -> Unit = {},onClickedRegisterText: ()
            )
        }
         Column(
-            modifier = Modifier.fillMaxWidth().weight(6f)
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(6f)
         ) {
             Text(text = "Go2Joy xin chào!", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
             Text(text = "Đăng nhập để đặt phòng với những ưu đãi độc quyền dành cho thành viên", textAlign = TextAlign.Start,modifier = Modifier
@@ -83,16 +96,11 @@ fun LoginScreen(onCancelButtonClicked: () -> Unit = {},onClickedRegisterText: ()
                 .fillMaxWidth()
                 .padding(16.dp, 0.dp))
             Spacer(modifier = Modifier.height(12.dp))
-            var text by remember { mutableStateOf("") }
-            var showError by remember { mutableStateOf(false) }
-            var errorMessage by remember { mutableStateOf<String?>(null) }
+
             OutlinedTextField(
-                value = text,
-                onValueChange = {
-                    text = it
-                    showError = false
-                },
-                isError = showError,
+                value = loginViewModel.phoneNumber,
+                onValueChange = { loginViewModel.updatePhoneNumber(it) },
+                isError = loginViewModel.showError,
                 prefix ={ PrefixOfTextField()},
                 placeholder = { Text(text = "Số điện thoại",Modifier.height(24.dp)) },
                 keyboardOptions = KeyboardOptions.Default.copy(
@@ -104,7 +112,7 @@ fun LoginScreen(onCancelButtonClicked: () -> Unit = {},onClickedRegisterText: ()
                     .padding(paddingValues),
                 shape = RoundedCornerShape(8.dp)
             )
-            errorMessage?.let {
+            loginViewModel.errorMessage?.let {
                 Text(text = it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(start = 16.dp))
             }
 
@@ -118,18 +126,7 @@ fun LoginScreen(onCancelButtonClicked: () -> Unit = {},onClickedRegisterText: ()
 //                )
 //            }
                 Button(
-                    onClick = { authenticateUser(
-                        text,
-                        onAuthenticated = onCancelButtonClicked,
-                        onTextEmpty = {
-                            errorMessage = "Số điện thoại không được để trống"
-                            showError = true
-                        },
-                        onCredentialsInvalid = {
-                            errorMessage = "Số điện thoại không đúng"
-                            showError = true
-                        }
-                    ) },
+                    onClick = { loginViewModel.send(loginViewModel.phoneNumber,activity) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Red,
                         contentColor = Color.White),
@@ -147,6 +144,19 @@ fun LoginScreen(onCancelButtonClicked: () -> Unit = {},onClickedRegisterText: ()
                     Image(painter = painterResource(id = R.drawable.ic_gg),contentDescription = null,Modifier.padding(paddingValues))
                 }
             }
+            // OTP Diaglog
+            if(loginViewModel.isDialogShown) {
+                DialogOTP(
+                    onDismiss = { /*TODO*/
+                        loginViewModel.onDissmissDialog()
+                    },
+                    onConfirm = {otp ->
+                        if (otp.isNotEmpty()) {
+                            loginViewModel.otpVerification(otp,activity,onSuccess = onCancelButtonClicked)
+                        }
+                    }
+                )
+            }
         }
 
         Row(
@@ -163,23 +173,13 @@ fun LoginScreen(onCancelButtonClicked: () -> Unit = {},onClickedRegisterText: ()
             Text(text = "Đăng ký ngay", color = colorResource(id = R.color.primary), textDecoration = TextDecoration.Underline, modifier = Modifier.clickable(onClick = onClickedRegisterText))
         }
     }
-}
-val correctTelephoneNumber = "12345789"
 
-private fun authenticateUser(
-    inputTelephone: String,
-    onAuthenticated: () -> Unit,
-    onTextEmpty: () -> Unit,
-    onCredentialsInvalid: () -> Unit
-) {
-    if(inputTelephone.isEmpty()) {
-        onTextEmpty()
-    }else if (inputTelephone == correctTelephoneNumber ) {
-        onAuthenticated()
-    } else {
-        onCredentialsInvalid()
-    }
 }
+
+
+
+
+
 
 @Composable
 fun PrefixOfTextField() {
