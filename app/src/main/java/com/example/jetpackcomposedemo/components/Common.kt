@@ -56,6 +56,4 @@ fun TitleMain(
             }
         }
     }
-
-
 }

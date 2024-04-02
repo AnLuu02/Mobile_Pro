@@ -17,7 +17,6 @@ fun ScreenWithBottomNavigationBar(
     content: @Composable (PaddingValues,LazyListState) -> Unit
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
     val listState = rememberLazyListState()
 
     Scaffold(

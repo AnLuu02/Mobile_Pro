@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DatePickerBottomBar(
+    onHandleClick:()->Unit
 ) {
     val interactionSource = remember {
         MutableInteractionSource()
@@ -51,7 +52,7 @@ fun DatePickerBottomBar(
             )
 
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { onHandleClick() },
                 modifier = Modifier.clip(MaterialTheme.shapes.small),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Red,

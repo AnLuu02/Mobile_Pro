@@ -21,12 +21,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DateRangePickerScreen(
+    isEverynight: Boolean = false,
     onCloseCalenderScreen:()->Unit
 ) {
     val dateTime = LocalDateTime.now()
@@ -40,6 +44,20 @@ fun DateRangePickerScreen(
         )
     }
 
+    val dateFormatter = DateTimeFormatter.ofPattern("dd/MM")
+    val selectedStartDate = dateRangePickerState.selectedStartDateMillis?.let {
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
+    } ?: dateTime
+
+    val selectedEndDate = dateRangePickerState.selectedEndDateMillis?.let {
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
+    } ?: dateTime.plusDays(3)
+
+    val formattedStartDate = selectedStartDate.format(dateFormatter)
+    val formattedEndDate = selectedEndDate.format(dateFormatter)
+
+    val totalDaysSelected = ChronoUnit.DAYS.between(selectedStartDate, selectedEndDate) + 1
+
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.Black.copy(alpha = 0.1f))
@@ -47,11 +65,15 @@ fun DateRangePickerScreen(
     ) {
         Scaffold(
             topBar = {
-                DatePickerTopBar(onCloseCalenderScreen = {
+                DatePickerTopBar(
+                    dateCheckin = formattedStartDate,
+                    dateCheckout = formattedEndDate,
+                    totalDate = if (totalDaysSelected>0) totalDaysSelected else 0,
+                    onCloseCalenderScreen = {
                     onCloseCalenderScreen()
                 })
             },
-            bottomBar = { DatePickerBottomBar() },
+            bottomBar = { DatePickerBottomBar(){} },
             modifier = Modifier
                 .padding(top = 46.dp)
                 .clip(shape = MaterialTheme.shapes.extraLarge)
@@ -66,7 +88,7 @@ fun DateRangePickerScreen(
                     state = dateRangePickerState,
                     title = null,
                     headline = null,
-                    dateValidator = { it >= System.currentTimeMillis() },
+                    dateValidator = { it >= System.currentTimeMillis()-100000000 },
                     showModeToggle = false,
                     colors = DatePickerDefaults.colors(
                         dayInSelectionRangeContainerColor = Color.Red,

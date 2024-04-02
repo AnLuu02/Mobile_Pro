@@ -33,6 +33,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DatePickerTopBar(
+    dateCheckin:String,
+    dateCheckout:String,
+    totalDate: Long = 1,
     onCloseCalenderScreen: ()->Unit
 ) {
     val interactionSource = remember {
@@ -104,7 +107,7 @@ fun DatePickerTopBar(
                 ) {
                     Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = "08/04", color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(text = dateCheckin, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                 }
 
@@ -130,7 +133,7 @@ fun DatePickerTopBar(
                 ) {
                     Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = "12/04", color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(text = dateCheckout, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                 }
 
@@ -155,7 +158,7 @@ fun DatePickerTopBar(
                 ) {
                     Text(text = "Số ngày", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = "2", color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(text = totalDate.toString(), color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                 }
 

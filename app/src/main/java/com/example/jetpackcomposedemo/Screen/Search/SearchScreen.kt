@@ -141,7 +141,7 @@ fun SearchScreen(
                                     horizontalAlignment = Alignment.Start,
                                     modifier = Modifier.padding(start=16.dp)
                                 ) {
-                                    Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
+                                    Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Text(text = "Bất kì", color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
