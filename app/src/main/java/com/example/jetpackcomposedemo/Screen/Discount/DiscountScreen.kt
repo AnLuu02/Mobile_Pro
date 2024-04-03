@@ -37,10 +37,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.R
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun DiscountScreen(
-    padding: PaddingValues
+    padding: PaddingValues,
+    navController: NavHostController
 
 ) {
 
@@ -69,6 +73,9 @@ fun DiscountScreen(
                         modifier = Modifier
                             .size(screenWidth * 10 / 37)
                             .background(Color.White)
+                            .clickable{
+                                navController.navigate("CouponScreen");
+                            }
                         ,
                         Alignment.Center
                     ) {
