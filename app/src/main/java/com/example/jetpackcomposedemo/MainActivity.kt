@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
+import com.example.jetpackcomposedemo.Screen.Services.ServiceScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
@@ -86,7 +87,11 @@ fun MainApp(){
                                 },
                                 onOpenDetailCardScreen = {cardId->
                                     navController.navigate("carddetail/$cardId")
-                                })
+                                },
+                                onSelectService = { type ->
+                                    navController.navigate("service/$type")
+                                },
+                            )
                         })
                 }
 
@@ -205,6 +210,26 @@ fun MainApp(){
 
                     val cardId = backStackEntry.arguments?.getString("cardId")
                     CardDetailScreen(cardId = cardId,navController)
+                }
+
+                composable(
+                    "service/{type}",
+                    arguments = listOf(
+                        navArgument("type") {
+                            type = NavType.StringType
+                        },
+                    )
+                ){ backStackEntry ->
+                    val type = backStackEntry.arguments?.getString("type");
+                    ServiceScreen(
+                        type = type,
+                        onCancelButtonClicked = {
+                            navController.popBackStack()
+                        },
+                        onSearchFieldClicked = {
+                            navController.navigate("search")
+                        }
+                    )
                 }
             }
         }

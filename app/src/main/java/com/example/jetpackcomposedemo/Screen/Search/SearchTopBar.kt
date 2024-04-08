@@ -58,9 +58,9 @@ fun SearchTopBar(
     searchCategory:(String)->Unit,
     closeSearchScreen:()->Unit
 ) {
-
     val interactionSource = remember { MutableInteractionSource() }
     val currentNavItem = remember { mutableStateOf("hourly") }
+
     searchCategory(currentNavItem.value)
     Column(
         modifier = Modifier.fillMaxWidth().shadow(elevation = 2.dp)

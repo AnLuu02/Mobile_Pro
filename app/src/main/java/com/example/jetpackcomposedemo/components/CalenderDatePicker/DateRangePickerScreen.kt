@@ -27,6 +27,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -42,7 +43,8 @@ fun DateRangePickerScreen(
             initialDisplayedMonthMillis = null,
             initialSelectedEndDateMillis = dateTime.plusDays(1).toMillis(),
             initialDisplayMode = DisplayMode.Picker,
-            yearRange = (dateTime.year..2024)
+            yearRange = (dateTime.year..2024),
+            locale = Locale.ROOT
         )
     }
 
@@ -90,17 +92,17 @@ fun DateRangePickerScreen(
                     state = dateRangePickerState,
                     title = null,
                     headline = null,
-                    dateValidator = {
-                        val calendarNow = Calendar.getInstance()
-                        with(calendarNow) {
-                            set(Calendar.HOUR_OF_DAY, 0)
-                            set(Calendar.MINUTE, 0)
-                            set(Calendar.SECOND, 0)
-                            set(Calendar.MILLISECOND, 0)
-                        }
-                        return@DateRangePicker it >= calendarNow.timeInMillis
-
-                    },
+//                    dateValidator = {
+//                        val calendarNow = Calendar.getInstance()
+//                        with(calendarNow) {
+//                            set(Calendar.HOUR_OF_DAY, 0)
+//                            set(Calendar.MINUTE, 0)
+//                            set(Calendar.SECOND, 0)
+//                            set(Calendar.MILLISECOND, 0)
+//                        }
+//                        return@DateRangePicker it >= calendarNow.timeInMillis
+//
+//                    },
                     showModeToggle = false,
                     colors = DatePickerDefaults.colors(
                         dayInSelectionRangeContainerColor = Color.Red,

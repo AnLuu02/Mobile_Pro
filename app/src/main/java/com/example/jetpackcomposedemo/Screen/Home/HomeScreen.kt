@@ -29,7 +29,8 @@ fun HomeScreen(
     padding:PaddingValues,
     listState:LazyListState,
     onOpenScreenSearch: ()->Unit,
-    onOpenDetailCardScreen: (String)->Unit
+    onOpenDetailCardScreen: (String)->Unit,
+    onSelectService: (String) -> Unit,
 ) {
     //test slide adv
     val sliderList = remember {
@@ -49,7 +50,7 @@ fun HomeScreen(
     ) {
         item {
             LocationSection(onOpenScreenSearch)
-            ServiceSection()
+            ServiceSection(onSelectService = onSelectService)
 
             Spacer(modifier = Modifier.height(15.dp))
 

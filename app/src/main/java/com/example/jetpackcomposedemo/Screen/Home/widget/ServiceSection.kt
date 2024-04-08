@@ -34,41 +34,50 @@ import com.example.jetpackcomposedemo.data.ServicesUI
 val servicesUI = listOf(
     ServicesUI(
         icon = Icons.Rounded.LocationOn,
-        title = "Gần bạn"
+        title = "Gần bạn",
+        type = "near"
     ),
     ServicesUI(
         icon = Icons.Rounded.HourglassTop,
-        title = "Theo giờ"
+        title = "Theo giờ",
+        type = "byHour"
     ),
     ServicesUI(
         icon = Icons.Rounded.ShieldMoon,
-        title = "Qua đêm"
+        title = "Qua đêm",
+        type = "overnight"
     ),
     ServicesUI(
         icon = Icons.Rounded.DateRange,
-        title = "Theo ngày"
+        title = "Theo ngày",
+        type = "byDay"
     ),
     ServicesUI(
         icon = Icons.Rounded.SupervisorAccount,
-        title = "Tình yêu"
+        title = "Tình yêu",
+        type = "love"
     ),
     ServicesUI(
         icon = Icons.Rounded.Flight,
-        title = "Du lịch"
+        title = "Du lịch",
+        type = "travel"
     ),
     ServicesUI(
         icon = Icons.Rounded.Discount,
-        title = "Giảm tới 50k"
+        title = "Giảm tới 50k",
+        type = "discount"
     ),
     ServicesUI(
         icon = Icons.Rounded.FiberNew,
-        title = "Đổi gió ngay"
+        title = "Đổi gió ngay",
+        type = "new"
     ),
-
-    )
+)
 
 @Composable
-fun ServiceSection() {
+fun ServiceSection(
+    onSelectService: (String) -> Unit
+) {
 
     Column(
         modifier = Modifier
@@ -89,7 +98,7 @@ fun ServiceSection() {
             modifier = Modifier
                 .height(min(100.dp, 300.dp))
         ) {
-            items(servicesUI.size) { index -> ServiceItem(index = index) }
+            items(servicesUI.size) { index -> ServiceItem(index = index, onSelectService = onSelectService) }
 
         }
     }
@@ -97,14 +106,15 @@ fun ServiceSection() {
 
 @Composable
 fun ServiceItem(
-    index: Int
+    index: Int,
+    onSelectService: (String) -> Unit
 ) {
     val item = servicesUI[index]
 
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { }
+        modifier = Modifier.clickable { onSelectService(item.type) }
 
     ) {
         Icon(
