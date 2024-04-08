@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
@@ -143,7 +144,7 @@ fun DatePickerScreen(
                 },
                 modifier = Modifier
                     .padding(top = 46.dp)
-                    .clip(shape = MaterialTheme.shapes.extraLarge)
+                    .clip(shape = RoundedCornerShape(topEndPercent = 6, topStartPercent = 6))
 
 
             ) { padding ->

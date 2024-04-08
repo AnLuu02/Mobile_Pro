@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DateRangePickerState
@@ -170,7 +171,7 @@ fun DateRangePickerScreen(
                 },
                 modifier = Modifier
                     .padding(top = 46.dp)
-                    .clip(shape = MaterialTheme.shapes.extraLarge)
+                    .clip(shape = RoundedCornerShape(topEndPercent = 6, topStartPercent = 6))
 
             ) { padding ->
                 Box(

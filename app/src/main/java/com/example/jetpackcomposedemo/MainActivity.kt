@@ -60,7 +60,7 @@ fun MainApp(){
             color = MaterialTheme.colorScheme.background
         ) {
             val searchViewModel: SearchViewModel = viewModel()
-            NavHost(navController = navController, startDestination = "search" ){
+            NavHost(navController = navController, startDestination = "home" ){
 
 
                 //search result
@@ -123,7 +123,7 @@ fun MainApp(){
                             visible = showCalender.value,
                             onCloseCalenderScreen = {
                                 showCalender.value = false
-                                navController.popBackStack()
+                                navController.popBackStack(route = "search",inclusive = false)
                             })
                         "overnight"-> DateRangePickerScreen(
                             searchViewModel = searchViewModel,
@@ -131,7 +131,7 @@ fun MainApp(){
                             visible = showCalender.value,
                             onCloseCalenderScreen = {
                                 showCalender.value = false
-                                navController.popBackStack()
+                                navController.popBackStack(route = "search",inclusive = false)
                             }
                         )
                         "bydate"-> DateRangePickerScreen(
@@ -140,7 +140,7 @@ fun MainApp(){
                             visible = showCalender.value,
                             onCloseCalenderScreen = {
                                 showCalender.value = false
-                                navController.popBackStack()
+                                navController.popBackStack(route = "search",inclusive = false)
                             }
                         )
                     }
