@@ -40,10 +40,6 @@ fun DatePickerTopBar(
     totalHourlyCheckin: Long = 1,
     onCloseCalenderScreen: ()->Unit
 ) {
-    val interactionSource = remember {
-        MutableInteractionSource()
-    }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -59,7 +55,7 @@ fun DatePickerTopBar(
                     .background(color = Color.Transparent, shape = CircleShape)
                     .align(Alignment.CenterStart)
                     .clickable(
-                        interactionSource = interactionSource,
+                        interactionSource =  remember { MutableInteractionSource() },
                         indication = rememberRipple(bounded = false, radius = 24.dp),
                     ){
                         onCloseCalenderScreen()

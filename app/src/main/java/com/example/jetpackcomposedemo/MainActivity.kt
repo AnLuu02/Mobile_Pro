@@ -29,8 +29,8 @@ import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
+import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.Screen.User.LoginScreen
-import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
@@ -46,14 +46,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MainApp()
-//            JetpackComposeDemoTheme {
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
-//                ) {
-//                    DateRangePickerScreen(visible = true, onCloseCalenderScreen = {})
-//                }
-//            }
         }
     }
 }
@@ -68,7 +60,8 @@ fun MainApp(){
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            NavHost(navController = navController, startDestination = "home" ){
+            val searchViewModel: SearchViewModel = viewModel()
+            NavHost(navController = navController, startDestination = "search" ){
 
                 //Home Screen
                 composable("home"){
@@ -93,18 +86,19 @@ fun MainApp(){
                 // search widget
                 composable("search") {
                     SearchScreen(
-                        onOpenDatePickerScreen = {searchCategory->
-                            navController.navigate("calender/$searchCategory")
-                        }
-                        ,closeSearchScreen={
+                        searchViewModel = searchViewModel,
+                        onOpenDatePickerScreen = {typeBooking->
+                            navController.navigate("search/$typeBooking/calender")
+                        },
+                        closeSearchScreen={
                             navController.popBackStack()
                         })
                 }
 
                 composable(
-                    "calender/{searchCategory}",
+                    "search/{typeBooking}/calender",
                     arguments = listOf(
-                        navArgument("searchCategory") {
+                        navArgument("typeBooking") {
                             type = NavType.StringType
                         }),
                     enterTransition = {
@@ -121,11 +115,28 @@ fun MainApp(){
                     popExitTransition = { fadeOut(animationSpec = tween(1000)) }
                 ) { backStackEntry ->
 
-                    val searchCategory = backStackEntry.arguments?.getString("searchCategory")
-                    when(searchCategory){
-                        "hourly"-> DatePickerScreen{navController.popBackStack()}
-                        "overnight"-> DateRangePickerScreen {navController.popBackStack()}
-                        "bydate"-> DateRangePickerScreen {navController.popBackStack()}
+                    val typeBooking = backStackEntry.arguments?.getString("typeBooking")
+                    when(typeBooking){
+                        "hourly"-> DatePickerScreen(
+                            searchViewModel = searchViewModel,
+                            typeBooking = typeBooking,
+                            onCloseCalenderScreen = {
+                                navController.popBackStack()
+                            })
+                        "overnight"-> DateRangePickerScreen(
+                            searchViewModel = searchViewModel,
+                            typeBooking = typeBooking,
+                            onCloseCalenderScreen = {
+                                navController.popBackStack()
+                            }
+                        )
+                        "bydate"-> DateRangePickerScreen(
+                            searchViewModel = searchViewModel,
+                            typeBooking = typeBooking,
+                            onCloseCalenderScreen = {
+                                navController.popBackStack()
+                            }
+                        )
                     }
                 }
 
@@ -149,7 +160,6 @@ fun MainApp(){
                     })
                 }
 
-
                 //Ưu đãi Screen
                 composable("discount"){
                     ScreenWithBottomNavigationBar(navController = navController, topBar = {
@@ -158,7 +168,6 @@ fun MainApp(){
                         DiscountScreen(padding = padding)
                     })
                 }
-
 
                 //user Screen
                 composable("user"){
@@ -193,8 +202,7 @@ fun MainApp(){
                     )
                 }
 
-
-                //handle payload
+                //handle payload card
                 composable(
                     "carddetail/{cardId}",
                     arguments = listOf(

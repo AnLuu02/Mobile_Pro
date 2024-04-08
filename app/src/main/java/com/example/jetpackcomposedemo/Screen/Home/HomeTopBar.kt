@@ -39,11 +39,6 @@ fun HomeTopBar(
     LaunchedEffect(listState.firstVisibleItemScrollOffset) {
         showSearchIcon.value = listState.firstVisibleItemScrollOffset > 240
     }
-
-    val interactionSource = remember {
-        MutableInteractionSource()
-    }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -72,7 +67,7 @@ fun HomeTopBar(
                     modifier = Modifier
                         .size(30.dp)
                         .clickable(
-                            interactionSource = interactionSource,
+                            interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = false, radius = 24.dp),
                             onClick = onOpenScreenSearch
                         )

@@ -59,10 +59,6 @@ fun <T> PriceCard(
     val screenWidth = with(LocalDensity.current) {
         LocalConfiguration.current.screenWidthDp.dp
     }
-
-    val interactionSource  = remember {
-        MutableInteractionSource()
-    }
     val sizeCard = screenWidth*10/12
 
     var lastPaddingEnd = 0.dp
@@ -76,7 +72,7 @@ fun <T> PriceCard(
             .padding(start = 16.dp, end = lastPaddingEnd)
             .clip(shape = MaterialTheme.shapes.small)
             .clickable(
-                interactionSource = interactionSource,
+                interactionSource =  remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true)
             ) { onOpenDetailCardScreen(index.toString()) }
     ) {

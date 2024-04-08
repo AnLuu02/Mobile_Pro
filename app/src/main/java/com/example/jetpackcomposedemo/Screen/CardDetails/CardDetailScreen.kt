@@ -57,7 +57,7 @@ fun CardDetailScreen(
         },
 
 
-    ) { padding ->
+        ) { padding ->
 
         LazyColumn(
             state = listState,
@@ -629,7 +629,7 @@ fun Introduce(){
                 },
                     style = MaterialTheme.typography.bodyMedium,
 
-                )
+                    )
             }
 
             Spacer(modifier = Modifier.height(16.dp))

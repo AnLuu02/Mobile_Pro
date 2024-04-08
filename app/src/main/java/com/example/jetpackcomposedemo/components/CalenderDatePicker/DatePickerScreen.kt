@@ -25,13 +25,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.Screen.Search.Bookroom
+import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -43,51 +45,80 @@ import java.util.Calendar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerScreen(
+    searchViewModel: SearchViewModel,
+    typeBooking:String,
     onCloseCalenderScreen:()->Unit
 ) {
     val currentTime = remember { LocalDateTime.now() }
-    val seletedHourlyCheckin = remember{ mutableStateOf(roundUpHour(currentTime,true).toInt()) }
-    val totalHourlyCheckin = remember{ mutableStateOf(1) }
-    val selectedHourlyCheckout = seletedHourlyCheckin.value + totalHourlyCheckin.value
+    val timeCheckin = remember{ mutableIntStateOf(
+        if(searchViewModel.getOnlyHourBooking(typeBooking) != null){
+            searchViewModel.getOnlyHourBooking(typeBooking)!!.timeCheckin.toInt()
+        }
+        else{
+            roundUpHour(currentTime,true).toInt()
+        }
 
+    ) } // biến lưu giờ nhan phòng
+    val totalTime = remember{ mutableIntStateOf(
+        if(searchViewModel.getTotalDate(typeBooking) != 0){
+            searchViewModel.getTotalDate(typeBooking)
+        }
+        else{
+            1
+        }
+    ) }
+    val timeCheckout = if(timeCheckin.intValue + totalTime.intValue >23) ((timeCheckin.intValue + totalTime.intValue)-24) else timeCheckin.intValue + totalTime.intValue
+    val initialSelectedDateMillis = if(searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin != null) searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin?.let {
+        convertStringToTimestamp(
+            it
+        )
+    } else currentTime.toMillis()
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis  = currentTime.toMillis(),
+        initialSelectedDateMillis  = initialSelectedDateMillis,
         initialDisplayedMonthMillis = null,
         initialDisplayMode = DisplayMode.Picker,
         yearRange = (currentTime.year..3000)
     )
-    val dateFormatter = DateTimeFormatter.ofPattern("dd/MM")
-    val selectedDateText = datePickerState.selectedDateMillis?.let {
+    val currentDay = currentTime.format(DateTimeFormatter.ofPattern("dd"))
+    val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    datePickerState.selectedDateMillis?.let {
         val selectedDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
-        selectedDate.format(dateFormatter) // Use the formatter to convert to string
-    } ?: "no selection"
-
-    //arrDateSelected[0] lấy này, 1 lấy tháng
-    val arrTimeSelected = selectedDateText.toString().split("/")
-
-    //arrDateSelected[0] lấy này, 1 lấy tháng
-    val arrCurrentTime = currentTime.format(DateTimeFormatter.ofPattern("dd/MM")).toString().split("/")
-    val currentHourly = if(arrTimeSelected[0] == arrCurrentTime[0]) roundUpHour(currentTime,true).toInt() else 0
-
+        var newDate = selectedDate
+        if(timeCheckout < timeCheckin.intValue){
+            newDate = selectedDate.plusDays(1)
+        }
+        searchViewModel.setSelectedCalendar(
+            typeBooking,
+            Bookroom(
+                timeCheckin = "${formatHourly(timeCheckin.intValue)}, ${selectedDate.format(dateFormatter)}",
+                timeCheckOut= "${formatHourly(timeCheckout)}, ${newDate.format(dateFormatter)}",
+                totalTime = totalTime.intValue
+            )
+        )
+    }
+    val currentHourly = if((searchViewModel.getOnlyDayBooking(typeBooking)?.timeCheckin ?: "") == currentDay) roundUpHour(currentTime,true).toInt() else 0
+    val dateCheckinString = searchViewModel.getDateNotYear(typeBooking)?.timeCheckin.toString()
+    val dateCheckoutString = searchViewModel.getDateNotYear(typeBooking)?.timeCheckOut.toString()
 
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.Black.copy(alpha = 0.1f))
-
     ) {
         Scaffold(
             topBar = {
                 DatePickerTopBar(
                     isHourly = true,
-                    checkIn = "${formatHourly(seletedHourlyCheckin.value)}, $selectedDateText",
-                    checkOut = "${formatHourly(selectedHourlyCheckout)}, $selectedDateText",
-                    totalHourlyCheckin = totalHourlyCheckin.value.toLong(),
+                    checkIn = dateCheckinString,
+                    checkOut = dateCheckoutString,
+                    totalHourlyCheckin = totalTime.intValue.toLong(),
                     onCloseCalenderScreen = {
                         onCloseCalenderScreen()
                     })
             },
             bottomBar = {
-                DatePickerBottomBar(){}
+                DatePickerBottomBar(
+                    onHandleClickButton = onCloseCalenderScreen,
+                )
             },
             modifier = Modifier
                 .padding(top = 46.dp)
@@ -120,8 +151,8 @@ fun DatePickerScreen(
                             },
                             colors = DatePickerDefaults.colors(
                                 selectedDayContainerColor = Color.Red.copy(alpha = 0.1f),
-                                todayDateBorderColor = Color.Red.copy(alpha = 0.1f),
-                                todayContentColor = Color.Red,
+                                todayDateBorderColor = Color.Transparent,
+                                todayContentColor = Color.Black,
                                 selectedDayContentColor = Color.Red,
                                 disabledSelectedDayContentColor = Color.Gray
 
@@ -155,20 +186,22 @@ fun DatePickerScreen(
                                         lastPadding = 12.dp
                                     }
                                     if(it >= currentHourly){
-                                        val selectedHourly = it == seletedHourlyCheckin.value
+                                        val selectedHourly = it == timeCheckin.intValue
                                         Box(
                                             modifier = Modifier
                                                 .padding(start = 12.dp, end = lastPadding)
                                                 .background(
-                                                    if (!selectedHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(alpha = 0.1f),
+                                                    if (!selectedHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(
+                                                        alpha = 0.1f
+                                                    ),
                                                     shape = MaterialTheme.shapes.small
                                                 )
-                                                .clip( MaterialTheme.shapes.small)
+                                                .clip(MaterialTheme.shapes.small)
                                                 .clickable(
                                                     interactionSource = remember { MutableInteractionSource() },
                                                     indication = rememberRipple(bounded = true)
                                                 ) {
-                                                    seletedHourlyCheckin.value = it
+                                                    timeCheckin.intValue = it
                                                 },
                                         ){
                                             Text(
@@ -204,17 +237,19 @@ fun DatePickerScreen(
                             Spacer(modifier = Modifier.height(12.dp))
 
                             LazyRow {
-                                var lastPadding = 0.dp;
+                                var lastPadding = 0.dp
                                 items(listOf(1,2,3,4,5,6,7,8,9,10)){
                                     if(it == 10){
                                         lastPadding=12.dp
                                     }
-                                    val selectedTotalHourly = it == totalHourlyCheckin.value
+                                    val selectedTotalHourly = it == totalTime.intValue
                                     Box(
                                         modifier = Modifier
                                             .padding(start = 12.dp, end = lastPadding)
                                             .background(
-                                                if (!selectedTotalHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(alpha = 0.1f),
+                                                if (!selectedTotalHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(
+                                                    alpha = 0.1f
+                                                ),
                                                 shape = MaterialTheme.shapes.small
                                             )
                                             .clip(MaterialTheme.shapes.small)
@@ -222,12 +257,12 @@ fun DatePickerScreen(
                                                 interactionSource = remember { MutableInteractionSource() },
                                                 indication = rememberRipple(bounded = true)
                                             ) {
-                                                totalHourlyCheckin.value = it
+                                                totalTime.intValue = it
                                             },
 
                                         ){
                                         Text(
-                                            text = "${it} giờ",
+                                            text = "$it giờ",
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.Bold,
                                             color = if(selectedTotalHourly) Color.Red else Color.Black,
@@ -239,14 +274,13 @@ fun DatePickerScreen(
                         }
                     }
                 }}
-
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun roundUpHour(currentTime: LocalDateTime,isHourly:Boolean = false): String {
-    val formatter = DateTimeFormatter.ofPattern(if(!isHourly) "HH:mm, dd/MM" else "HH")
+fun roundUpHour(currentTime: LocalDateTime,onlyHour:Boolean = false): String {
+    val formatter = DateTimeFormatter.ofPattern(if(!onlyHour) "HH:mm, dd/MM" else "HH")
 
     return if (currentTime.minute == 0 && currentTime.second == 0) {
         currentTime.format(formatter)
@@ -261,4 +295,11 @@ fun formatHourly(hourly:Int):String{
     } else{
         "$hourly:00"
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun convertStringToTimestamp(dateTimeString: String): Long {
+    val formatter = DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy")
+    val dateTime = LocalDateTime.parse(dateTimeString, formatter)
+    return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }

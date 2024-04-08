@@ -22,14 +22,13 @@ import androidx.compose.material.icons.filled.ArrowOutward
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,20 +44,19 @@ import androidx.compose.ui.unit.dp
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SearchScreen(
+    searchViewModel: SearchViewModel,
     onOpenDatePickerScreen:(String)->Unit,
     closeSearchScreen:()->Unit
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val interactionSource1 = remember { MutableInteractionSource() }
-    val searchCategory = remember {
+    val typeBooking = remember {
         mutableStateOf("")
     }
 
     Scaffold(
         topBar = {
             SearchTopBar(
-                searchCategory = {i->
-                    searchCategory.value = i
+                typeBooking = {i->
+                    typeBooking.value = i
                 },
                 closeSearchScreen)
         }
@@ -94,10 +92,10 @@ fun SearchScreen(
                             .clip(MaterialTheme.shapes.medium)
 
                             .clickable(
-                                interactionSource = interactionSource1,
+                                interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = true)
                             ) {
-                                onOpenDatePickerScreen(searchCategory.value)
+                                onOpenDatePickerScreen(typeBooking.value)
                             }
                     ) {
                         Row(
@@ -117,7 +115,12 @@ fun SearchScreen(
                                 ) {
                                     Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
                                     Spacer(modifier = Modifier.height(6.dp))
-                                    Text(text = "Bất kì", color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        text = (if(searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckin != null) searchViewModel.getDateSearch(typeBooking.value)?.timeCheckin.toString() else "Bất kì"),
+                                        color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.clickable {  }
+                                    )
+
 
                                 }
 
@@ -143,7 +146,9 @@ fun SearchScreen(
                                 ) {
                                     Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                                     Spacer(modifier = Modifier.height(6.dp))
-                                    Text(text = "Bất kì", color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        text = (if(searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckOut != null) searchViewModel.getDateSearch(typeBooking.value)?.timeCheckOut.toString() else "Bất kì"),
+                                        color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                                 }
 
@@ -166,7 +171,7 @@ fun SearchScreen(
                             .clip(shape = MaterialTheme.shapes.large)
                             .background(Color.Red)
                             .clickable(
-                                interactionSource = interactionSource,
+                                interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = true)
                             ) {}
                         ,
@@ -190,7 +195,6 @@ fun SearchScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextFieldSearch(
     onOpenScreenSearch:()->Unit
@@ -198,7 +202,6 @@ fun TextFieldSearch(
     var text by remember {
         mutableStateOf("")
     }
-    val interactionSource = remember { MutableInteractionSource() }
 
     Surface(
         shadowElevation = 4.dp, // Độ nâng của đổ bóng
@@ -206,7 +209,7 @@ fun TextFieldSearch(
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .clickable(
-                interactionSource = interactionSource,
+                interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true),
                 onClick = onOpenScreenSearch
             )
@@ -238,9 +241,9 @@ fun TextFieldSearch(
                 .fillMaxWidth(),
 
             shape = MaterialTheme.shapes.medium, // Border radius
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.onSecondary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSecondary // Màu viền khi TextField không được focus
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSecondary, // Màu viền khi TextField không được focus
             )
         )
     }

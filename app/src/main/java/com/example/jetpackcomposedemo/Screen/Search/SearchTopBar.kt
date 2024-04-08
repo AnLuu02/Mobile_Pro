@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -55,15 +56,16 @@ val itemsSubNav = listOf(
 )
 @Composable
 fun SearchTopBar(
-    searchCategory:(String)->Unit,
+    typeBooking:(String)->Unit,
     closeSearchScreen:()->Unit
 ) {
 
-    val interactionSource = remember { MutableInteractionSource() }
-    val currentNavItem = remember { mutableStateOf("hourly") }
-    searchCategory(currentNavItem.value)
+    val currentNavItem = rememberSaveable { mutableStateOf("hourly") }
+    typeBooking(currentNavItem.value)
     Column(
-        modifier = Modifier.fillMaxWidth().shadow(elevation = 2.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(elevation = 2.dp)
     ) {
         Box(
             modifier = Modifier
@@ -76,7 +78,7 @@ fun SearchTopBar(
                     .background(color = Color.White, shape = CircleShape)
                     .align(Alignment.CenterStart)
                     .clickable(
-                        interactionSource = interactionSource,
+                        interactionSource = remember { MutableInteractionSource() },
                         indication = rememberRipple(bounded = false, radius = 24.dp),
                         onClick = closeSearchScreen
                     )
@@ -113,7 +115,7 @@ fun SearchTopBar(
                 itemsSubNav.forEach {item->
                     SubNavItem(item,currentNavItem.value == item.route, onClick = {
                         currentNavItem.value = item.route
-                        searchCategory(item.route)
+                        typeBooking(item.route)
                     })
                 }
             }
@@ -130,16 +132,14 @@ fun SubNavItem(
     selected:Boolean,
     onClick:()->Unit
 ){
-    val interactionSource = remember { MutableInteractionSource() }
-
     val screenWidth = with(LocalDensity.current) {
         LocalConfiguration.current.screenWidthDp.dp
     }
     Box(
         modifier = Modifier
-            .width(screenWidth/4)
+            .width(screenWidth / 4)
             .clickable(
-                interactionSource = interactionSource,
+                interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onClick
             )

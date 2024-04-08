@@ -60,9 +60,6 @@ fun LoginScreen(loginViewModel : LoginViewModel = viewModel(),
                 paddingValues: PaddingValues = PaddingValues(16.dp),)
 {
     val activity = LocalContext.current as Activity
-    val interactionSource = remember{
-        MutableInteractionSource()
-    }
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
@@ -78,7 +75,7 @@ fun LoginScreen(loginViewModel : LoginViewModel = viewModel(),
                    .size(20.dp)
                    .offset(16.dp, 46.dp)
                    .clickable(
-                       interactionSource = interactionSource,
+                       interactionSource = remember { MutableInteractionSource() },
                        indication = rememberRipple(bounded = false, radius = 24.dp),
                        onClick = onCancelButtonClicked
                    )
