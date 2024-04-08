@@ -1,7 +1,14 @@
 package com.example.jetpackcomposedemo.components.CalenderDatePicker
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -47,6 +54,7 @@ import java.util.Calendar
 fun DatePickerScreen(
     searchViewModel: SearchViewModel,
     typeBooking:String,
+    visible:Boolean = false,
     onCloseCalenderScreen:()->Unit
 ) {
     val currentTime = remember { LocalDateTime.now() }
@@ -68,7 +76,7 @@ fun DatePickerScreen(
         }
     ) }
     val timeCheckout = if(timeCheckin.intValue + totalTime.intValue >23) ((timeCheckin.intValue + totalTime.intValue)-24) else timeCheckin.intValue + totalTime.intValue
-    val initialSelectedDateMillis = if(searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin != null) searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin?.let {
+    val initialSelectedDateMillis = if(searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin != null && searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin != "") searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin?.let {
         convertStringToTimestamp(
             it
         )
@@ -101,97 +109,166 @@ fun DatePickerScreen(
     val dateCheckoutString = searchViewModel.getDateNotYear(typeBooking)?.timeCheckOut.toString()
 
     Box(modifier = Modifier
-        .fillMaxWidth()
-        .background(Color.Black.copy(alpha = 0.1f))
+        .fillMaxSize()
     ) {
-        Scaffold(
-            topBar = {
-                DatePickerTopBar(
-                    isHourly = true,
-                    checkIn = dateCheckinString,
-                    checkOut = dateCheckoutString,
-                    totalHourlyCheckin = totalTime.intValue.toLong(),
-                    onCloseCalenderScreen = {
-                        onCloseCalenderScreen()
-                    })
-            },
-            bottomBar = {
-                DatePickerBottomBar(
-                    onHandleClickButton = onCloseCalenderScreen,
-                )
-            },
+        Box(
             modifier = Modifier
-                .padding(top = 46.dp)
-                .clip(shape = MaterialTheme.shapes.extraLarge)
-
-
-        ) { padding ->
-            Box(modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    item{
-                        DatePicker(
-                            state = datePickerState,
-                            title = null,
-                            headline = null,
-                            showModeToggle = false,
-                            dateValidator = {
-                                val calendarNow = Calendar.getInstance()
-                                with(calendarNow) {
-                                    set(Calendar.HOUR_OF_DAY, 0)
-                                    set(Calendar.MINUTE, 0)
-                                    set(Calendar.SECOND, 0)
-                                    set(Calendar.MILLISECOND, 0)
-                                }
-                                return@DatePicker it >= calendarNow.timeInMillis
+                .background(Color.Black.copy(alpha = 0.1f ))
+                .clickable { onCloseCalenderScreen() }
+        )
 
-                            },
-                            colors = DatePickerDefaults.colors(
-                                selectedDayContainerColor = Color.Red.copy(alpha = 0.1f),
-                                todayDateBorderColor = Color.Transparent,
-                                todayContentColor = Color.Black,
-                                selectedDayContentColor = Color.Red,
-                                disabledSelectedDayContentColor = Color.Gray
+        AnimatedVisibility(
+            visible = visible,
+            enter = slideInVertically(initialOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 1000))+ fadeIn( initialAlpha = 1f),
+            exit = slideOutVertically(targetOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 1000))+ fadeOut(targetAlpha = 1f)
+        ) {
+            Scaffold(
+                topBar = {
+                    DatePickerTopBar(
+                        isHourly = true,
+                        checkIn = dateCheckinString,
+                        checkOut = dateCheckoutString,
+                        totalHourlyCheckin = totalTime.intValue.toLong(),
+                        onCloseCalenderScreen = {
+                            onCloseCalenderScreen()
+                        })
+                },
+                bottomBar = {
+                    DatePickerBottomBar(
+                        searchViewModel = searchViewModel,
+                        typeBooking = typeBooking,
+                        onHandleClickButton = onCloseCalenderScreen,
+                    )
+                },
+                modifier = Modifier
+                    .padding(top = 46.dp)
+                    .clip(shape = MaterialTheme.shapes.extraLarge)
 
-                            )
 
-                        )
-
-                        Spacer(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(0.5.dp)
-                            .background(Color.Gray))
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 12.dp, bottom = 12.dp)
-                        ) {
-                            Text(
-                                text = "Giờ nhận phòng",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(start=12.dp)
-                            )
-                            Spacer(modifier = Modifier
-                                .height(12.dp))
-                            LazyRow {
-                                var lastPadding = 0.dp
-
-                                items(listOf(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)){
-                                    if(it == 23){
-                                        lastPadding = 12.dp
+            ) { padding ->
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        item{
+                            DatePicker(
+                                state = datePickerState,
+                                title = null,
+                                headline = null,
+                                showModeToggle = false,
+                                dateValidator = {
+                                    val calendarNow = Calendar.getInstance()
+                                    with(calendarNow) {
+                                        set(Calendar.HOUR_OF_DAY, 0)
+                                        set(Calendar.MINUTE, 0)
+                                        set(Calendar.SECOND, 0)
+                                        set(Calendar.MILLISECOND, 0)
                                     }
-                                    if(it >= currentHourly){
-                                        val selectedHourly = it == timeCheckin.intValue
+                                    return@DatePicker it >= calendarNow.timeInMillis
+
+                                },
+                                colors = DatePickerDefaults.colors(
+                                    selectedDayContainerColor = Color.Red.copy(alpha = 0.1f),
+                                    todayDateBorderColor = Color.Transparent,
+                                    todayContentColor = Color.Black,
+                                    selectedDayContentColor = Color.Red,
+                                    disabledSelectedDayContentColor = Color.Gray
+
+                                )
+
+                            )
+
+                            Spacer(modifier = Modifier
+                                .fillMaxWidth()
+                                .height(0.5.dp)
+                                .background(Color.Gray))
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp, bottom = 12.dp)
+                            ) {
+                                Text(
+                                    text = "Giờ nhận phòng",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(start=12.dp)
+                                )
+                                Spacer(modifier = Modifier
+                                    .height(12.dp))
+                                LazyRow {
+                                    var lastPadding = 0.dp
+
+                                    items(listOf(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)){
+                                        if(it == 23){
+                                            lastPadding = 12.dp
+                                        }
+                                        if(it >= currentHourly){
+                                            val selectedHourly = it == timeCheckin.intValue
+                                            Box(
+                                                modifier = Modifier
+                                                    .padding(start = 12.dp, end = lastPadding)
+                                                    .background(
+                                                        if (!selectedHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(
+                                                            alpha = 0.1f
+                                                        ),
+                                                        shape = MaterialTheme.shapes.small
+                                                    )
+                                                    .clip(MaterialTheme.shapes.small)
+                                                    .clickable(
+                                                        interactionSource = remember { MutableInteractionSource() },
+                                                        indication = rememberRipple(bounded = true)
+                                                    ) {
+                                                        timeCheckin.intValue = it
+                                                    },
+                                            ){
+                                                Text(
+                                                    text = formatHourly(it),
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = if(selectedHourly) Color.Red else Color.Black,
+                                                    modifier = Modifier.padding(10.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier
+                                .fillMaxWidth()
+                                .height(0.5.dp)
+                                .background(Color.Gray))
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp, bottom = 12.dp)
+                            ) {
+                                Text(
+                                    text = "Số giờ sử dụng",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(start=12.dp)
+                                )
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                LazyRow {
+                                    var lastPadding = 0.dp
+                                    items(listOf(1,2,3,4,5,6,7,8,9,10)){
+                                        if(it == 10){
+                                            lastPadding=12.dp
+                                        }
+                                        val selectedTotalHourly = it == totalTime.intValue
                                         Box(
                                             modifier = Modifier
                                                 .padding(start = 12.dp, end = lastPadding)
                                                 .background(
-                                                    if (!selectedHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(
+                                                    if (!selectedTotalHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(
                                                         alpha = 0.1f
                                                     ),
                                                     shape = MaterialTheme.shapes.small
@@ -201,14 +278,15 @@ fun DatePickerScreen(
                                                     interactionSource = remember { MutableInteractionSource() },
                                                     indication = rememberRipple(bounded = true)
                                                 ) {
-                                                    timeCheckin.intValue = it
+                                                    totalTime.intValue = it
                                                 },
-                                        ){
+
+                                            ){
                                             Text(
-                                                text = formatHourly(it),
+                                                text = "$it giờ",
                                                 style = MaterialTheme.typography.titleMedium,
                                                 fontWeight = FontWeight.Bold,
-                                                color = if(selectedHourly) Color.Red else Color.Black,
+                                                color = if(selectedTotalHourly) Color.Red else Color.Black,
                                                 modifier = Modifier.padding(10.dp)
                                             )
                                         }
@@ -216,65 +294,10 @@ fun DatePickerScreen(
                                 }
                             }
                         }
-
-                        Spacer(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(0.5.dp)
-                            .background(Color.Gray))
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 12.dp, bottom = 12.dp)
-                        ) {
-                            Text(
-                                text = "Số giờ sử dụng",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(start=12.dp)
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            LazyRow {
-                                var lastPadding = 0.dp
-                                items(listOf(1,2,3,4,5,6,7,8,9,10)){
-                                    if(it == 10){
-                                        lastPadding=12.dp
-                                    }
-                                    val selectedTotalHourly = it == totalTime.intValue
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(start = 12.dp, end = lastPadding)
-                                            .background(
-                                                if (!selectedTotalHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(
-                                                    alpha = 0.1f
-                                                ),
-                                                shape = MaterialTheme.shapes.small
-                                            )
-                                            .clip(MaterialTheme.shapes.small)
-                                            .clickable(
-                                                interactionSource = remember { MutableInteractionSource() },
-                                                indication = rememberRipple(bounded = true)
-                                            ) {
-                                                totalTime.intValue = it
-                                            },
-
-                                        ){
-                                        Text(
-                                            text = "$it giờ",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if(selectedTotalHourly) Color.Red else Color.Black,
-                                            modifier = Modifier.padding(10.dp)
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }}
+                    }}
+            }
         }
+
     }
 }
 

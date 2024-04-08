@@ -3,10 +3,16 @@
 package com.example.jetpackcomposedemo.components.CalenderDatePicker
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DateRangePicker
@@ -36,6 +42,7 @@ import java.util.TimeZone
 fun DateRangePickerScreen(
     searchViewModel:SearchViewModel,
     typeBooking:String,
+    visible:Boolean = false,
     onCloseCalenderScreen:()->Unit
 ) {
     val currentTime = remember { LocalDateTime.now() }
@@ -58,13 +65,19 @@ fun DateRangePickerScreen(
         }
     ) }
 
-    var initialSelectedStartDateMillis = if(searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin != null) searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin?.let {
+    var initialSelectedStartDateMillis =
+        if(searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin != null
+            && searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin != "")
+            searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin?.let {
         convertStringToTimestamp(
             it
         )
     } else currentTime.toMillis()
 
-    var initialSelectedEndDateMillis = if(searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckOut != null) searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckOut?.let {
+    var initialSelectedEndDateMillis =
+        if(searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckOut != null
+            && searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckOut != "")
+            searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckOut?.let {
         convertStringToTimestamp(
             it
         )
@@ -123,62 +136,77 @@ fun DateRangePickerScreen(
     val totalSelectedDay = searchViewModel.getSelectedCalendar(typeBooking).value?.totalTime.toString().toLong()
 
     Box(modifier = Modifier
-        .fillMaxWidth()
-        .background(Color.Black.copy(alpha = 0.1f))
+        .fillMaxSize()
 
     ) {
-        Scaffold(
-            topBar = {
-                DatePickerTopBar(
-                    checkIn = dateCheckinString,
-                    checkOut = dateCheckoutString,
-                    totalDate = totalSelectedDay,
-                    onCloseCalenderScreen = {
-                        onCloseCalenderScreen()
-                    })
-            },
-            bottomBar = {
-                DatePickerBottomBar(
-                    onHandleClickButton = onCloseCalenderScreen,
-                )
-            },
+        Box(
             modifier = Modifier
-                .padding(top = 46.dp)
-                .clip(shape = MaterialTheme.shapes.extraLarge)
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.1f))
+                .clickable { onCloseCalenderScreen() }
+        )
 
-        ) { padding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
-                DateRangePicker(
-                    state = dateRangePickerState,
-                    title = null,
-                    headline = null,
-                    dateValidator = {
-                        val calendarNow = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"))
-                        with(calendarNow) {
-                            set(Calendar.HOUR_OF_DAY, 0)
-                            set(Calendar.MINUTE, 0)
-                            set(Calendar.SECOND, 0)
-                            set(Calendar.MILLISECOND, 0)
-                        }
-                        it >= calendarNow.timeInMillis
-
-                    },
-                    showModeToggle = false,
-                    colors = DatePickerDefaults.colors(
-                        dayInSelectionRangeContainerColor = Color.Red,
-                        selectedDayContainerColor = Color.Red,
-                        todayDateBorderColor = Color.Red,
-                        currentYearContentColor = Color.Red,
-                        selectedYearContainerColor = Color.Gray,
-                        disabledDayContentColor = Color.Gray,
-                        todayContentColor = Color.Red
-
+        AnimatedVisibility(
+            visible = visible,
+            enter = slideInVertically(initialOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 1000))+ fadeIn( initialAlpha = 1f),
+            exit = slideOutVertically(targetOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 1000))+ fadeOut(targetAlpha = 1f)
+        ) {
+            Scaffold(
+                topBar = {
+                    DatePickerTopBar(
+                        checkIn = dateCheckinString,
+                        checkOut = dateCheckoutString,
+                        totalDate = totalSelectedDay,
+                        onCloseCalenderScreen = {
+                            onCloseCalenderScreen()
+                        })
+                },
+                bottomBar = {
+                    DatePickerBottomBar(
+                        searchViewModel = searchViewModel,
+                        typeBooking = typeBooking,
+                        onHandleClickButton = onCloseCalenderScreen,
                     )
-                )
+                },
+                modifier = Modifier
+                    .padding(top = 46.dp)
+                    .clip(shape = MaterialTheme.shapes.extraLarge)
+
+            ) { padding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                ) {
+                    DateRangePicker(
+                        state = dateRangePickerState,
+                        title = null,
+                        headline = null,
+                        dateValidator = {
+                            val calendarNow =
+                                Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"))
+                            with(calendarNow) {
+                                set(Calendar.HOUR_OF_DAY, 0)
+                                set(Calendar.MINUTE, 0)
+                                set(Calendar.SECOND, 0)
+                                set(Calendar.MILLISECOND, 0)
+                            }
+                            it >= calendarNow.timeInMillis
+
+                        },
+                        showModeToggle = false,
+                        colors = DatePickerDefaults.colors(
+                            dayInSelectionRangeContainerColor = Color.Red,
+                            selectedDayContainerColor = Color.Red,
+                            todayDateBorderColor = Color.Red,
+                            currentYearContentColor = Color.Red,
+                            selectedYearContainerColor = Color.Gray,
+                            disabledDayContentColor = Color.Gray,
+                            todayContentColor = Color.Red
+
+                        )
+                    )
+                }
             }
         }
     }

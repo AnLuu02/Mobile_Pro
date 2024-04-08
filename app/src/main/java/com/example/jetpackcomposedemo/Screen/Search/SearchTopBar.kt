@@ -70,7 +70,7 @@ fun SearchTopBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 60.dp, bottom = 16.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 40.dp, bottom = 16.dp),
         ){
             Box(
                 modifier = Modifier

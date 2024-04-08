@@ -5,14 +5,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -28,6 +26,7 @@ import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
+import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.Screen.User.LoginScreen
@@ -62,6 +61,12 @@ fun MainApp(){
         ) {
             val searchViewModel: SearchViewModel = viewModel()
             NavHost(navController = navController, startDestination = "search" ){
+
+
+                //search result
+                composable("search/result"){
+                    SearchResultScreen()
+                }
 
                 //Home Screen
                 composable("home"){
@@ -101,39 +106,40 @@ fun MainApp(){
                         navArgument("typeBooking") {
                             type = NavType.StringType
                         }),
-                    enterTransition = {
-                        fadeIn(animationSpec = tween(1000)) + slideIntoContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Up, tween(1000)
-                        )
-                    },
-                    exitTransition ={
-                        fadeOut(animationSpec = tween(1000)) + slideOutOfContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Down, tween(1000)
-                        )
-                    },
-                    popEnterTransition = { fadeIn(animationSpec = tween(1000)) },
-                    popExitTransition = { fadeOut(animationSpec = tween(1000)) }
+                    enterTransition = null,
+                    exitTransition =null,
+                    popEnterTransition = null,
+                    popExitTransition = null
                 ) { backStackEntry ->
 
                     val typeBooking = backStackEntry.arguments?.getString("typeBooking")
+                    val showCalender = remember {
+                        mutableStateOf(true)
+                    }
                     when(typeBooking){
                         "hourly"-> DatePickerScreen(
                             searchViewModel = searchViewModel,
                             typeBooking = typeBooking,
+                            visible = showCalender.value,
                             onCloseCalenderScreen = {
+                                showCalender.value = false
                                 navController.popBackStack()
                             })
                         "overnight"-> DateRangePickerScreen(
                             searchViewModel = searchViewModel,
                             typeBooking = typeBooking,
+                            visible = showCalender.value,
                             onCloseCalenderScreen = {
+                                showCalender.value = false
                                 navController.popBackStack()
                             }
                         )
                         "bydate"-> DateRangePickerScreen(
                             searchViewModel = searchViewModel,
                             typeBooking = typeBooking,
+                            visible = showCalender.value,
                             onCloseCalenderScreen = {
+                                showCalender.value = false
                                 navController.popBackStack()
                             }
                         )

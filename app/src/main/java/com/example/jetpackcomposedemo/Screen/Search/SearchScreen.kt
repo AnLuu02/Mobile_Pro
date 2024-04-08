@@ -52,6 +52,17 @@ fun SearchScreen(
         mutableStateOf("")
     }
 
+    val timeCheckin =
+        if(searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckin != null
+            && searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckin != "")
+            searchViewModel.getDateSearch(typeBooking.value)?.timeCheckin.toString() else "Bất kì"
+    val timeCheckOut =
+        if(searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckOut != null
+            && searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckOut != "")
+            searchViewModel.getDateSearch(typeBooking.value)?.timeCheckOut.toString() else "Bất kì"
+
+
+
     Scaffold(
         topBar = {
             SearchTopBar(
@@ -116,9 +127,8 @@ fun SearchScreen(
                                     Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Text(
-                                        text = (if(searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckin != null) searchViewModel.getDateSearch(typeBooking.value)?.timeCheckin.toString() else "Bất kì"),
+                                        text = timeCheckin,
                                         color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.clickable {  }
                                     )
 
 
@@ -147,7 +157,7 @@ fun SearchScreen(
                                     Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Text(
-                                        text = (if(searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckOut != null) searchViewModel.getDateSearch(typeBooking.value)?.timeCheckOut.toString() else "Bất kì"),
+                                        text = timeCheckOut,
                                         color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                                 }
@@ -183,7 +193,6 @@ fun SearchScreen(
                             color = Color.White,
                             modifier = Modifier
                                 .padding(10.dp)
-
                         )
                     }
                 }
