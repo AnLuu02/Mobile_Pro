@@ -108,4 +108,8 @@ dependencies {
     // Livedata
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
 
+
+    //layout tự động xuống hàng
+//    implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
+
 }

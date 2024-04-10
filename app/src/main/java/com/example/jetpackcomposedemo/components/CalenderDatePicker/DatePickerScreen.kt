@@ -1,7 +1,6 @@
 package com.example.jetpackcomposedemo.components.CalenderDatePicker
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -56,12 +55,13 @@ fun DatePickerScreen(
     searchViewModel: SearchViewModel,
     typeBooking:String,
     visible:Boolean = false,
-    onCloseCalenderScreen:()->Unit
+    onCloseCalenderScreen:()->Unit,
+    onHandleClickButtonDelete:()->Unit
 ) {
     val currentTime = remember { LocalDateTime.now() }
     val timeCheckin = remember{ mutableIntStateOf(
-        if(searchViewModel.getOnlyHourBooking(typeBooking) != null){
-            searchViewModel.getOnlyHourBooking(typeBooking)!!.timeCheckin.toInt()
+        if(searchViewModel.getOnlyHourBooking(typeBooking).timeCheckin != "Bất kì"){
+            searchViewModel.getOnlyHourBooking(typeBooking).timeCheckin.toInt()
         }
         else{
             roundUpHour(currentTime,true).toInt()
@@ -76,12 +76,18 @@ fun DatePickerScreen(
             1
         }
     ) }
-    val timeCheckout = if(timeCheckin.intValue + totalTime.intValue >23) ((timeCheckin.intValue + totalTime.intValue)-24) else timeCheckin.intValue + totalTime.intValue
-    val initialSelectedDateMillis = if(searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin != null && searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin != "") searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin?.let {
-        convertStringToTimestamp(
-            it
-        )
-    } else currentTime.toMillis()
+
+    val timeCheckout =
+        if(timeCheckin.intValue + totalTime.intValue >23)
+            ((timeCheckin.intValue + totalTime.intValue)-24)
+    else timeCheckin.intValue + totalTime.intValue
+
+    val initialSelectedDateMillis = if(searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckin != "Bất kì")
+            searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckin.let {
+                convertStringToTimestamp(
+                    it
+                )
+            } else currentTime.toMillis()
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis  = initialSelectedDateMillis,
         initialDisplayedMonthMillis = null,
@@ -90,24 +96,30 @@ fun DatePickerScreen(
     )
     val currentDay = currentTime.format(DateTimeFormatter.ofPattern("dd"))
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-    datePickerState.selectedDateMillis?.let {
-        val selectedDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
-        var newDate = selectedDate
-        if(timeCheckout < timeCheckin.intValue){
-            newDate = selectedDate.plusDays(1)
-        }
-        searchViewModel.setSelectedCalendar(
-            typeBooking,
-            Bookroom(
-                timeCheckin = "${formatHourly(timeCheckin.intValue)}, ${selectedDate.format(dateFormatter)}",
-                timeCheckOut= "${formatHourly(timeCheckout)}, ${newDate.format(dateFormatter)}",
-                totalTime = totalTime.intValue
-            )
-        )
+    val selectedDate = datePickerState.selectedDateMillis?.let {
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
     }
-    val currentHourly = if((searchViewModel.getOnlyDayBooking(typeBooking)?.timeCheckin ?: "") == currentDay) roundUpHour(currentTime,true).toInt() else 0
-    val dateCheckinString = searchViewModel.getDateNotYear(typeBooking)?.timeCheckin.toString()
-    val dateCheckoutString = searchViewModel.getDateNotYear(typeBooking)?.timeCheckOut.toString()
+
+    val newDate = datePickerState.selectedDateMillis?.let {
+        if(timeCheckout < timeCheckin.intValue){
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault()).plusDays(1)
+        }
+        else{
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
+        }
+    }
+
+    val currentHourly = if((searchViewModel.getOnlyDayBooking(typeBooking).timeCheckin) == currentDay) roundUpHour(currentTime,true).toInt() else 0
+    val dateCheckinString = if(searchViewModel.getDateNotYear(typeBooking).timeCheckin == "Bất kì")
+        "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
+    else
+        searchViewModel.getDateNotYear(typeBooking).timeCheckin
+
+
+    val dateCheckoutString = if(searchViewModel.getDateNotYear(typeBooking).timeCheckOut == "Bất kì")
+        "${formatHourly(timeCheckout)}, ${newDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
+    else
+        searchViewModel.getDateNotYear(typeBooking).timeCheckOut
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -139,12 +151,27 @@ fun DatePickerScreen(
                     DatePickerBottomBar(
                         searchViewModel = searchViewModel,
                         typeBooking = typeBooking,
-                        onHandleClickButton = onCloseCalenderScreen,
+                        onHandleClickButton = {
+                            if (selectedDate != null) {
+                                if (newDate != null) {
+                                    searchViewModel.setSelectedCalendar(
+                                        typeBooking,
+                                        Bookroom(
+                                            timeCheckin = "${formatHourly(timeCheckin.intValue)}, ${selectedDate.format(dateFormatter)}",
+                                            timeCheckOut= "${formatHourly(timeCheckout)}, ${newDate.format(dateFormatter)}",
+                                            totalTime = totalTime.intValue
+                                        )
+                                    )
+                                }
+                            }
+                            onCloseCalenderScreen()
+                        },
+                        onHandleClickButtonDelete = onHandleClickButtonDelete
                     )
                 },
                 modifier = Modifier
                     .padding(top = 46.dp)
-                    .clip(shape = RoundedCornerShape(topEndPercent = 6, topStartPercent = 6))
+                    .clip(shape = RoundedCornerShape(topEndPercent = 8, topStartPercent = 8))
 
 
             ) { padding ->
@@ -181,7 +208,6 @@ fun DatePickerScreen(
                                 )
 
                             )
-
                             Spacer(modifier = Modifier
                                 .fillMaxWidth()
                                 .height(0.5.dp)

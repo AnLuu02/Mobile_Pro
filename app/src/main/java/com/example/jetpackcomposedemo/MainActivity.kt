@@ -26,6 +26,7 @@ import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
+import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultFilterScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
@@ -62,12 +63,6 @@ fun MainApp(){
             val searchViewModel: SearchViewModel = viewModel()
             NavHost(navController = navController, startDestination = "home" ){
 
-
-                //search result
-                composable("search/result"){
-                    SearchResultScreen()
-                }
-
                 //Home Screen
                 composable("home"){
                     ScreenWithBottomNavigationBar(
@@ -95,10 +90,34 @@ fun MainApp(){
                         onOpenDatePickerScreen = {typeBooking->
                             navController.navigate("search/$typeBooking/calender")
                         },
+                        onHandleSearchClickButton = {
+                            navController.navigate("search/result")
+                        },
                         closeSearchScreen={
                             navController.popBackStack()
                         })
                 }
+                //search result
+                composable("search/result"){
+                    SearchResultScreen(
+                        onBackSearchScreen = {
+                            navController.popBackStack()
+                        },
+                        onOpenSearchScreen = {
+                            navController.navigate("search")
+                        },
+                        onOpenFilter = {
+                            navController.navigate("search/filter")
+                        }
+                    )
+                }
+
+                composable("search/filter"){
+                    SearchResultFilterScreen {
+                        navController.popBackStack()
+                    }
+                }
+
 
                 composable(
                     "search/{typeBooking}/calender",
@@ -121,6 +140,10 @@ fun MainApp(){
                             searchViewModel = searchViewModel,
                             typeBooking = typeBooking,
                             visible = showCalender.value,
+                            onHandleClickButtonDelete = {
+                                navController.popBackStack(route = "search",inclusive = false)
+
+                            },
                             onCloseCalenderScreen = {
                                 showCalender.value = false
                                 navController.popBackStack(route = "search",inclusive = false)
@@ -129,6 +152,10 @@ fun MainApp(){
                             searchViewModel = searchViewModel,
                             typeBooking = typeBooking,
                             visible = showCalender.value,
+                            onHandleClickButtonDelete = {
+                                navController.popBackStack(route = "search",inclusive = false)
+
+                            },
                             onCloseCalenderScreen = {
                                 showCalender.value = false
                                 navController.popBackStack(route = "search",inclusive = false)
@@ -138,6 +165,10 @@ fun MainApp(){
                             searchViewModel = searchViewModel,
                             typeBooking = typeBooking,
                             visible = showCalender.value,
+                            onHandleClickButtonDelete = {
+                                navController.popBackStack(route = "search",inclusive = false)
+
+                            },
                             onCloseCalenderScreen = {
                                 showCalender.value = false
                                 navController.popBackStack(route = "search",inclusive = false)

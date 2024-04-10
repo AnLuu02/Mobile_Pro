@@ -20,7 +20,6 @@ import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
@@ -44,13 +43,15 @@ fun DateRangePickerScreen(
     searchViewModel:SearchViewModel,
     typeBooking:String,
     visible:Boolean = false,
-    onCloseCalenderScreen:()->Unit
+    onCloseCalenderScreen:()->Unit,
+    onHandleClickButtonDelete:()->Unit
+
 ) {
     val currentTime = remember { LocalDateTime.now() }
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val timeCheckin = remember{ mutableIntStateOf(
-        if(searchViewModel.getOnlyHourBooking(typeBooking) != null){
-            searchViewModel.getOnlyHourBooking(typeBooking)!!.timeCheckin.toInt()
+        if(searchViewModel.getOnlyHourBooking(typeBooking).timeCheckin != "Bất kì"){
+            searchViewModel.getOnlyHourBooking(typeBooking).timeCheckin.toInt()
         }
         else{
             currentTime.format(DateTimeFormatter.ofPattern("dd")).toInt()
@@ -58,8 +59,8 @@ fun DateRangePickerScreen(
     ) }
 
     val timeCheckout = remember{ mutableIntStateOf(
-        if(searchViewModel.getOnlyHourBooking(typeBooking) != null){
-            searchViewModel.getOnlyHourBooking(typeBooking)!!.timeCheckOut.toInt()
+        if(searchViewModel.getOnlyHourBooking(typeBooking).timeCheckOut != "Bất kì"){
+            searchViewModel.getOnlyHourBooking(typeBooking).timeCheckOut.toInt()
         }
         else{
             currentTime.format(DateTimeFormatter.ofPattern("dd")).toInt()
@@ -67,22 +68,20 @@ fun DateRangePickerScreen(
     ) }
 
     var initialSelectedStartDateMillis =
-        if(searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin != null
-            && searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin != "")
-            searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckin?.let {
-        convertStringToTimestamp(
-            it
-        )
-    } else currentTime.toMillis()
+        if (searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckin != "Bất kì")
+            searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckin.let {
+                convertStringToTimestamp(
+                    it
+                )
+            } else currentTime.toMillis()
 
     var initialSelectedEndDateMillis =
-        if(searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckOut != null
-            && searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckOut != "")
-            searchViewModel.getSelectedCalendar(typeBooking).value?.timeCheckOut?.let {
-        convertStringToTimestamp(
-            it
-        )
-    } else currentTime.plusDays(3).toMillis()
+        if( searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckOut != "Bất kì")
+            searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckOut.let {
+                convertStringToTimestamp(
+                    it
+                )
+            } else currentTime.plusDays(3).toMillis()
 
     val dateRangePickerState = remember {
         DateRangePickerState(
@@ -93,48 +92,26 @@ fun DateRangePickerScreen(
             yearRange = (currentTime.year..3000)
         )
     }
+
     val selectedStart = dateRangePickerState.selectedStartDateMillis?.let {
-        initialSelectedStartDateMillis = it
-        initialSelectedEndDateMillis = LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault()).plusDays(1).toMillis()
         if(typeBooking == "overnight"){
+            initialSelectedStartDateMillis = it
+            initialSelectedEndDateMillis = LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault()).plusDays(1).toMillis()
             dateRangePickerState.setSelection(
                 startDateMillis = initialSelectedStartDateMillis,
                 endDateMillis = initialSelectedEndDateMillis
             )
         }
-
         LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
     }
 
     val selectedEnd = dateRangePickerState.selectedEndDateMillis?.let {
-        initialSelectedEndDateMillis = it
         LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
     }
 
-    if (selectedStart != null) {
-        if (selectedEnd != null) {
-            searchViewModel.setSelectedCalendar(typeBooking,
-                Bookroom(
-                    timeCheckin = "${formatHourly(timeCheckin.intValue)}, ${selectedStart.format(dateFormatter)}",
-                    timeCheckOut = "${formatHourly(timeCheckout.intValue)}, ${selectedEnd.format(dateFormatter)}",
-                    totalTime = convertMillisToDays(selectedEnd.toMillis() - selectedStart.toMillis())
-                )
-            )
-        }
-        else{
-            searchViewModel.setSelectedCalendar(typeBooking,
-                Bookroom(
-                    timeCheckin = "${formatHourly(timeCheckin.intValue)}, ${selectedStart.format(dateFormatter)}",
-                    timeCheckOut = "${formatHourly(timeCheckout.intValue)}, ${selectedStart.plusDays(3).format(dateFormatter)}",
-                    totalTime = convertMillisToDays(selectedStart.plusDays(3).toMillis() - selectedStart.toMillis())
-                )
-            )
-        }
-    }
-
-    val dateCheckinString = searchViewModel.getDayAndMonth(typeBooking)?.timeCheckin.toString()
-    val dateCheckoutString = searchViewModel.getDayAndMonth(typeBooking)?.timeCheckOut.toString()
-    val totalSelectedDay = searchViewModel.getSelectedCalendar(typeBooking).value?.totalTime.toString().toLong()
+    val dateCheckinString = selectedStart?.format(dateFormatter).toString()
+    val dateCheckoutString = selectedEnd?.format(dateFormatter)?.toString() ?: "Bất kì"
+    val totalSelectedDay =  if(selectedEnd!=null && selectedStart != null) convertMillisToDays(selectedEnd.toMillis() - selectedStart.toMillis()) else 0
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -157,7 +134,7 @@ fun DateRangePickerScreen(
                     DatePickerTopBar(
                         checkIn = dateCheckinString,
                         checkOut = dateCheckoutString,
-                        totalDate = totalSelectedDay,
+                        totalDate = totalSelectedDay.toLong(),
                         onCloseCalenderScreen = {
                             onCloseCalenderScreen()
                         })
@@ -166,7 +143,21 @@ fun DateRangePickerScreen(
                     DatePickerBottomBar(
                         searchViewModel = searchViewModel,
                         typeBooking = typeBooking,
-                        onHandleClickButton = onCloseCalenderScreen,
+                        onHandleClickButton = {
+                            if (selectedStart != null) {
+                                if (selectedEnd != null) {
+                                    searchViewModel.setSelectedCalendar(typeBooking,
+                                        Bookroom(
+                                            timeCheckin = "${formatHourly(timeCheckin.intValue)}, ${selectedStart.format(dateFormatter)}",
+                                            timeCheckOut = "${formatHourly(timeCheckout.intValue)}, ${selectedEnd.format(dateFormatter)}",
+                                            totalTime = convertMillisToDays(selectedEnd.toMillis() - selectedStart.toMillis())
+                                        )
+                                    )
+                                }
+                            }
+                            onCloseCalenderScreen()
+                        },
+                        onHandleClickButtonDelete = onHandleClickButtonDelete
                     )
                 },
                 modifier = Modifier

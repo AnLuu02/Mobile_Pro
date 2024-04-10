@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
@@ -42,9 +43,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SearchResultTopBar(){
+fun SearchResultTopBar(
+    onOpenSort:(Boolean)->Unit,
+    onOpenFilter:()->Unit,
+    onBackSearchScreen:()->Unit,
+    onOpenSearchScreen:()->Unit
+
+){
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().background(Color.White)
     ) {
         Row(
             modifier = Modifier
@@ -59,7 +66,7 @@ fun SearchResultTopBar(){
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = rememberRipple(bounded = false, radius = 24.dp),
-                        onClick = { }
+                        onClick = { onBackSearchScreen()}
                     )
                 ,
                 contentAlignment = Alignment.Center
@@ -74,7 +81,7 @@ fun SearchResultTopBar(){
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            TextFieldSearchResult {}
+            TextFieldSearchResult {onOpenSearchScreen()}
 
         }
 
@@ -96,7 +103,12 @@ fun SearchResultTopBar(){
 
             ) {
                 Row(
-                    modifier = Modifier.weight(1f).fillMaxSize().clickable {  },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                        .clickable {
+                            onOpenSort(true)
+                        },
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -113,7 +125,12 @@ fun SearchResultTopBar(){
 
 
                 Row(
-                    modifier = Modifier.weight(1f).fillMaxSize().clickable {  },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                        .clickable {
+                            onOpenFilter()
+                        },
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -176,16 +193,18 @@ fun TextFieldSearchResult(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "emailIcon"
+                    contentDescription = "emailIcon",
+                    modifier = Modifier.size(30.dp)
                 )
             },
             placeholder = {
                 Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "Hồ Chí Minh",
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyMedium
                     )
 
                     Row(
@@ -218,8 +237,9 @@ fun TextFieldSearchResult(
 
             modifier = Modifier
                 .fillMaxWidth()
+                .wrapContentHeight()
                 .background(
-                    Color.LightGray.copy(alpha = 0.5f),
+                    Color.LightGray.copy(alpha = 0.2f),
                     shape = MaterialTheme.shapes.extraLarge
                 )
             ,

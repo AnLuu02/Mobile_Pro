@@ -46,22 +46,15 @@ import androidx.compose.ui.unit.dp
 fun SearchScreen(
     searchViewModel: SearchViewModel,
     onOpenDatePickerScreen:(String)->Unit,
+    onHandleSearchClickButton:(Bookroom)->Unit,
     closeSearchScreen:()->Unit
 ) {
     val typeBooking = remember {
         mutableStateOf("")
     }
 
-    val timeCheckin =
-        if(searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckin != null
-            && searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckin != "")
-            searchViewModel.getDateSearch(typeBooking.value)?.timeCheckin.toString() else "Bất kì"
-    val timeCheckOut =
-        if(searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckOut != null
-            && searchViewModel.getSelectedCalendar(typeBooking.value).value?.timeCheckOut != "")
-            searchViewModel.getDateSearch(typeBooking.value)?.timeCheckOut.toString() else "Bất kì"
-
-
+    val timeCheckin = searchViewModel.getDateSearch(typeBooking.value).timeCheckin
+    val timeCheckOut = searchViewModel.getDateSearch(typeBooking.value).timeCheckOut
 
     Scaffold(
         topBar = {
@@ -183,7 +176,13 @@ fun SearchScreen(
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = true)
-                            ) {}
+                            ) {
+
+                                onHandleSearchClickButton(
+                                    searchViewModel.getSelectedCalendar(typeBooking.value).value
+                                )
+
+                            }
                         ,
                         Alignment.Center
                     ) {

@@ -1,6 +1,5 @@
 package com.example.jetpackcomposedemo.components.CalenderDatePicker
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -33,6 +32,7 @@ fun DatePickerBottomBar(
     searchViewModel: SearchViewModel,
     typeBooking:String,
     onHandleClickButton:()->Unit,
+    onHandleClickButtonDelete: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -60,12 +60,12 @@ fun DatePickerBottomBar(
                 ) {
                     searchViewModel.setSelectedCalendar(typeBooking,
                         Bookroom(
-                            timeCheckin = "",
-                            timeCheckOut = "",
-                            totalTime = 0
+                            timeCheckin = "Bất kì",
+                            timeCheckOut = "Bất kì",
+                            totalTime = 1
                         )
-                        )
-                    onHandleClickButton()
+                    )
+                    onHandleClickButtonDelete()
                 }
             )
 
