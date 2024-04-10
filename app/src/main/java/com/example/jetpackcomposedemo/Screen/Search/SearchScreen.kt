@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 fun SearchScreen(
     searchViewModel: SearchViewModel,
     onOpenDatePickerScreen:(String)->Unit,
-    onHandleSearchClickButton:(Bookroom)->Unit,
+    onHandleSearchClickButton:(String)->Unit,
     closeSearchScreen:()->Unit
 ) {
     val typeBooking = remember {
@@ -177,11 +177,7 @@ fun SearchScreen(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = true)
                             ) {
-
-                                onHandleSearchClickButton(
-                                    searchViewModel.getSelectedCalendar(typeBooking.value).value
-                                )
-
+                                onHandleSearchClickButton(typeBooking.value)
                             }
                         ,
                         Alignment.Center

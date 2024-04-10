@@ -63,7 +63,7 @@ fun MainApp(){
             val searchViewModel: SearchViewModel = viewModel()
             NavHost(navController = navController, startDestination = "home" ){
 
-                //Home Screen
+                //----------------------------------- HOME ------------------------------
                 composable("home"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
@@ -83,23 +83,32 @@ fun MainApp(){
                         })
                 }
 
-                // search widget
+                //----------------------------------- SEARCH ------------------------------
                 composable("search") {
                     SearchScreen(
                         searchViewModel = searchViewModel,
                         onOpenDatePickerScreen = {typeBooking->
                             navController.navigate("search/$typeBooking/calender")
                         },
-                        onHandleSearchClickButton = {
-                            navController.navigate("search/result")
+                        onHandleSearchClickButton = {typeBooking->
+                            navController.navigate("search/$typeBooking/result")
                         },
                         closeSearchScreen={
                             navController.popBackStack()
                         })
                 }
                 //search result
-                composable("search/result"){
+                composable(
+                    "search/{typeBooking}/result",
+                    arguments = listOf(
+                        navArgument("typeBooking") {
+                            type = NavType.StringType
+                        })
+                ){backStackEntry ->
+
+                    val typeBooking = backStackEntry.arguments?.getString("typeBooking")
                     SearchResultScreen(
+                        typeBooking = typeBooking.toString(),
                         onBackSearchScreen = {
                             navController.popBackStack()
                         },
@@ -117,7 +126,6 @@ fun MainApp(){
                         navController.popBackStack()
                     }
                 }
-
 
                 composable(
                     "search/{typeBooking}/calender",
@@ -178,7 +186,7 @@ fun MainApp(){
                 }
 
 
-                // Đề xuất Screen
+                //----------------------------------- PROPOSED ------------------------------
                 composable("proposed"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
@@ -190,14 +198,14 @@ fun MainApp(){
                         })
                 }
 
-                //Đặt phòng nhanh Screen
+                //----------------------------------- BOOKQUICKLY ------------------------------
                 composable("bookquickly"){
                     ScreenWithBottomNavigationBar(navController = navController, content = {padding,listState->
                         BookQuicklyScreen(padding = padding)
                     })
                 }
 
-                //Ưu đãi Screen
+                //----------------------------------- DISCOUNT ------------------------------
                 composable("discount"){
                     ScreenWithBottomNavigationBar(navController = navController, topBar = {
                         DiscountTopBar()
@@ -206,7 +214,7 @@ fun MainApp(){
                     })
                 }
 
-                //user Screen
+                //----------------------------------- USER ------------------------------
                 composable("user"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
@@ -239,7 +247,7 @@ fun MainApp(){
                     )
                 }
 
-                //handle payload card
+                //----------------------------------- PAYLOAD CARD ------------------------------
                 composable(
                     "carddetail/{cardId}",
                     arguments = listOf(

@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.Search.SearchResult
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,6 +23,7 @@ import com.example.jetpackcomposedemo.components.Card.PriceCard
 
 @Composable
 fun SearchResultScreen(
+    typeBooking:String,
     onBackSearchScreen:()->Unit,
     onOpenSearchScreen:()->Unit,
     onOpenFilter:()->Unit
@@ -29,6 +31,7 @@ fun SearchResultScreen(
     val isOpenSort = remember {
         mutableStateOf(false)
     }
+    Log.e("typeBooking",typeBooking)
     Scaffold(
         topBar = {
             SearchResultTopBar(
