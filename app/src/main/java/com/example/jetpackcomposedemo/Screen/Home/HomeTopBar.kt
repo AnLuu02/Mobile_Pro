@@ -33,7 +33,8 @@ import com.example.jetpackcomposedemo.R
 @Composable
 fun HomeTopBar(
     listState:LazyListState,
-    onOpenScreenSearch:()->Unit
+    onOpenScreenSearch:()->Unit,
+    onOpenNotifications: () -> Unit
 ){
     val showSearchIcon = remember { mutableStateOf(false) }
     LaunchedEffect(listState.firstVisibleItemScrollOffset) {
@@ -81,7 +82,12 @@ fun HomeTopBar(
                 painter = painterResource(id = R.drawable.outline_notifications_24),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(30.dp),
+                modifier = Modifier.size(30.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = rememberRipple(bounded = false, radius = 24.dp),
+                        onClick = onOpenNotifications
+                    ),
             )
         }
 
