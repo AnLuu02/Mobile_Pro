@@ -58,7 +58,6 @@ class SearchViewModel:ViewModel() {
             }
         }
     }
-
     fun getDateNotYear(typeBooking:String): Bookroom {
         val regex = "/\\d{4}".toRegex()
         return when (typeBooking) {

@@ -19,11 +19,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.components.Card.PriceCard
 
 @Composable
 fun SearchResultScreen(
     typeBooking:String,
+    searchViewModel:SearchViewModel,
     onBackSearchScreen:()->Unit,
     onOpenSearchScreen:()->Unit,
     onOpenFilter:()->Unit
@@ -35,6 +37,8 @@ fun SearchResultScreen(
     Scaffold(
         topBar = {
             SearchResultTopBar(
+                typeBooking = typeBooking,
+                searchViewModel = searchViewModel,
                 onOpenSort = {
                     isOpenSort.value = it
                 },

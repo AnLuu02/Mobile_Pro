@@ -109,6 +109,17 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
 
 
+    //retrofit
+    // Retrofit and GSON
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Logging
+    implementation ("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
+
+
+
     //layout tự động xuống hàng
 //    implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
 
