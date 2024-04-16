@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun NotificationsScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(pageCount = { HomeTabs.values().size })
+    val pagerState = rememberPagerState(pageCount = { HomeTabs.entries.size })
     val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
 
     Scaffold(
@@ -59,7 +59,7 @@ fun NotificationsScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
 
                 ) {
-                HomeTabs.values().forEachIndexed { index, currentTab ->
+                HomeTabs.entries.forEachIndexed { index, currentTab ->
                     Tab(
                         selected = selectedTabIndex.value == index,
                         onClick = {
@@ -93,7 +93,6 @@ enum class HomeTabs(
     val text: String
 ) {
     All(
-
         text = "Tất cả"
     ),
     Bookroom(

@@ -107,7 +107,7 @@ class LoginViewModel : ViewModel() {
 
 
 }
-val correctTelephoneNumber = "12345789"
+const val correctTelephoneNumber = "12345789"
 private fun authenticateUser(
     inputTelephone: String,
     onAuthenticated: () -> Unit,

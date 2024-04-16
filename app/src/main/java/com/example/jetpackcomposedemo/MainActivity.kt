@@ -48,6 +48,7 @@ import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
+import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultFilterScreen
@@ -69,19 +70,22 @@ import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel by viewModels<ProductsViewModel> (factoryProducer = {
-        object : ViewModelProvider.Factory{
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ProductsViewModel(ProductsRepositoryImpl(RetrofitInstance.apiService))
-                        as T
-            }
-        }
-    })
+//    private val viewModel by viewModels<ProductsViewModel> (factoryProducer = {
+//        object : ViewModelProvider.Factory{
+//            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//                return ProductsViewModel(ProductsRepositoryImpl(RetrofitInstance.apiService))
+//                        as T
+//            }
+//        }
+//    })
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            MainApp()
+        }
+//        setContent {
 //            val productList = viewModel.product.collectAsState().value
 //            val context = LocalContext.current
 //            LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
@@ -111,67 +115,11 @@ class MainActivity : ComponentActivity() {
 //                    }
 //                }
 //            }
-            MainApp()
-
-        }
+//
+//        }
     }
 }
-@Composable
-fun Product(product: Product) {
-    val imageState = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalContext.current).data(product.thumbnail)
-            .size(coil.size.Size.ORIGINAL).build()
-    ).state
 
-    Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
-            .height(300.dp)
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primaryContainer)
-    ) {
-
-        if (imageState is AsyncImagePainter.State.Error) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-
-        if (imageState is AsyncImagePainter.State.Success) {
-            Image(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                painter = imageState.painter,
-                contentDescription = product.title,
-                contentScale = ContentScale.Crop
-            )
-        }
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = "${product.title} -- Price: ${product.price}$",
-            fontSize = 17.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = product.description,
-            fontSize = 13.sp,
-        )
-
-    }
-}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -190,7 +138,9 @@ fun MainApp(){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
                         topBar ={listState-> HomeTopBar(listState,
-                            onOpenNotifications = {},
+                            onOpenNotifications = {
+                                navController.navigate("notification")
+                            },
                             onOpenScreenSearch ={
                                 navController.navigate("search")
                             }
@@ -206,6 +156,11 @@ fun MainApp(){
                                     navController.navigate("carddetail/$cardId")
                                 })
                         })
+                }
+
+                //----------------------------------- NOTIFICATION ------------------------------
+                composable("notification"){
+                    NotificationsScreen(navController = navController)
                 }
 
                 //----------------------------------- SEARCH ------------------------------
@@ -355,7 +310,7 @@ fun MainApp(){
                         navController = navController,
                         topBar = { UserTopBar(onLoginButtonClicked = { navController.navigate("login") }) },
                         content = { padding, _ ->
-                            UserScreen(padding = padding, )
+                            UserScreen(padding = padding )
                         })
                 }
 
