@@ -7,9 +7,6 @@ interface ApiService {
     @GET("products")
     suspend fun getProductsList():Products
 
-    companion object {
-        const val BASE_URL = "https://dummyjson.com/"
-    }
 
 //
 //    @GET("products/{type}")
