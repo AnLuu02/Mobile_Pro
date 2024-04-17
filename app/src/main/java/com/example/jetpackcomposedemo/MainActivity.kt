@@ -148,7 +148,11 @@ fun MainApp(
                 ){backStackEntry->
                     val typeBooking = backStackEntry.arguments?.getString("typeBooking").toString()
                     SearchResultFilterScreen(
-                        typeBooking = typeBooking
+                        searchViewModel = searchViewModel,
+                        typeBooking = typeBooking,
+                        onHandleApply = {
+                            navController.popBackStack()
+                        }
                     ) {
                         navController.popBackStack()
                     }

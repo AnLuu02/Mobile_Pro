@@ -33,7 +33,8 @@ fun SearchResultScreen(
     val isOpenSort = remember {
         mutableStateOf(false)
     }
-    Log.e("typeBooking",typeBooking)
+    Log.e("Filter",searchViewModel.getFilterRoom().toString())
+
     Scaffold(
         topBar = {
             SearchResultTopBar(

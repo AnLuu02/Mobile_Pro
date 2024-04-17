@@ -49,6 +49,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,21 +69,33 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.Screen.Search.FilterRoom
+import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
 fun SearchResultFilterScreen(
+    searchViewModel: SearchViewModel,
     typeBooking:String,
     visible:Boolean = true,
+    onHandleApply:()->Unit,
     onCloseFilter:()->Unit
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+
+    var minPriceRoom = 0
+    var maxPriceRoom = 0
+    var rateScore = ""
+    var cleanScore = ""
+    var typeRoom = ""
+    var utilitiesRoom:List<String>? = null
+
     Box(modifier = Modifier
         .fillMaxSize()
         .clickable(
-            interactionSource = remember{ MutableInteractionSource() },
+            interactionSource = remember { MutableInteractionSource() },
             indication = null
         ) {
             focusManager.clearFocus()
@@ -171,7 +184,17 @@ fun SearchResultFilterScreen(
                             ,
                         ) {
                             Button(
-                                onClick = {  },
+                                onClick = {
+                                    searchViewModel.setFilterRoom(FilterRoom(
+                                        minPriceRoom = minPriceRoom,
+                                        maxPriceRoom = maxPriceRoom,
+                                        rateScore = rateScore,
+                                        cleanScore = cleanScore,
+                                        typeRoom = typeRoom,
+                                        utilitiesRoom = utilitiesRoom
+                                    ))
+                                    onHandleApply()
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(MaterialTheme.shapes.small),
@@ -211,19 +234,42 @@ fun SearchResultFilterScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         item{
-                            PriceRangeSlider(focusManager)
+                            PriceRangeSlider(focusManager,
+                                minPriceRoom = {
+                                    minPriceRoom = it
+                                },
+                                maxPriceRoom = {
+                                    maxPriceRoom = it
+                                }
+                            )
                         }
                         item {
-                            StarRating("Điểm đánh giá")
+                            StarRating("Điểm đánh giá",
+                                starRating = {
+                                    rateScore = it
+                                }
+                            )
                         }
                         item {
-                            StarRating("Điểm sạch sẽ")
+                            StarRating("Điểm sạch sẽ",
+                                starRating = {
+                                    cleanScore = it
+                                }
+                            )
                         }
                         item {
-                            TypeHotel()
+                            TypeHotel(
+                                typeRoom = {
+                                    typeRoom = it
+                                }
+                            )
                         }
                         item {
-                            UtilitiesHotel()
+                            UtilitiesHotel(
+                                utilitiesRoom = {
+                                    utilitiesRoom = it
+                                }
+                            )
                         }
                     }
                 }
@@ -234,8 +280,12 @@ fun SearchResultFilterScreen(
 
 @Composable
 fun PriceRangeSlider(
-    focusManager: FocusManager
+    focusManager: FocusManager,
+    minPriceRoom:(Int)->Unit,
+    maxPriceRoom:(Int)->Unit
 ) {
+
+
     val priceRange = remember { mutableStateOf(100000f..20000000f) }
     val rangeLimit = 100000f..20000000f // Phạm vi giới hạn cho slider
     val slideStart = remember{ mutableStateOf(priceRange.value.start.toInt().toString()) }
@@ -244,6 +294,10 @@ fun PriceRangeSlider(
     val editPriceEnd = remember{ mutableStateOf(false) }
     val focusRequesterPriceStart = FocusRequester()
     val focusRequesterPriceEnd = FocusRequester()
+
+    minPriceRoom(slideStart.value.toInt())
+    maxPriceRoom(slideEnd.value.toInt())
+
 
 
     Box(modifier = Modifier.fillMaxWidth()){
@@ -263,6 +317,8 @@ fun PriceRangeSlider(
                     slideStart.value = newRange.start.toInt().toString()
                     slideEnd.value = newRange.endInclusive.toInt().toString()
                     priceRange.value = newRange.start .. newRange.endInclusive
+
+
                 },
                 valueRange = rangeLimit,
                 steps = 0,
@@ -316,6 +372,7 @@ fun PriceRangeSlider(
                                     slideEnd.value =  slideStart.value
                                 }
                                 priceRange.value = slideStart.value.toFloat() .. slideEnd.value.toFloat()
+
                             }
                         },
                         label = {
@@ -343,7 +400,7 @@ fun PriceRangeSlider(
                         ),
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(top=12.dp)
+                            .padding(top = 12.dp)
                             .focusRequester(focusRequesterPriceStart)
                             .onFocusChanged {
                                 editPriceStart.value = it.isFocused
@@ -393,7 +450,6 @@ fun PriceRangeSlider(
                                     slideEnd.value = "20000000"
                                 }
                                 priceRange.value = slideStart.value.toFloat() .. slideEnd.value.toFloat()
-
                             }
                         },
                         label = {
@@ -451,7 +507,8 @@ fun PriceRangeSlider(
 
 @Composable
 fun StarRating(
-    title:String
+    title:String,
+    starRating:(String)->Unit
 ) {
     val selectedRate = remember{ mutableStateOf("") }
     val dataStarRate = listOf("4.5","4","3.5")
@@ -502,6 +559,7 @@ fun StarRating(
                                 indication = rememberRipple(bounded = true)
                             ) {
                                 selectedRate.value = item
+                                starRating(item)
                             }
 
                     ){
@@ -542,7 +600,9 @@ fun StarRating(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TypeHotel() {
+fun TypeHotel(
+    typeRoom:(String)->Unit
+) {
     val dataTypeHotel = listOf("Flash Sale","EasyBoking","Ưu đãi đặc biệt","Khuyến mãi","Nổi bật","Mới","Tem")
     val selectedTypeHotel = remember{ mutableStateOf("") }
 
@@ -583,6 +643,7 @@ fun TypeHotel() {
                                 indication = rememberRipple(bounded = true)
                             ) {
                                 selectedTypeHotel.value = item
+                                typeRoom(item)
                             }
 
                     ){
@@ -614,7 +675,9 @@ fun TypeHotel() {
 }
 
 @Composable
-fun UtilitiesHotel() {
+fun UtilitiesHotel(
+    utilitiesRoom:(List<String>)->Unit
+) {
     val dataUtilitiesHotel = listOf("Wi-Fi miễn phí","Ghế tình yêu","Lễ tân 24/24","Bồn tắm","Smart TV","Điều hòa ","Két sắt","Tủ lạnh")
     val checkBoxStates = remember { mutableStateListOf<Boolean>().apply {
         for (i in 1..dataUtilitiesHotel.size) {
@@ -622,12 +685,12 @@ fun UtilitiesHotel() {
         }
     }}
     val selectedUtilitiesHotel= remember{ mutableStateListOf<String>() }
-
+    utilitiesRoom(selectedUtilitiesHotel)
     Box(modifier = Modifier.fillMaxWidth()){
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top=16.dp, bottom = 16.dp)
+                .padding(top = 16.dp, bottom = 16.dp)
         ) {
             Text(
                 text = "Tiện ích",
@@ -644,20 +707,21 @@ fun UtilitiesHotel() {
                         interactionSource = remember { MutableInteractionSource() },
                         indication = rememberRipple(bounded = true)
                     ) {
-                        checkBoxStates[index] = ! checkBoxStates[index]
-                        if(checkBoxStates[index] && !selectedUtilitiesHotel.contains(dataUtilitiesHotel[index])){
+                        checkBoxStates[index] = !checkBoxStates[index]
+                        if (checkBoxStates[index] && !selectedUtilitiesHotel.contains(
+                                dataUtilitiesHotel[index]
+                            )
+                        ) {
                             selectedUtilitiesHotel.add(dataUtilitiesHotel[index])
-                        }
-                        else{
+                        } else {
                             selectedUtilitiesHotel.remove(dataUtilitiesHotel[index])
                         }
-                        Log.e("Arr",selectedUtilitiesHotel.toString())
                     }
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 16.dp,end=16.dp)
+                            .padding(start = 16.dp, end = 16.dp)
 
                         ,
                         verticalAlignment = Alignment.CenterVertically,
@@ -691,7 +755,7 @@ fun UtilitiesHotel() {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(0.4.dp)
-                                .padding(start = 16.dp,end=16.dp)
+                                .padding(start = 16.dp, end = 16.dp)
                                 .background(Color.Black.copy(alpha = 0.4f))
                                 .align(Alignment.BottomCenter)
                         )

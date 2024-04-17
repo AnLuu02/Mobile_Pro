@@ -63,8 +63,6 @@ fun SearchScreen(
     Log.e("aaa",productsViewModel.product.toString())
 
 
-
-
     val typeBooking = remember {
         mutableStateOf("")
     }

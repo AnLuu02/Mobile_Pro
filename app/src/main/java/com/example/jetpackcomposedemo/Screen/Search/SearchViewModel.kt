@@ -9,12 +9,22 @@ data class Bookroom(
     val timeCheckOut:String = "Bất kì",
     val totalTime:Int = 1,
 )
+
+data class  FilterRoom(
+    val minPriceRoom:Int? = null,
+    val maxPriceRoom:Int? = null,
+    val rateScore:String? = null,
+    val cleanScore:String? = null,
+    val typeRoom:String? = null,
+    val utilitiesRoom:List<String>? = null,
+)
 class SearchViewModel:ViewModel() {
 
     // Lưu trữ các trạng thái đã chọn của lịch
     private val _hourSelectedCalendar = mutableStateOf(Bookroom())
     private val _overnightSelectedCalendar = mutableStateOf(Bookroom())
     private val _daySelectedCalendar  = mutableStateOf(Bookroom())
+    private var _filterRoom  = mutableStateOf(FilterRoom())
 
     fun getSelectedCalendar(typeBooking:String): MutableState<Bookroom> {
         return when(typeBooking){
@@ -24,6 +34,10 @@ class SearchViewModel:ViewModel() {
         }
     }
 
+    fun getFilterRoom():MutableState<FilterRoom>{
+        return _filterRoom
+    }
+
     fun setSelectedCalendar(typeBooking:String,timeCheckin: Bookroom) {
         when(typeBooking){
             "hourly"->_hourSelectedCalendar.value = timeCheckin
@@ -31,6 +45,11 @@ class SearchViewModel:ViewModel() {
             else -> _daySelectedCalendar.value = timeCheckin
         }
     }
+
+    fun setFilterRoom(filterRoom: FilterRoom) {
+        _filterRoom.value = filterRoom
+    }
+
     fun getOnlyDayBooking(typeBooking: String): Bookroom {
         val regexDay = "\\b\\d{2}:\\d{2}, (\\d{2})/\\d{2}/\\d{4}\\b".toRegex()
         return when (typeBooking) {
@@ -170,47 +189,3 @@ class SearchViewModel:ViewModel() {
         }
     }
 }
-
-
-//import androidx.compose.runtime.MutableState
-//import androidx.compose.runtime.mutableStateOf
-//import androidx.lifecycle.ViewModel
-//
-//data class Bookroom(
-//    val timeCheckin: String = "",
-//    val timeCheckOut:String = "",
-//    val totalTime:Int = 1,
-//)
-//class SearchViewModel:ViewModel() {
-//    private val _timeBookroom = mutableStateOf<Bookroom?>(null)
-//    val getTimeBookroom: MutableState<Bookroom?> = _timeBookroom
-//
-//    fun setTimeBookroom(timeCheckin: Bookroom) {
-//        _timeBookroom.value = timeCheckin
-//    }
-//
-//    fun getDayAndMonth(): Bookroom? {
-//        val regex = "/\\d{4}".toRegex()
-//        return _timeBookroom.value?.timeCheckin?.let {
-//            _timeBookroom.value?.timeCheckOut?.let { it1 ->
-//                Bookroom(
-//                    timeCheckin = it.replace(regex, ""),
-//                    timeCheckOut = it1.replace(regex, ""),
-//                    totalTime = _timeBookroom.value!!.totalTime
-//                )
-//            }
-//        }
-//    }
-//    fun getOnlyHourCheckin(): Int {
-//        return _timeBookroom.value?.timeCheckin?.split(":")?.get(0)?.toInt() ?: -1
-//    }
-//
-//    fun getOnlyHourCheckout(): Int {
-//        return _timeBookroom.value?.timeCheckOut?.split(":")?.get(0)?.toInt() ?: -1
-//    }
-//
-//    fun getTotalDate(): Int {
-//        return _timeBookroom.value?.totalTime ?: -1
-//    }
-//}
-//

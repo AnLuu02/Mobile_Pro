@@ -4,7 +4,7 @@ import com.example.jetpackcomposedemo.data.models.Products
 import retrofit2.http.GET
 
 interface ApiService {
-    @GET("products")
+    @GET("api/coupon")
     suspend fun getProductsList():Products
 
 
