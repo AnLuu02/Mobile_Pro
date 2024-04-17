@@ -55,15 +55,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackcomposedemo.R
 
 @Composable
-fun LoginScreen(loginViewModel : LoginViewModel = viewModel(),
-                onCancelButtonClicked: () -> Unit = {},
-                onClickedRegisterText: () -> Unit = {},
-                paddingValues: PaddingValues = PaddingValues(16.dp),)
+fun LoginScreen(
+    loginViewModel: LoginViewModel ,
+    onCancelButtonClicked: () -> Unit = {},
+    onClickedRegisterText: () -> Unit = {},
+    paddingValues: PaddingValues = PaddingValues(16.dp),
+)
 {
     val activity = LocalContext.current as Activity
-    val loginUiState by loginViewModel.uiState.collectAsState()
-
-    Log.d("DEBUG","User Telephone Number : ${loginUiState.phoneNumber} " )
+//    val loginUiState by loginViewModel.uiState.collectAsState()
+//
+//    Log.d("DEBUG","User Telephone Number : ${loginUiState.phoneNumber} " )
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween

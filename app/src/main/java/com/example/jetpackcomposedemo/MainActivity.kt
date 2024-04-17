@@ -21,6 +21,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -56,6 +58,7 @@ import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScr
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.Screen.User.LoginScreen
+import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
@@ -123,7 +126,9 @@ class MainActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainApp(){
+fun MainApp(
+    loginViewModel1: LoginViewModel = viewModel()
+){
     val navController = rememberNavController()
     JetpackComposeDemoTheme {
         Surface(
@@ -131,6 +136,7 @@ fun MainApp(){
             color = MaterialTheme.colorScheme.background
         ) {
             val searchViewModel: SearchViewModel = viewModel()
+            val loginUiState by loginViewModel1.uiState.collectAsState()
             NavHost(navController = navController, startDestination = "home" ){
 
                 //----------------------------------- HOME ------------------------------
@@ -308,7 +314,7 @@ fun MainApp(){
                 composable("user"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
-                        topBar = { UserTopBar(onLoginButtonClicked = { navController.navigate("login") }) },
+                        topBar = { UserTopBar(loginUiState = loginUiState,onLoginButtonClicked = { navController.navigate("login") }) },
                         content = { padding, _ ->
                             UserScreen(padding = padding )
                         })
@@ -316,6 +322,7 @@ fun MainApp(){
 
                 composable("login") {
                     LoginScreen(
+                        loginViewModel1,
                         onCancelButtonClicked = {
                             navController.popBackStack("user", inclusive = false)
                         },
