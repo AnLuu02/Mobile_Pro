@@ -1,7 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.Home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -33,17 +32,13 @@ import com.example.jetpackcomposedemo.R
 @Composable
 fun HomeTopBar(
     listState:LazyListState,
-    onOpenScreenSearch:()->Unit
+    onOpenScreenSearch:()->Unit,
+    onOpenNotifications: () -> Unit
 ){
     val showSearchIcon = remember { mutableStateOf(false) }
     LaunchedEffect(listState.firstVisibleItemScrollOffset) {
         showSearchIcon.value = listState.firstVisibleItemScrollOffset > 240
     }
-
-    val interactionSource = remember {
-        MutableInteractionSource()
-    }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -72,7 +67,7 @@ fun HomeTopBar(
                     modifier = Modifier
                         .size(30.dp)
                         .clickable(
-                            interactionSource = interactionSource,
+                            interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = false, radius = 24.dp),
                             onClick = onOpenScreenSearch
                         )
@@ -86,7 +81,12 @@ fun HomeTopBar(
                 painter = painterResource(id = R.drawable.outline_notifications_24),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(30.dp),
+                modifier = Modifier.size(30.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = rememberRipple(bounded = false, radius = 24.dp),
+                        onClick = onOpenNotifications
+                    ),
             )
         }
 

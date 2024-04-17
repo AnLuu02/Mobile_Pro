@@ -89,8 +89,6 @@ fun TextFieldSearch(
     var text by remember {
         mutableStateOf("")
     }
-    var interactionSource = remember { MutableInteractionSource() }
-
     Surface(
         shadowElevation = 4.dp, // Độ nâng của đổ bóng
         modifier = Modifier
@@ -98,7 +96,7 @@ fun TextFieldSearch(
             .padding(16.dp)
             .clip(MaterialTheme.shapes.medium)
             .clickable (
-                interactionSource = interactionSource,
+                interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true),
                 onClick = onOpenScreenSearch
             )

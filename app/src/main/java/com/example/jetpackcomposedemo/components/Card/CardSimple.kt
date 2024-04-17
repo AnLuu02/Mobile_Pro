@@ -46,9 +46,6 @@ fun <T> CardSimple(
         LocalConfiguration.current.screenWidthDp.dp
     }
 
-    val interactionSource = remember {
-        MutableInteractionSource()
-    }
 
 
     var lastPaddingEnd = 0.dp
@@ -60,7 +57,7 @@ fun <T> CardSimple(
             .padding(start = 16.dp, end = lastPaddingEnd)
             .clip(shape = MaterialTheme.shapes.small)
             .clickable(
-                interactionSource = interactionSource,
+                interactionSource =  remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true)
             ) { }
     ) {
