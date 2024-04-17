@@ -312,7 +312,7 @@ fun MainApp(
                 }
 
                 composable("CouponScreen"){
-                    CouponScreen()
+                    CouponScreen(navController)
                 }
 
 
