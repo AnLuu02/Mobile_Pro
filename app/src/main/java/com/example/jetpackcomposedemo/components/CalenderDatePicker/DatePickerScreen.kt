@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.components.CalenderDatePicker
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -108,7 +109,10 @@ fun DatePickerScreen(
         }
     }
 
-    val currentHourly = if((searchViewModel.getOnlyDayBooking(typeBooking).timeCheckin) == currentDay) roundUpHour(currentTime,true).toInt() else 0
+    val currentHourly = if(selectedDate?.format(DateTimeFormatter.ofPattern("dd")) == currentDay) roundUpHour(currentTime,true).toInt() else 0
+    Log.e("Current Hourly",currentHourly.toString())
+    Log.e("Current Day",currentDay.toString())
+
     val dateCheckinString = if(searchViewModel.getDateNotYear(typeBooking).timeCheckin == "Bất kì")
         "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
     else if("${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}" != searchViewModel.getDateNotYear(typeBooking).timeCheckin
