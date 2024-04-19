@@ -18,6 +18,10 @@ data class  FilterRoom(
     val typeRoom:String? = null,
     val utilitiesRoom:List<String>? = null,
 )
+
+data class SortMethod(
+    val sortMethod:String? = null
+)
 class SearchViewModel:ViewModel() {
 
     // Lưu trữ các trạng thái đã chọn của lịch
@@ -25,6 +29,7 @@ class SearchViewModel:ViewModel() {
     private val _overnightSelectedCalendar = mutableStateOf(Bookroom())
     private val _daySelectedCalendar  = mutableStateOf(Bookroom())
     private var _filterRoom  = mutableStateOf(FilterRoom())
+    private var _sortRoom  = mutableStateOf(SortMethod())
 
     fun getSelectedCalendar(typeBooking:String): MutableState<Bookroom> {
         return when(typeBooking){
@@ -36,6 +41,9 @@ class SearchViewModel:ViewModel() {
 
     fun getFilterRoom():MutableState<FilterRoom>{
         return _filterRoom
+    }
+    fun getSortMethod():MutableState<SortMethod>{
+        return _sortRoom
     }
 
     fun setSelectedCalendar(typeBooking:String,timeCheckin: Bookroom) {
@@ -49,7 +57,9 @@ class SearchViewModel:ViewModel() {
     fun setFilterRoom(filterRoom: FilterRoom) {
         _filterRoom.value = filterRoom
     }
-
+    fun setSortMethod(sortMethod: SortMethod) {
+        _sortRoom.value = sortMethod
+    }
     fun getOnlyDayBooking(typeBooking: String): Bookroom {
         val regexDay = "\\b\\d{2}:\\d{2}, (\\d{2})/\\d{2}/\\d{4}\\b".toRegex()
         return when (typeBooking) {
