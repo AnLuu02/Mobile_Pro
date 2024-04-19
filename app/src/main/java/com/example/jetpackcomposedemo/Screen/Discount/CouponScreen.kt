@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.Discount
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,10 +28,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInList
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInTopBar
+import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModel
 
 // Xử lý chức năng
 val showDetailCoupon: () -> Unit = {
@@ -51,7 +54,6 @@ val buttons = listOf(
     "Text" to "Sắp hết hạn"
   )
 )
-
 // Xử lý UI
 // Color
 val grayColor = Color(android.graphics.Color.parseColor("#E7E7E7"))
@@ -62,10 +64,14 @@ val lightRedColor = Color(android.graphics.Color.parseColor("#FFE1E4"))
 val whiteColor = Color(android.graphics.Color.parseColor("#FFFFFF"))
 
 // Màn hình
-
 @Composable
 fun CouponScreen(navController: NavHostController) {
   var selectedButtonID by remember { mutableStateOf(buttons.firstOrNull()?.get("ID") as? Int) }
+
+
+//    val viewModel: CouponViewModel = viewModel()
+
+//    Log.e("1",viewModel.toString())
 
   Column (
     modifier = Modifier
