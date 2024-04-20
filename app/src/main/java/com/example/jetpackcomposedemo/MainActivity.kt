@@ -217,6 +217,7 @@ fun MainApp(){
                     arguments = listOf(
                         navArgument("type") {
                             type = NavType.StringType
+                            
                         },
                     )
                 ){ backStackEntry ->

@@ -38,24 +38,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.components.BottomSheet.Sort.SortBottomSheet
 
 const val location = "Đồng Tháp"
+
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Composable
 fun ServiceTopBar (
-    onCancelButtonClicked: () -> Unit,
-    onSearchFieldClicked: () -> Unit,
+    onCancelButtonClicked: () -> Unit = {},
+    onSearchFieldClicked: () -> Unit = {},
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
+    val closeButtonInteractionSource = remember { MutableInteractionSource() }
+    val searchInteractionSource = remember { MutableInteractionSource() }
     val sheetState = rememberModalBottomSheetState()
     var showSortBottomSheet by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(elevation = 2.dp)
     ) {
         Row (
             modifier = Modifier
@@ -73,7 +76,7 @@ fun ServiceTopBar (
                         .background(color = Color.White, shape = CircleShape)
                         .align(Alignment.CenterVertically)
                         .clickable(
-                            interactionSource = interactionSource,
+                            interactionSource = closeButtonInteractionSource,
                             indication = rememberRipple(bounded = false, radius = 24.dp),
                             onClick = onCancelButtonClicked
                         ),
@@ -94,7 +97,7 @@ fun ServiceTopBar (
                         .weight(7.5F)
                         .background(Color.White, shape = RoundedCornerShape(24.dp))
                         .clickable(
-                            interactionSource = interactionSource,
+                            interactionSource = searchInteractionSource,
                             indication = rememberRipple(bounded = true),
                             onClick = onSearchFieldClicked
                         ),
@@ -113,7 +116,7 @@ fun ServiceTopBar (
             }
         }
         HorizontalDivider (
-            color = Color.DarkGray,
+            color = Color.LightGray,
             modifier = Modifier
                 .height(1.dp)
                 .fillMaxWidth()
@@ -138,7 +141,7 @@ fun ServiceTopBar (
                 Icon(
                     imageVector = Icons.Rounded.SwapVert,
                     contentDescription = "Sort",
-                    tint = Color.White,
+                    tint = Color.Black,
                 )
                 Text(
                     modifier = Modifier
@@ -149,7 +152,7 @@ fun ServiceTopBar (
                 )
             }
             VerticalDivider (
-                color = Color.DarkGray,
+                color = Color.LightGray,
                 modifier = Modifier.size(width = 1.dp, height = 42.dp)
             )
             Row (
@@ -163,7 +166,7 @@ fun ServiceTopBar (
                 Icon(
                     imageVector = Icons.Rounded.Tune,
                     contentDescription = "Select",
-                    tint = Color.White
+                    tint = Color.Black
                 )
                 Text(
                     modifier = Modifier
@@ -176,7 +179,7 @@ fun ServiceTopBar (
         }
 
         HorizontalDivider (
-            color = Color.DarkGray,
+            color = Color.LightGray,
             modifier = Modifier
                 .height(1.dp)
                 .fillMaxWidth()
