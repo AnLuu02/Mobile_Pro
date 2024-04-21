@@ -24,6 +24,7 @@ import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
+import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultFilterScreen
@@ -69,7 +70,10 @@ fun MainApp(){
                         navController = navController,
                         topBar ={listState-> HomeTopBar(listState,onOpenScreenSearch ={
                             navController.navigate("search")
-                        }) } ,
+                        },
+                            onOpenNotifications = {
+                                navController.navigate("notifications") // Chuyển hướng đến trang notifications khi icon được nhấn
+                            }) } ,
                         content ={ padding,listState->
                             HomeScreen(
                                 padding = padding,
@@ -258,6 +262,10 @@ fun MainApp(){
 
                     val cardId = backStackEntry.arguments?.getString("cardId")
                     CardDetailScreen(cardId = cardId,navController)
+                }
+                composable("notifications") {
+                    // Gọi hàm NotificationsScreen() để hiển thị màn hình notifications
+                    NotificationsScreen(navController = navController)
                 }
             }
         }
