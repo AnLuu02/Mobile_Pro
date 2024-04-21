@@ -41,7 +41,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.jetpackcomposedemo.components.BottomSheet.Filter.FilterBottomSheet
 import com.example.jetpackcomposedemo.components.BottomSheet.Sort.SortBottomSheet
+import java.util.logging.Filter
 
 const val location = "Đồng Tháp"
 
@@ -51,11 +53,17 @@ const val location = "Đồng Tháp"
 fun ServiceTopBar (
     onCancelButtonClicked: () -> Unit = {},
     onSearchFieldClicked: () -> Unit = {},
+    onOptionSelected: (String) -> Unit = {},
+    selectOption: String = ""
 ) {
     val closeButtonInteractionSource = remember { MutableInteractionSource() }
     val searchInteractionSource = remember { MutableInteractionSource() }
-    val sheetState = rememberModalBottomSheetState()
+    val sortInteractionSource = remember { MutableInteractionSource() }
+    val filterInteractionSource = remember { MutableInteractionSource() }
+    val sortSheetState = rememberModalBottomSheetState()
+    val filterSheetState = rememberModalBottomSheetState()
     var showSortBottomSheet by remember { mutableStateOf(false) }
+    var showFilterBottomSheet by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -127,10 +135,11 @@ fun ServiceTopBar (
         ) {
             Row (
                 modifier = Modifier
-                    .padding(top = 8.dp, bottom = 8.dp)
                     .fillMaxWidth()
                     .weight(1F)
                     .clickable(
+                        interactionSource = sortInteractionSource,
+                        indication = rememberRipple(bounded = true),
                         onClick = {
                             showSortBottomSheet = true
                         }
@@ -139,12 +148,15 @@ fun ServiceTopBar (
                 horizontalArrangement = Arrangement.Center,
             ) {
                 Icon(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp),
                     imageVector = Icons.Rounded.SwapVert,
                     contentDescription = "Sort",
                     tint = Color.Black,
                 )
                 Text(
                     modifier = Modifier
+                        .padding(vertical = 8.dp)
                         .padding(start = 8.dp),
                     text = "Sắp xếp",
                     fontSize = 14.sp,
@@ -153,23 +165,32 @@ fun ServiceTopBar (
             }
             VerticalDivider (
                 color = Color.LightGray,
-                modifier = Modifier.size(width = 1.dp, height = 42.dp)
+                modifier = Modifier.size(width = 1.dp, height = 40.dp)
             )
             Row (
                 modifier = Modifier
-                    .padding(top = 8.dp, bottom = 8.dp)
                     .weight(1F)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable(
+                        interactionSource = filterInteractionSource,
+                        indication = rememberRipple(bounded = true),
+                        onClick = {
+                            showFilterBottomSheet = true
+                        }
+                    ),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
                 Icon(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp),
                     imageVector = Icons.Rounded.Tune,
                     contentDescription = "Select",
                     tint = Color.Black
                 )
                 Text(
                     modifier = Modifier
+                        .padding(vertical = 8.dp)
                         .padding(start = 8.dp),
                     text = "Chọn lọc theo",
                     fontSize = 14.sp,
@@ -186,7 +207,22 @@ fun ServiceTopBar (
         )
 
         if(showSortBottomSheet) {
-            SortBottomSheet(onDismissRequest = { showSortBottomSheet = false }, sheetState = sheetState)
+            SortBottomSheet(
+                onDismissRequest = {
+                    showSortBottomSheet = false
+                },
+                sheetState = sortSheetState,
+                onOptionSelected = onOptionSelected,
+                selectOption = selectOption
+            )
+        }
+        else if(showFilterBottomSheet) {
+            FilterBottomSheet(
+                onDismissRequest = {
+                    showFilterBottomSheet = false
+                },
+                sheetState = filterSheetState
+            )
         }
     }
 }

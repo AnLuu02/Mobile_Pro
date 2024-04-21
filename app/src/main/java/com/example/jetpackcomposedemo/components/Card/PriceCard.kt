@@ -53,15 +53,12 @@ fun <T> PriceCard(
     isSale: Boolean = false,
     isDiscount: Boolean = false,
     isImageFull: Boolean = false,
+    isColumn:Boolean = false,
     onOpenDetailCardScreen: (String)->Unit
 ) {
 
     val screenWidth = with(LocalDensity.current) {
         LocalConfiguration.current.screenWidthDp.dp
-    }
-
-    val interactionSource  = remember {
-        MutableInteractionSource()
     }
     val sizeCard = screenWidth*10/12
 
@@ -73,10 +70,10 @@ fun <T> PriceCard(
 
     Box(
         modifier = Modifier
-            .padding(start = 16.dp, end = lastPaddingEnd)
+            .then(if(isColumn) Modifier.padding(start = 16.dp,end=16.dp) else Modifier.padding(start = 16.dp, end = lastPaddingEnd))
             .clip(shape = MaterialTheme.shapes.small)
             .clickable(
-                interactionSource = interactionSource,
+                interactionSource =  remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true)
             ) { onOpenDetailCardScreen(index.toString()) }
     ) {
@@ -88,7 +85,7 @@ fun <T> PriceCard(
             ) {
             Box(
                 modifier = Modifier
-                    .width(sizeCard)
+                    .then(if(isColumn) Modifier.fillMaxWidth() else Modifier.width(sizeCard))
                     .then(if (isImageFull) Modifier.heightIn(max = sizeCard) else Modifier.wrapContentHeight())
                 ,
             ) {

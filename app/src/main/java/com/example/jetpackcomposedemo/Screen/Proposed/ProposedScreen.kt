@@ -14,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.jetpackcomposedemo.components.Card.ImageRightCard
 import com.example.jetpackcomposedemo.Screen.Home.dataTest
+import com.example.jetpackcomposedemo.components.Card.ImageRightCard
 
 @Composable
 fun ProposedScreen(

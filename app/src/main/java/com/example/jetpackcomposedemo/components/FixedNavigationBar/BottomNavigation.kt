@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.data
+package com.example.jetpackcomposedemo.components.FixedNavigationBar
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

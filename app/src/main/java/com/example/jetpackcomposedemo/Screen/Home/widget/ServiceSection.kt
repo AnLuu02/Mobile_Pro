@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import com.example.jetpackcomposedemo.data.ServicesUI
+import com.example.jetpackcomposedemo.data.models.ServicesUI
 
 
 val servicesUI = listOf(
@@ -109,7 +109,7 @@ fun ServiceItem(
     index: Int,
     onSelectService: (String) -> Unit
 ) {
-    val item = servicesUI[index]
+    val item = servicesUI[index];
 
     Column(
         verticalArrangement = Arrangement.Center,

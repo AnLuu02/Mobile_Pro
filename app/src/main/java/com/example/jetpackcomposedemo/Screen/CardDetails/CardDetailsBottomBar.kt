@@ -36,9 +36,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BottomCardDetail(){
-    val interactionSource = remember {
-        MutableInteractionSource()
-    }
     Surface(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -112,7 +109,7 @@ fun BottomCardDetail(){
                         .background(Color.Red, shape = MaterialTheme.shapes.extraLarge)
                         .clip(shape = MaterialTheme.shapes.extraLarge)
                         .clickable(
-                            interactionSource = interactionSource,
+                            interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = true)
                         ) { },
                 ) {
