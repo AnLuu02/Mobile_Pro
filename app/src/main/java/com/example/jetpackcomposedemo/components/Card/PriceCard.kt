@@ -2,6 +2,7 @@ package com.example.jetpackcomposedemo.components.Card
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -70,22 +71,31 @@ fun <T> PriceCard(
 
     Box(
         modifier = Modifier
-            .then(if(isColumn) Modifier.padding(start = 16.dp,end=16.dp) else Modifier.padding(start = 16.dp, end = lastPaddingEnd))
+            .then(
+                if (isColumn) Modifier.padding(start = 16.dp, end = 16.dp) else Modifier.padding(
+                    start = 16.dp,
+                    end = lastPaddingEnd
+                )
+            )
             .clip(shape = MaterialTheme.shapes.small)
             .clickable(
-                interactionSource =  remember { MutableInteractionSource() },
+                interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true)
             ) { onOpenDetailCardScreen(index.toString()) }
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, color = Color.LightGray, MaterialTheme.shapes.small),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             shape = MaterialTheme.shapes.small,
-
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            )
             ) {
             Box(
                 modifier = Modifier
-                    .then(if(isColumn) Modifier.fillMaxWidth() else Modifier.width(sizeCard))
+                    .then(if (isColumn) Modifier.fillMaxWidth() else Modifier.width(sizeCard))
                     .then(if (isImageFull) Modifier.heightIn(max = sizeCard) else Modifier.wrapContentHeight())
                 ,
             ) {
