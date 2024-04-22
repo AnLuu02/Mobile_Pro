@@ -71,7 +71,7 @@ fun MainApp(
         ) {
             val searchViewModel: SearchViewModel = viewModel()
             val loginUiState by loginViewModel1.uiState.collectAsState()
-            NavHost(navController = navController, startDestination = "methodpayment" ){
+            NavHost(navController = navController, startDestination = "home" ){
 
                 //----------------------------------- HOME ------------------------------
                 composable("home"){
