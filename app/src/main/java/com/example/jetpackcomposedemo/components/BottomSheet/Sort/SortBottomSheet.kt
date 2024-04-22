@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
@@ -25,7 +24,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,22 +31,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-val options = arrayOf(
-    "Phù hợp nhất",
-    "Khoảng cách từ gần đến xa",
-    "Điểm đánh giá từ cao đến thấp",
-    "Giá từ thấp đến cao",
-    "Giá từ cao đến thấp"
-)
+import com.example.jetpackcomposedemo.Screen.Services.sortOptions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SortBottomSheet (
     onDismissRequest: () -> Unit,
     sheetState: SheetState,
-    selectOption: String,
-    onOptionSelected: (String) -> Unit = {}
+    sortOption: String,
+    onSortOptionSelected: (String) -> Unit = {}
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -57,8 +48,8 @@ fun SortBottomSheet (
     ) {
         SheetContent(
             onCloseButtonClicked = onDismissRequest,
-            onOptionSelected = onOptionSelected,
-            selectOption = selectOption,
+            onSortOptionSelected = onSortOptionSelected,
+            sortOption = sortOption,
             onDismissRequest = onDismissRequest,
         )
     }
@@ -67,8 +58,8 @@ fun SortBottomSheet (
 @Composable
 fun SheetContent(
     onCloseButtonClicked: () -> Unit,
-    selectOption: String,
-    onOptionSelected: (String) -> Unit,
+    sortOption: String,
+    onSortOptionSelected: (String) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val closeButtonInteractionResource = remember { MutableInteractionSource() }
@@ -113,34 +104,34 @@ fun SheetContent(
         Column (
             modifier = Modifier.padding(bottom=24.dp)
         ) {
-            for((index, value) in options.withIndex()) {
+            for((index, value) in sortOptions.withIndex()) {
                 Column() {
                     Row (
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier
                             .padding(horizontal = 18.dp)
                             .selectable(
-                                selected = (value == selectOption),
+                                selected = (value == sortOption),
                                 onClick = {
-                                    onOptionSelected(value)
+                                    onSortOptionSelected(value)
                                     onDismissRequest()
                                 }
                             )
                     ) {
-                        Text(
+                        Text (
                             text = value,
                             fontSize = 13.sp,
                             modifier = Modifier.weight(1F).align(Alignment.CenterVertically),
                         )
                         RadioButton(
-                            selected = (value == selectOption),
+                            selected = (value == sortOption),
                             onClick = {
-                                onOptionSelected(value)
+                                onSortOptionSelected(value)
                                 onDismissRequest()
                             }
                         )
                     };
-                    if(index != options.size - 1) {
+                    if(index != sortOptions.size - 1) {
                         HorizontalDivider(
                             modifier = Modifier
                                 .height(1.dp)

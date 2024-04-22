@@ -48,13 +48,16 @@ import java.util.logging.Filter
 const val location = "Đồng Tháp"
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
 fun ServiceTopBar (
     onCancelButtonClicked: () -> Unit = {},
     onSearchFieldClicked: () -> Unit = {},
-    onOptionSelected: (String) -> Unit = {},
-    selectOption: String = ""
+    onSortOptionSelected: (String) -> Unit = {},
+    sortOption: String = "",
+    onCapacityOptionSelected: (Int) -> Unit = {},
+    capacityOption: Int,
+    setMinPrice: (Int) -> Unit = {},
+    setMaxPrice: (Int) -> Unit = {},
 ) {
     val closeButtonInteractionSource = remember { MutableInteractionSource() }
     val searchInteractionSource = remember { MutableInteractionSource() }
@@ -212,8 +215,8 @@ fun ServiceTopBar (
                     showSortBottomSheet = false
                 },
                 sheetState = sortSheetState,
-                onOptionSelected = onOptionSelected,
-                selectOption = selectOption
+                onSortOptionSelected = onSortOptionSelected,
+                sortOption = sortOption
             )
         }
         else if(showFilterBottomSheet) {
@@ -221,7 +224,11 @@ fun ServiceTopBar (
                 onDismissRequest = {
                     showFilterBottomSheet = false
                 },
-                sheetState = filterSheetState
+                sheetState = filterSheetState,
+                setMaxPrice = setMaxPrice,
+                setMinPrice = setMinPrice,
+                onCapacityOptionSelected = onCapacityOptionSelected,
+                capacityOption = capacityOption,
             )
         }
     }

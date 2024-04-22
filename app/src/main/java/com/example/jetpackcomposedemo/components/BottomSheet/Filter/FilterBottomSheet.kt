@@ -9,17 +9,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DensityMedium
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.jetpackcomposedemo.Screen.Services.capacityOptions
 import com.example.jetpackcomposedemo.data.models.PriceRange
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
@@ -60,28 +68,41 @@ val filterOption = arrayOf(
 @Composable
 fun FilterBottomSheet(
     onDismissRequest: () -> Unit,
+    setMaxPrice: (Int) -> Unit,
+    setMinPrice: (Int) -> Unit,
+    onCapacityOptionSelected: (Int) -> Unit = {},
+    capacityOption: Int,
     sheetState: SheetState,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         dragHandle = null,
+        modifier = Modifier
+            .wrapContentHeight()
+//            .fillMaxHeight(0.7f)
+        ,
     ) {
         SheetContent(
             onCloseButtonClicked = onDismissRequest,
             onDismissRequest = onDismissRequest,
+            setMaxPrice = setMaxPrice,
+            setMinPrice = setMinPrice,
+            onCapacityOptionSelected = onCapacityOptionSelected,
+            capacityOption = capacityOption,
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SheetContent(
     onCloseButtonClicked: () -> Unit,
     onDismissRequest: () -> Unit,
+    setMaxPrice: (Int) -> Unit,
+    setMinPrice: (Int) -> Unit,
+    onCapacityOptionSelected: (Int) -> Unit = {},
+    capacityOption: Int,
 ) {
-    val range = 2f..100f
-    var sliderPosition by remember { mutableStateOf(range)}
     val closeButtonInteractionResource = remember { MutableInteractionSource() }
     Column (
         modifier = Modifier
@@ -120,105 +141,231 @@ fun SheetContent(
                 )
             }
         }
+        HorizontalDivider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(color = Color.LightGray)
+        )
         Column (
             modifier = Modifier
-                .padding(bottom=24.dp)
+                .padding(top = 12.dp,bottom=24.dp)
         ) {
             Row (
                 modifier = Modifier
                     .padding(vertical = 2.dp)
                     .fillMaxWidth()
             ) {
-                Column (
+                PriceRangeSelector(
+                    setMinPrice = setMinPrice,
+                    setMaxPrice = setMaxPrice
+                )
+            }
+            Row (
+                modifier = Modifier
+                    .padding(top = 4.dp, bottom = 8.dp)
+                    .fillMaxWidth()
+            ) {
+                CapacitySelector (
+                    onCapacityOptionSelected = onCapacityOptionSelected,
+                    capacityOption = capacityOption,
+                )
+            }
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Box (
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(0.6f)
+                        .background(color = Color.Red, shape = CircleShape)
                 ) {
-                    Text(
-                        text = "Khoảng giá",
+                    Text (
+                        text = "Áp dụng",
+                        color = Color.White,
+                        fontSize = 16.sp,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
+                            .padding(vertical = 8.dp, horizontal = 12.dp)
+                            .align(Alignment.Center)
                     )
-                    RangeSlider(
-                        value = sliderPosition,
-                        onValueChange = { range ->
-                            sliderPosition =  range
-                        },
-                        valueRange = range,
-                        steps = 48,
-                        modifier = Modifier
-                            .width(320.dp)
-                            .align(Alignment.CenterHorizontally),
-                        endThumb = {
-                            ThumbIcon()
-                        },
-                        startThumb = {
-                            ThumbIcon()
-                        }
-                    )
-                    Row(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Column (
-                            modifier = Modifier
-                                .weight(1f),
-//                            contentAlignment = Alignment.Center
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Card (
-                                border = BorderStroke(2.dp, Color(240,240, 240)),
-                                colors = CardDefaults.cardColors(containerColor = Color(250,250, 250)),
-                                modifier = Modifier.size(width = 120.dp, height = 64.dp),
-                            ) {
-                                val minPrice = DecimalFormat("#,###").format((sliderPosition.start.roundToInt()*10000f)) + "đ"
-                                Text(
-                                    text = "Giá tối thiểu",
-                                    fontWeight = FontWeight.Medium,
-                                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 8.dp)
-                                )
-                                Text(
-                                    text = minPrice,
-                                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp)
-                                )
-                            }
-                        }
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .height(1.dp)
-                                .width(18.dp)
-                        )
-                        Column (
-                            modifier = Modifier
-                                .weight(1f),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Card (
-                                border = BorderStroke(2.dp, Color(240,240, 240)),
-                                colors = CardDefaults.cardColors(containerColor = Color(250,250, 250)),
-                                modifier = Modifier.size(width = 120.dp, height = 64.dp)
-                            ) {
-                                val maxPrice = DecimalFormat("#,###").format(sliderPosition.endInclusive.roundToInt()*10000f) + "đ"
-                                Text(
-                                    text = "Giá tối đa",
-                                    fontWeight = FontWeight.Medium,
-                                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 8.dp)
-                                )
-                                Text(
-                                    text = maxPrice,
-                                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp)
-                                )
-                            }
-                        }
-                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun CapacitySelector(
+    onCapacityOptionSelected: (Int) -> Unit = {},
+    capacityOption: Int,
+) {
+    var (selectedItem, setSelectedItem) = remember {
+        mutableIntStateOf(capacityOption)
+    }
+    Column (
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Row (
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Số lượng người",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, bottom = 8.dp),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            modifier = Modifier.padding(bottom = 8.dp)
+        ) {
+            items(capacityOptions.size) {
+                val cardColor = if(capacityOptions[it] == selectedItem) Color(230,230,230) else Color(240,240, 240)
+                val border = if(capacityOptions[it] == selectedItem) BorderStroke(width = 1.dp, color = Color(200,200,200)) else null
+                Card (
+                    modifier = Modifier.run {
+                        padding(vertical = 4.dp, horizontal = 8.dp)
+                            .selectable(
+                                interactionSource = null,
+                                indication = null,
+                                selected = (capacityOptions[it] == capacityOption),
+                                onClick = {
+                                    onCapacityOptionSelected(capacityOptions[it])
+                                    setSelectedItem(capacityOptions[it])
+                                },
+                            )
+                    },
+                    colors = CardDefaults.cardColors(containerColor = cardColor),
+                    border = border
+                ) {
+                    Text(
+                        text = capacityOptions[it].toString() +" người",
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(vertical = 6.dp)
+                    )
+                }
+            }
+        }
+        HorizontalDivider(
+            modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+                .background(color = Color.LightGray)
+                .align(Alignment.CenterHorizontally)
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PriceRangeSelector (
+    setMaxPrice: (Int) -> Unit,
+    setMinPrice: (Int) -> Unit
+) {
+    val range = 2f..100f
+    var rangePosition by remember { mutableStateOf(range) }
+    Column (
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = "Khoảng giá",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+        RangeSlider (
+            value = rangePosition,
+            onValueChange = { range ->
+                rangePosition = range
+                setMinPrice(rangePosition.start.roundToInt()*10000)
+                setMaxPrice(rangePosition.endInclusive.roundToInt()*10000)
+            },
+            valueRange = range,
+            steps = 48,
+            modifier = Modifier
+                .width(320.dp)
+                .align(Alignment.CenterHorizontally),
+            endThumb = {
+                ThumbIcon()
+            },
+            startThumb = {
+                ThumbIcon()
+            }
+        )
+        Row(
+            modifier = Modifier.padding(top = 8.dp, bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Column (
+                modifier = Modifier
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Card (
+                    border = BorderStroke(2.dp, Color(240,240, 240)),
+                    colors = CardDefaults.cardColors(containerColor = Color(250,250, 250)),
+                    modifier = Modifier.size(width = 120.dp, height = 64.dp),
+                ) {
+                    val minPrice = DecimalFormat("#,###").format((rangePosition.start.roundToInt()*10000f)) + "đ"
+                    Text(
+                        text = "Giá tối thiểu",
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 8.dp)
+                    )
+                    Text(
+                        text = minPrice,
+                        modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp)
+                    )
+                }
+            }
+            HorizontalDivider(
+                modifier = Modifier
+                    .height(1.dp)
+                    .width(18.dp)
+            )
+            Column (
+                modifier = Modifier
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Card (
+                    border = BorderStroke(2.dp, Color(240,240, 240)),
+                    colors = CardDefaults.cardColors(containerColor = Color(250,250, 250)),
+                    modifier = Modifier.size(width = 120.dp, height = 64.dp)
+                ) {
+                    val maxPrice = DecimalFormat("#,###").format(rangePosition.endInclusive.roundToInt()*10000f) + "đ"
+                    Text(
+                        text = "Giá tối đa",
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 8.dp)
+                    )
+                    Text(
+                        text = maxPrice,
+                        modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp)
+                    )
+                }
+            }
+        }
+        HorizontalDivider(
+            modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+                .background(color = Color.LightGray)
+                .align(Alignment.CenterHorizontally)
+        )
     }
 }
 

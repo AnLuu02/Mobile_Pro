@@ -1,46 +1,67 @@
 package com.example.jetpackcomposedemo.Screen.Services
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.jetpackcomposedemo.components.BottomSheet.Sort.options
 
+val sortOptions = arrayOf(
+    "Phù hợp nhất",
+    "Khoảng cách từ gần đến xa",
+    "Điểm đánh giá từ cao đến thấp",
+    "Giá từ thấp đến cao",
+    "Giá từ cao đến thấp"
+)
+val capacityOptions = arrayOf(
+    1,2,4,5,6,8,10
+)
 @Composable
 fun ServiceScreen(
     type:String?,
     onCancelButtonClicked: () -> Unit,
     onSearchFieldClicked: () -> Unit
 ) {
-    val (selectOption, onOptionSelected) = remember {
-        mutableStateOf(options[0]);
+    val (sortOption, onSortOptionSelected) = remember {
+        mutableStateOf(sortOptions[0]);
+    }
+    val (minPrice, setMinPrice) = remember {
+        mutableIntStateOf(20000);
+    }
+    val (maxPrice, setMaxPrice) = remember {
+        mutableIntStateOf(1000000);
+    }
+    val (capacityOption, onCapacityOptionSelected) = remember {
+        mutableIntStateOf(capacityOptions[0]);
     }
     Scaffold (
         topBar = {
             ServiceTopBar (
                 onCancelButtonClicked = onCancelButtonClicked,
                 onSearchFieldClicked = onSearchFieldClicked,
-                onOptionSelected = onOptionSelected,
-                selectOption = selectOption,
+                onSortOptionSelected = onSortOptionSelected,
+                sortOption = sortOption,
+                onCapacityOptionSelected = onCapacityOptionSelected,
+                capacityOption = capacityOption,
+                setMinPrice = setMinPrice,
+                setMaxPrice = setMaxPrice,
             )
         }
     ) {padding ->
-        Box (
+        Column (
             modifier = Modifier
                 .padding(padding)
                 .fillMaxWidth()
         ) {
-            Text(text = selectOption)
+            Text(text = sortOption)
+            Text(text = minPrice.toString())
+            Text(text = maxPrice.toString())
+            Text(text = capacityOption.toString())
         }
     }
 }
