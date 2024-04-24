@@ -1,17 +1,16 @@
 package com.example.jetpackcomposedemo.data.network
 
+import com.example.jetpackcomposedemo.data.models.Product
 import com.example.jetpackcomposedemo.data.models.Products
-import com.example.jetpackcomposedemo.data.models.coupon.Coupon
-import com.example.jetpackcomposedemo.data.models.coupon.CouponList
+import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.POST
 
 interface ApiService {
     @GET("api/coupon")
-    suspend fun getCouponList():List<Coupon>
-
-    companion object {
-        const val BASE_URL = "http://localhost:8080"
-    }
+    suspend fun getProductsList():Products
+    @POST("products/new")
+    suspend fun postProductData(product: Product): Response<Product>
 
 //
 //    @GET("products/{type}")

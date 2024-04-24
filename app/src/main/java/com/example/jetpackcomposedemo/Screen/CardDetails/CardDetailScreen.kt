@@ -18,7 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Divider
@@ -43,6 +43,7 @@ import com.example.jetpackcomposedemo.R
 
 @Composable
 fun CardDetailScreen(
+    bookingViewModel:BookingViewModel,
     cardId: String?,
     navController:NavHostController
 ) {
@@ -53,7 +54,7 @@ fun CardDetailScreen(
             TopCardDetail(navController,listState,cardId.toString())
         },
         bottomBar = {
-            BottomCardDetail()
+            BottomCardDetail(bookingViewModel,navController)
         },
 
 
@@ -242,7 +243,7 @@ fun CardDetailScreen(
                                 )
 
                                 Icon(
-                                    imageVector = Icons.Rounded.ArrowForwardIos,
+                                    imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos,
                                     contentDescription = "",
                                     tint = Color.Red,
                                     modifier = Modifier.size(10.dp)
@@ -386,7 +387,7 @@ fun DiscountTickets(){
 
             }
 
-            Icon(imageVector = Icons.Rounded.ArrowForwardIos, contentDescription = "", tint = Color.Red, modifier = Modifier.size(12.dp))
+            Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos, contentDescription = "", tint = Color.Red, modifier = Modifier.size(12.dp))
 
         }
 
@@ -464,7 +465,7 @@ fun Evaluate(){
                     )
 
                     Icon(
-                        imageVector = Icons.Rounded.ArrowForwardIos,
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos,
                         contentDescription = "",
                         tint = Color.Red,
                         modifier = Modifier.size(16.dp)

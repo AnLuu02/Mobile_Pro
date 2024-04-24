@@ -33,7 +33,7 @@ fun SearchResultScreen(
     val isOpenSort = remember {
         mutableStateOf(false)
     }
-    Log.e("typeBooking",typeBooking)
+
     Scaffold(
         topBar = {
             SearchResultTopBar(
@@ -57,10 +57,12 @@ fun SearchResultScreen(
 
     ) {paddingValues ->
 
-        SearchResult(paddingValues = paddingValues)
+        SearchResult(searchViewModel = searchViewModel,paddingValues = paddingValues)
 
         if(isOpenSort.value){
-            SearchResultModeScreen {
+            SearchResultModeScreen(
+                searchViewModel = searchViewModel
+            ) {
                 isOpenSort.value = it
             }
         }
@@ -71,10 +73,12 @@ fun SearchResultScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResult(
+    searchViewModel:SearchViewModel,
     paddingValues:PaddingValues
 ){
     val dataTest = listOf(1, 2, 3, 4, 5)
     val sheetState = rememberBottomSheetScaffoldState()
+
     LaunchedEffect(Unit) {
         sheetState.bottomSheetState.expand()
     }

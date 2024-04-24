@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.Search
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,6 +31,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +43,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.jetpackcomposedemo.data.models.Product
+import com.example.jetpackcomposedemo.data.network.RetrofitInstance
+import com.example.jetpackcomposedemo.data.repository.ProductsRepository
+import com.example.jetpackcomposedemo.data.repository.ProductsRepositoryImpl
+import com.example.jetpackcomposedemo.data.viewmodel.ProductsViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.ProductsViewModelFactory
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -50,6 +60,36 @@ fun SearchScreen(
     onHandleSearchClickButton:(String)->Unit,
     closeSearchScreen:()->Unit
 ) {
+
+    //////////////////////////demooooooooooo////////////////////////////////////////////
+
+    val productsViewModel: ProductsViewModel = viewModel(factory = ProductsViewModelFactory(ProductsRepositoryImpl(RetrofitInstance.apiService)))
+    Log.e("aaa",productsViewModel.product.toString())
+
+
+    val newProduct = Product(
+        brand = "Brand",
+        category = "Category",
+        description = "Description",
+        discountPercentage = 10.0,
+        id = 0, // Giả sử đây là id mới sẽ được generated bởi server
+        images = listOf("url1", "url2"),
+        price = 100,
+        rating = 4.5,
+        stock = 50,
+        thumbnail = "thumbnail_url",
+        title = "New Product Title"
+    )
+    LaunchedEffect(Unit) {
+        try {
+            productsViewModel.postProductData(newProduct)
+        } catch (e: Exception) {
+            // Handle the exception
+        }
+    }
+
+    //////////////////////////demooooooooooo////////////////////////////////////////////
+
     val typeBooking = remember {
         mutableStateOf("")
     }

@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
 import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
@@ -30,6 +31,9 @@ import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
+import com.example.jetpackcomposedemo.Screen.Search.ListRoomScreen
+import com.example.jetpackcomposedemo.Screen.Search.MethodPaymentScreen
+import com.example.jetpackcomposedemo.Screen.Search.PaymentScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultFilterScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
@@ -39,6 +43,7 @@ import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBooking.DatePickerBookingScreen
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerScreen
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DateRangePickerScreen
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
@@ -46,54 +51,12 @@ import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 
 class MainActivity : ComponentActivity() {
 
-//    private val viewModel by viewModels<ProductsViewModel> (factoryProducer = {
-//        object : ViewModelProvider.Factory{
-//            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-//                return ProductsViewModel(ProductsRepositoryImpl(RetrofitInstance.apiService))
-//                        as T
-//            }
-//        }
-//    })
-
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MainApp()
         }
-//        setContent {
-//            val productList = viewModel.product.collectAsState().value
-//            val context = LocalContext.current
-//            LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
-//                viewModel.showErrorToastChannel.collectLatest { show->
-//                    if(show){
-//                        Toast.makeText(
-//                            context,"Error",Toast.LENGTH_SHORT
-//                        ).show()
-//                    }
-//                }
-//
-//            }
-//
-//            if(productList.isEmpty()){
-//                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-//                }
-//            }
-//            else{
-//                LazyColumn(
-//                    modifier = Modifier.fillMaxSize(),
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                    contentPadding = PaddingValues(16.dp)
-//                ) {
-//                    items(productList.size) { index ->
-//                        Product(productList[index])
-//                        Spacer(modifier = Modifier.height(16.dp))
-//                    }
-//                }
-//            }
-//
-//        }
     }
 }
 
@@ -110,6 +73,8 @@ fun MainApp(
             color = MaterialTheme.colorScheme.background
         ) {
             val searchViewModel: SearchViewModel = viewModel()
+            val bookingViewModel: BookingViewModel = viewModel()
+
             val loginUiState by loginViewModel1.uiState.collectAsState()
             NavHost(navController = navController, startDestination = "home" ){
 
@@ -141,6 +106,33 @@ fun MainApp(
                 //----------------------------------- NOTIFICATION ------------------------------
                 composable("notification"){
                     NotificationsScreen(navController = navController)
+                }
+
+
+                //----------------------------------- Booking ------------------------------
+                composable("listroom"){
+                    ListRoomScreen(bookingViewModel,navController)
+                }
+
+                composable("payment"){
+                    PaymentScreen(bookingViewModel,navController)
+                }
+                composable("methodpayment"){
+                    MethodPaymentScreen(navController,bookingViewModel)
+
+                }
+                composable("bookingcalender",
+                    popEnterTransition = null, popExitTransition = null, exitTransition = null, enterTransition = null
+                ){
+                    DatePickerBookingScreen(
+                        bookingViewModel = bookingViewModel,
+                        searchViewModel = searchViewModel,
+                        onHandleApplyTimeBooking = {
+                            navController.popBackStack()
+                        })
+
+
+
                 }
 
                 //----------------------------------- SEARCH ------------------------------
@@ -191,7 +183,11 @@ fun MainApp(
                 ){backStackEntry->
                     val typeBooking = backStackEntry.arguments?.getString("typeBooking").toString()
                     SearchResultFilterScreen(
-                        typeBooking = typeBooking
+                        searchViewModel = searchViewModel,
+                        typeBooking = typeBooking,
+                        onHandleApply = {
+                            navController.popBackStack()
+                        }
                     ) {
                         navController.popBackStack()
                     }
@@ -333,7 +329,7 @@ fun MainApp(
                 ) { backStackEntry ->
 
                     val cardId = backStackEntry.arguments?.getString("cardId")
-                    CardDetailScreen(cardId = cardId,navController)
+                    CardDetailScreen(bookingViewModel=bookingViewModel,cardId = cardId,navController)
                 }
             }
         }
