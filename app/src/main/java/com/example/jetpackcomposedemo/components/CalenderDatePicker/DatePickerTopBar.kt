@@ -40,6 +40,8 @@ fun DatePickerTopBar(
     totalHourlyCheckin: Long = 1,
     onCloseCalenderScreen: ()->Unit
 ) {
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
