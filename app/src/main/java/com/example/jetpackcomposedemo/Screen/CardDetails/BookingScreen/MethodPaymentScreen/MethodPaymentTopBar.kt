@@ -24,10 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 
 @Composable
 fun MethodPaymentTopBar(
-    closeSearchScreen:()->Unit
+    navController:NavHostController
 ) {
 
 
@@ -52,7 +53,7 @@ fun MethodPaymentTopBar(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = false, radius = 24.dp),
-                            onClick = closeSearchScreen
+                            onClick = {navController.popBackStack()}
                         )
                     ,
                     contentAlignment = Alignment.Center

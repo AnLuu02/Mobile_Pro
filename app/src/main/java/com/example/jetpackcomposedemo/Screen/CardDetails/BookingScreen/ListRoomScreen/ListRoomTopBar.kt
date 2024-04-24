@@ -17,9 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
-import androidx.compose.material.icons.rounded.ArrowForward
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.HourglassTop
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
@@ -30,18 +29,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 
 @Composable
 fun ListRoomTopBar(
     listState:LazyListState,
-    closeSearchScreen:()->Unit
+    navController:NavHostController
 ) {
     val show = remember { mutableStateOf(false) }
     LaunchedEffect(listState.firstVisibleItemScrollOffset) {
@@ -69,7 +67,7 @@ fun ListRoomTopBar(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = false, radius = 24.dp),
-                            onClick = closeSearchScreen
+                            onClick = {navController.popBackStack()}
                         )
                     ,
                     contentAlignment = Alignment.Center
@@ -138,7 +136,7 @@ fun ListRoomTopBar(
                     Text(text = "07:00", style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.width(6.dp))
 
-                    Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = "", modifier = Modifier.size(16.dp))
+                    Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = "", modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(text = "08:00, 22/03", style = MaterialTheme.typography.bodyMedium)
                 }

@@ -3,11 +3,12 @@ package com.example.jetpackcomposedemo.data.repository
 import android.net.http.HttpException
 import android.os.Build
 import androidx.annotation.RequiresExtension
-import com.example.jetpackcomposedemo.helpper.Result
 import com.example.jetpackcomposedemo.data.models.Product
 import com.example.jetpackcomposedemo.data.network.ApiService
+import com.example.jetpackcomposedemo.helpper.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import retrofit2.Response
 import java.io.IOException
 
 class ProductsRepositoryImpl (
@@ -34,5 +35,8 @@ class ProductsRepositoryImpl (
             emit(Result.Success(productsFromApi.products))
         }
     }
+
+    override suspend fun postProductData(product: Product): Response<Product> = apiService.postProductData(product)
+
 
 }

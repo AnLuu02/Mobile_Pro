@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.Search
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -36,25 +36,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.MethodPaymentBottomBar
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MethodPaymentScreen(
-    onOpenDatePickerScreen:(String)->Unit,
-    onHandleSearchClickButton:(String)->Unit,
-    closeSearchScreen:()->Unit
+    navController:NavHostController,
+    bookingViewModel:BookingViewModel
 ) {
     val listState = rememberLazyListState()
-
+    val selectedMethodPayment = remember {
+        mutableStateOf(OptionPayment())
+    }
     Scaffold(
         topBar = {
-            MethodPaymentTopBar() { }
+            MethodPaymentTopBar(navController)
         },
         bottomBar = {
-            MethodPaymentBottomBar()
+            MethodPaymentBottomBar(bookingViewModel,navController,selectedMethodPayment.value)
         }
 
     ) { padding ->
@@ -66,7 +69,9 @@ fun MethodPaymentScreen(
                 .padding(padding)
         ) {
             item {
-                OptionsSort()
+                OptionsSort(bookingViewModel,onHandleChooseMethodPayment={
+                    selectedMethodPayment.value = it
+                })
             }
 
         }
@@ -74,14 +79,16 @@ fun MethodPaymentScreen(
 }
 
 data class OptionPayment(
-    val type:String,
-    val title:String,
+    val type:String? = null,
+    val title:String? = null,
     val icon:Int = 0,
 )
 
 
 @Composable
 fun OptionsSort(
+    bookingViewModel:BookingViewModel,
+    onHandleChooseMethodPayment:(OptionPayment)->Unit
 ){
     val options =  remember {
         mutableStateOf(
@@ -116,9 +123,11 @@ fun OptionsSort(
     }
 
     val selectedOption = remember {
-        mutableStateOf( options.value[0].type)
+        mutableStateOf(bookingViewModel.getBookingResult().value.methodPayment ?: options.value[0])
     }
+    onHandleChooseMethodPayment(selectedOption.value)
 
+    Log.e("aaaaaa",bookingViewModel.getBookingResult().toString())
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -131,8 +140,8 @@ fun OptionsSort(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
-                    selectedOption.value = item.type
-
+                    selectedOption.value = item
+                    onHandleChooseMethodPayment(selectedOption.value)
                 }
             ) {
                 Row(
@@ -149,20 +158,23 @@ fun OptionsSort(
                         Image(
                             painter = painterResource(id = item.icon),
                             contentDescription ="",
-                            modifier = Modifier.size(24.dp).clip(RoundedCornerShape(2.dp))
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clip(RoundedCornerShape(2.dp))
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = item.title,
+                            text = item.title.toString(),
                             style = MaterialTheme.typography.bodyLarge,
                             color = Color.Black.copy(alpha = 0.7f)
                         )
                     }
 
                     RadioButton(
-                        selected =  selectedOption.value == item.type,
+                        selected =  selectedOption.value.type == item.type,
                         onClick = {
-                            selectedOption.value = item.type
+                            selectedOption.value = item
+                            onHandleChooseMethodPayment(selectedOption.value)
                         },
                         colors = RadioButtonDefaults.colors(
                             selectedColor = Color.Red,
@@ -175,7 +187,7 @@ fun OptionsSort(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(0.5.dp)
-                            .padding(start=12.dp,end=12.dp)
+                            .padding(start = 12.dp, end = 12.dp)
                             .background(Color.Black.copy(alpha = 0.5f))
                             .align(Alignment.BottomCenter)
 

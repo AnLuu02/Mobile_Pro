@@ -19,9 +19,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
+import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
 
 @Composable
-fun MethodPaymentBottomBar(){
+fun MethodPaymentBottomBar(
+    bookingViewModel: BookingViewModel,
+    navController:NavHostController,
+    selectedMethodPayment:OptionPayment
+){
     Column(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -39,7 +46,10 @@ fun MethodPaymentBottomBar(){
         ) {
 
             Button(
-                onClick = { },
+                onClick = {
+                    bookingViewModel.setMethodPayment(selectedMethodPayment)
+                    navController.popBackStack()
+                },
                 modifier = Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Red,

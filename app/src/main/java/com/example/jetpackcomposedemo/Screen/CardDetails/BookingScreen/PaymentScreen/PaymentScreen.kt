@@ -41,25 +41,26 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.PaymentBottomBar
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaymentScreen(
-    onOpenDatePickerScreen:(String)->Unit,
-    onHandleSearchClickButton:(String)->Unit,
-    closeSearchScreen:()->Unit
+    bookingViewModel:BookingViewModel,
+    navController:NavHostController
 ) {
     val listState = rememberLazyListState()
 
     Scaffold(
         topBar = {
-            PaymentTopBar() { }
+            PaymentTopBar(navController = navController)
         },
         bottomBar = {
-            PaymentBottomBar()
+            PaymentBottomBar(bookingViewModel = bookingViewModel, navController=navController)
         }
 
     ) { padding ->

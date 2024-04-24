@@ -7,6 +7,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +35,7 @@ import androidx.compose.material.icons.filled.Discount
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material.icons.rounded.HourglassTop
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -43,6 +46,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,21 +59,32 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.roundUpHour
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ListRoomScreen(
-    onOpenDatePickerScreen:(String)->Unit,
-    onHandleSearchClickButton:(String)->Unit,
-    closeSearchScreen:()->Unit
+    bookingViewModel: BookingViewModel,
+    navController:NavHostController
 ) {
     val listState = rememberLazyListState()
 
+    val dateCheckinString = remember{ mutableStateOf(
+        bookingViewModel.getTimeCheckin() ?: roundUpHour(LocalDateTime.now())
+    ) }
+    val dateCheckoutString = remember{ mutableStateOf(
+        bookingViewModel.getTimeCheckout()?:roundUpHour(LocalDateTime.now().plusDays(1))) }
+    val totalTime = remember{ mutableStateOf(bookingViewModel.getTotalTime() ?: "1")  }
+    val typeBooking = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
     Scaffold(
         topBar = {
-            ListRoomTopBar(listState = listState) { }
+            ListRoomTopBar(listState = listState,navController = navController)
         }
 
     ) { padding ->
@@ -96,6 +112,13 @@ fun ListRoomScreen(
                                 Color.Red.copy(alpha = 0.1f),
                                 shape = MaterialTheme.shapes.small
                             )
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = rememberRipple(bounded = true)
+                            ) {
+                                navController.navigate("bookingcalender")
+                            }
+
                     ) {
                         Column {
                             Row(
@@ -116,7 +139,11 @@ fun ListRoomScreen(
 
                                     Spacer(modifier = Modifier.width(6.dp))
 
-                                    Text(text = "Theo ngày", style = MaterialTheme.typography.bodyMedium)
+                                    Text(text = when(typeBooking.value){
+                                        "hourly"->"Theo giờ"
+                                        "overnight"->"Qua đêm"
+                                        else -> "Theo ngày"
+                                    }, style = MaterialTheme.typography.bodyMedium)
 
                                     Spacer(modifier = Modifier.width(6.dp))
 
@@ -128,7 +155,9 @@ fun ListRoomScreen(
                                     )
 
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text(text = "01 ngày", style = MaterialTheme.typography.bodyMedium)
+                                    Text(text = if(typeBooking.value == "hourly") "${if(totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} giờ"
+                                    else "${if(totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} ngày",
+                                        style = MaterialTheme.typography.bodyMedium)
                                 }
 
                                 Text(
@@ -172,7 +201,7 @@ fun ListRoomScreen(
                                             Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
                                             Spacer(modifier = Modifier.height(6.dp))
                                             Text(
-                                                text = "14:00,22/04",
+                                                text = dateCheckinString.value,
                                                 color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold,
                                             )
 
@@ -202,7 +231,7 @@ fun ListRoomScreen(
                                             Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                                             Spacer(modifier = Modifier.height(6.dp))
                                             Text(
-                                                text = "12:00, 23/04",
+                                                text = dateCheckoutString.value,
                                                 color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                                         }
@@ -220,13 +249,13 @@ fun ListRoomScreen(
                         }
                     }
                 }
-                CardListRoom()
+                CardListRoom(navController)
                 Spacer(modifier = Modifier.height(12.dp))
-                CardListRoom()
+                CardListRoom(navController)
                 Spacer(modifier = Modifier.height(12.dp))
-                CardListRoom()
+                CardListRoom(navController)
                 Spacer(modifier = Modifier.height(12.dp))
-                CardListRoom()
+                CardListRoom(navController)
             }
 
         }
@@ -256,7 +285,9 @@ val slide = listOf(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CardListRoom(){
+fun CardListRoom(
+    navController:NavHostController
+){
     val screenWidth = with(LocalDensity.current) {
         LocalConfiguration.current.screenWidthDp.dp
     }
@@ -319,7 +350,9 @@ fun CardListRoom(){
                             PagerIndicator(
                                 pagerState = pagerState,
                                 pageCount = slide.size,
-                                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp)
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .padding(bottom = 8.dp)
                             )
 
 
@@ -396,7 +429,9 @@ fun CardListRoom(){
                                 }
 
                                 Button(
-                                    onClick = { },
+                                    onClick = {
+                                        navController.navigate("payment")
+                                    },
                                     modifier = Modifier.clip(MaterialTheme.shapes.small),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color.Red,
@@ -503,8 +538,7 @@ fun CardListRoom(){
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(
-                                ) {
+                                Row{
 
                                     Icon(imageVector = Icons.Default.WarningAmber,
                                         contentDescription = "warning",
@@ -573,7 +607,7 @@ fun PagerIndicator(
                 .padding(horizontal = 4.dp)
                 .clip(CircleShape)
                 .background(Color.LightGray)
-                .then(if(pagerState.currentPage == it) Modifier.size(8.dp) else Modifier.size(4.dp))
+                .then(if (pagerState.currentPage == it) Modifier.size(8.dp) else Modifier.size(4.dp))
             )
         }
 
