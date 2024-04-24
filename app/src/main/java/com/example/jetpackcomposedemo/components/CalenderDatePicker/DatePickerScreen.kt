@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.components.CalenderDatePicker
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -63,24 +64,21 @@ fun DatePickerScreen(
         if(searchViewModel.getOnlyHourBooking(typeBooking).timeCheckin != "Bất kì"){
             searchViewModel.getOnlyHourBooking(typeBooking).timeCheckin.toInt()
         }
-        else{
-            roundUpHour(currentTime,true).toInt()
-        }
+        else{ roundUpHour(currentTime,true).toInt() }
 
-    ) } // biến lưu giờ nhan phòng
+    ) }
+
     val totalTime = remember{ mutableIntStateOf(
         if(searchViewModel.getTotalDate(typeBooking) != 0){
             searchViewModel.getTotalDate(typeBooking)
         }
-        else{
-            1
-        }
+        else{ 1 }
     ) }
 
     val timeCheckout =
         if(timeCheckin.intValue + totalTime.intValue >23)
-            ((timeCheckin.intValue + totalTime.intValue)-24)
-    else timeCheckin.intValue + totalTime.intValue
+                ((timeCheckin.intValue + totalTime.intValue)-24)
+        else timeCheckin.intValue + totalTime.intValue
 
     val initialSelectedDateMillis = if(searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckin != "Bất kì")
             searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckin.let {
@@ -88,12 +86,14 @@ fun DatePickerScreen(
                     it
                 )
             } else currentTime.toMillis()
+
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis  = initialSelectedDateMillis,
         initialDisplayedMonthMillis = null,
         initialDisplayMode = DisplayMode.Picker,
         yearRange = (currentTime.year..3000)
     )
+
     val currentDay = currentTime.format(DateTimeFormatter.ofPattern("dd"))
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val selectedDate = datePickerState.selectedDateMillis?.let {
@@ -109,15 +109,27 @@ fun DatePickerScreen(
         }
     }
 
-    val currentHourly = if((searchViewModel.getOnlyDayBooking(typeBooking).timeCheckin) == currentDay) roundUpHour(currentTime,true).toInt() else 0
+    val currentHourly = if(selectedDate?.format(DateTimeFormatter.ofPattern("dd")) == currentDay) roundUpHour(currentTime,true).toInt() else 0
+    Log.e("Current Hourly",currentHourly.toString())
+    Log.e("Current Day",currentDay.toString())
+
     val dateCheckinString = if(searchViewModel.getDateNotYear(typeBooking).timeCheckin == "Bất kì")
         "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
-    else
-        searchViewModel.getDateNotYear(typeBooking).timeCheckin
+    else if("${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}" != searchViewModel.getDateNotYear(typeBooking).timeCheckin
+    ){
+        "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
+    }
+        else searchViewModel.getDateNotYear(typeBooking).timeCheckin
 
 
     val dateCheckoutString = if(searchViewModel.getDateNotYear(typeBooking).timeCheckOut == "Bất kì")
         "${formatHourly(timeCheckout)}, ${newDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
+    else if(
+        "${formatHourly(timeCheckout)}, ${newDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}" != searchViewModel.getDateNotYear(typeBooking).timeCheckOut
+    ){
+        "${formatHourly(timeCheckout)}, ${newDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
+
+    }
     else
         searchViewModel.getDateNotYear(typeBooking).timeCheckOut
 
@@ -151,6 +163,7 @@ fun DatePickerScreen(
                     DatePickerBottomBar(
                         searchViewModel = searchViewModel,
                         typeBooking = typeBooking,
+                        enabledButtonApply = true,
                         onHandleClickButton = {
                             if (selectedDate != null) {
                                 if (newDate != null) {

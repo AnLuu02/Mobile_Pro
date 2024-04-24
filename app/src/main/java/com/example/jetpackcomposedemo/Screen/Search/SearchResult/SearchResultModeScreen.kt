@@ -32,10 +32,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
+import com.example.jetpackcomposedemo.Screen.Search.SortMethod
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResultModeScreen(
+    searchViewModel:SearchViewModel,
     onCloseModeSort:(Boolean)->Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -54,14 +57,7 @@ fun SearchResultModeScreen(
                     modifier = Modifier
                         .size(36.dp)
                         .background(color = Color.Transparent, shape = CircleShape)
-                        .align(Alignment.CenterStart)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = rememberRipple(bounded = false, radius = 24.dp),
-                            onClick = {
-                                onCloseModeSort(false)
-                            }
-                        ),
+                        .align(Alignment.CenterStart),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -80,18 +76,22 @@ fun SearchResultModeScreen(
             }
         },
         content = {
-            OptionsSort()
+            OptionsSort(searchViewModel = searchViewModel,onCloseModeSort = onCloseModeSort)
         }
     )
 }
 
 @Composable
-fun OptionsSort(){
+fun OptionsSort(
+    searchViewModel:SearchViewModel,
+    onCloseModeSort:(Boolean)->Unit
+){
     val options = listOf("Phù hợp nhất","Điểm đánh giá từ cao đến thấp","Giá từ thấp đến cao","Giá từ cao đến thấp")
 
     val selectedOption = remember {
-        mutableStateOf(options[0])
+        mutableStateOf(searchViewModel.getSortMethod().value.sortMethod ?: options[0])
     }
+    searchViewModel.setSortMethod(SortMethod(sortMethod = selectedOption.value))
     Column(
         modifier = Modifier
             .fillMaxWidth()

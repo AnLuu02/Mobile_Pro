@@ -35,7 +35,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.data.SearchSubNav
+
+data class SearchSubNav(
+    val icon: Int,
+    val title:String,
+    val route: String
+)
 
 val itemsSubNav = listOf(
     SearchSubNav(
