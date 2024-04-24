@@ -29,6 +29,9 @@ import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
+import com.example.jetpackcomposedemo.Screen.Search.ListRoomScreen
+import com.example.jetpackcomposedemo.Screen.Search.MethodPaymentScreen
+import com.example.jetpackcomposedemo.Screen.Search.PaymentScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultFilterScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
@@ -96,6 +99,23 @@ fun MainApp(
                 //----------------------------------- NOTIFICATION ------------------------------
                 composable("notification"){
                     NotificationsScreen(navController = navController)
+                }
+
+                composable("listroom"){
+                    ListRoomScreen(onOpenDatePickerScreen = {}, onHandleSearchClickButton = {}) {
+
+                    }
+                }
+
+                composable("payment"){
+                    PaymentScreen(onOpenDatePickerScreen = {}, onHandleSearchClickButton = {}) {
+
+                    }
+                }
+                composable("methodpayment"){
+                    MethodPaymentScreen(onOpenDatePickerScreen = {}, onHandleSearchClickButton = {}) {
+
+                    }
                 }
 
                 //----------------------------------- SEARCH ------------------------------

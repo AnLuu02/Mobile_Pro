@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.Screen.Search.SortMethod
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResultModeScreen(
@@ -51,7 +52,7 @@ fun SearchResultModeScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding( 16.dp),
+                    .padding(16.dp),
             ) {
                 Box(
                     modifier = Modifier
@@ -81,30 +82,60 @@ fun SearchResultModeScreen(
     )
 }
 
+
+
+data class SortOption(
+    val type:String,
+    val title:String
+)
+
+
 @Composable
 fun OptionsSort(
     searchViewModel:SearchViewModel,
     onCloseModeSort:(Boolean)->Unit
 ){
-    val options = listOf("Phù hợp nhất","Điểm đánh giá từ cao đến thấp","Giá từ thấp đến cao","Giá từ cao đến thấp")
+    val options =  remember {
+        mutableStateOf(
+            listOf(
+                SortOption(
+                    type = "phuhopnhat",
+                    title = "Phù hợp nhất"
+                ),
+                SortOption(
+                    type = "danhgiacaothap",
+                    title = "Điểm đánh giá từ cao đến thấp",
+                ),
+                SortOption(
+                    type = "giathapcao",
+                    title = "Giá từ thấp đến cao"
+                ),
+                SortOption(
+                    type = "giacaothap",
+                    title = "Giá từ cao đến thấp"
+                )
+            )
+        )
+    }
 
     val selectedOption = remember {
-        mutableStateOf(searchViewModel.getSortMethod().value.sortMethod ?: options[0])
+        mutableStateOf(searchViewModel.getSortMethod().value.sortMethod ?: options.value[0].type)
     }
-    searchViewModel.setSortMethod(SortMethod(sortMethod = selectedOption.value))
     Column(
         modifier = Modifier
             .fillMaxWidth()
 
     ) {
-        options.forEachIndexed{index,item->
+        options.value.forEachIndexed{index,item->
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = rememberRipple(bounded = true)
                 ) {
-                    selectedOption.value = item
+                    selectedOption.value = item.type
+                    searchViewModel.setSortMethod(SortMethod(sortMethod = item.type))
+                    onCloseModeSort(false)
                 }
             ) {
                 Row(
@@ -115,22 +146,26 @@ fun OptionsSort(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = item,
+                        text = item.title,
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.Black.copy(alpha = 0.7f)
                     )
 
                     RadioButton(
-                        selected = selectedOption.value == item,
+                        selected = selectedOption.value == item.type,
                         onClick = {
-                            selectedOption.value = item
+                            selectedOption.value = item.type
+                            searchViewModel.setSortMethod(SortMethod(sortMethod = item.type))
+                            onCloseModeSort(false)
                         },
                         colors = RadioButtonDefaults.colors(
-                            selectedColor = Color.Red
+                            selectedColor = Color.Red,
+                            unselectedColor = Color.LightGray.copy(alpha = 0.5f)
+
                         )
                     )
                 }
-                if(index<options.size-1){
+                if(index<options.value.size-1){
                     Divider(
                         modifier = Modifier
                             .fillMaxWidth()
