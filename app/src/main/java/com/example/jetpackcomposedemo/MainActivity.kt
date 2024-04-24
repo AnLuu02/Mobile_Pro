@@ -74,14 +74,12 @@ fun MainApp(
                 composable("home"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
-                        topBar ={listState-> HomeTopBar(listState,
+                        topBar ={listState-> HomeTopBar(listState,onOpenScreenSearch ={
+                            navController.navigate("search")
+                        },
                             onOpenNotifications = {
-                                navController.navigate("notification")
-                            },
-                            onOpenScreenSearch ={
-                                navController.navigate("search")
-                            }
-                        ) } ,
+                                navController.navigate("notifications") // Chuyển hướng đến trang notifications khi icon được nhấn
+                            }) } ,
                         content ={ padding,listState->
                             HomeScreen(
                                 padding = padding,
@@ -290,6 +288,10 @@ fun MainApp(
 
                     val cardId = backStackEntry.arguments?.getString("cardId")
                     CardDetailScreen(cardId = cardId,navController)
+                }
+                composable("notifications") {
+                    // Gọi hàm NotificationsScreen() để hiển thị màn hình notifications
+                    NotificationsScreen(navController = navController)
                 }
             }
         }
