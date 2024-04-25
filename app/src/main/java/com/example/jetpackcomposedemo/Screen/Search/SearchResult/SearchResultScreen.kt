@@ -33,7 +33,6 @@ fun SearchResultScreen(
     val isOpenSort = remember {
         mutableStateOf(false)
     }
-    Log.e("Filter",searchViewModel.getFilterRoom().toString())
 
     Scaffold(
         topBar = {
@@ -79,8 +78,6 @@ fun SearchResult(
 ){
     val dataTest = listOf(1, 2, 3, 4, 5)
     val sheetState = rememberBottomSheetScaffoldState()
-
-    Log.e("method sort",searchViewModel.getSortMethod().value.sortMethod.toString())
 
     LaunchedEffect(Unit) {
         sheetState.bottomSheetState.expand()

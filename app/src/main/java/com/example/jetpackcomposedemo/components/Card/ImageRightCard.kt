@@ -42,7 +42,8 @@ fun<T> ImageRightCard(
 
     Box(modifier = Modifier
         .fillMaxWidth()
-        .clickable { onOpenDetailCardScreen(index.toString()) }) {
+        .clickable { onOpenDetailCardScreen(index.toString()) }
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

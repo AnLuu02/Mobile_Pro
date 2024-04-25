@@ -39,6 +39,14 @@ class SearchViewModel:ViewModel() {
         }
     }
 
+    fun getTimeCheckin(typeBooking: String):String{
+        return when(typeBooking){
+            "hourly"->_hourSelectedCalendar.value.timeCheckin
+            "overnight"->_overnightSelectedCalendar.value.timeCheckin
+            else -> _daySelectedCalendar.value.timeCheckin
+        }
+    }
+
     fun getFilterRoom():MutableState<FilterRoom>{
         return _filterRoom
     }

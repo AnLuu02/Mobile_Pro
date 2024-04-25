@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.material)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -110,7 +111,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
     // Livedata
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
-
+    implementation ("androidx.compose.runtime:runtime-livedata:1.6.6")
 
     //retrofit
     // Retrofit and GSON

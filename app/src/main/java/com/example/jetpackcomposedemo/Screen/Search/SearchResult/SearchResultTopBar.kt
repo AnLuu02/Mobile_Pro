@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.Search.SearchResult
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
+import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.Sort
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
@@ -54,22 +56,23 @@ fun SearchResultTopBar(
 
 ){
     Column(
-        modifier = Modifier.fillMaxWidth().background(Color.White)
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 40.dp, bottom = 16.dp),
+                .padding(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(36.dp)
                     .background(color = Color.White, shape = CircleShape)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = rememberRipple(bounded = false, radius = 24.dp),
-                        onClick = { onBackSearchScreen()}
+                        onClick = { onBackSearchScreen() }
                     )
                 ,
                 contentAlignment = Alignment.Center
@@ -117,16 +120,24 @@ fun SearchResultTopBar(
                 ) {
 
                     Icon(imageVector = Icons.Rounded.Sort, contentDescription = "Sap xep")
+                    Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = "Sắp xếp",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.bodyMedium
                     )
+                    Log.e("method sort",searchViewModel.getSortMethod().value.sortMethod.toString())
+
+                    if(searchViewModel.getSortMethod().value.sortMethod != null
+                        && searchViewModel.getSortMethod().value.sortMethod != "phuhopnhat" ){
+                        Box(modifier = Modifier
+                            .size(6.dp)
+                            .background(Color.Red, shape = CircleShape))
+
+                    }
 
 
                 }
-
-
                 Row(
                     modifier = Modifier
                         .weight(1f)
@@ -138,7 +149,8 @@ fun SearchResultTopBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Icon(imageVector = Icons.Rounded.Sort, contentDescription = "Sap xep")
+                    Icon(imageVector = Icons.Rounded.FilterList, contentDescription = "Sap xep")
+                    Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = "Chọn lọc theo",
                         fontWeight = FontWeight.Bold,
@@ -181,8 +193,8 @@ fun TextFieldSearchResult(
         else -> "Theo ngày"
     }
 
-    var startTimeBooking:String
-    var endTimeBooking:String
+    val startTimeBooking:String
+    val endTimeBooking:String
     val textHeader: String = when (typeBooking) {
         "hourly" -> {
             startTimeBooking = searchViewModel.getOnlyHourBooking(typeBooking).timeCheckin
@@ -191,7 +203,7 @@ fun TextFieldSearchResult(
                 startTimeBooking != "Bất kì"
                 && searchViewModel.getOnlyDayBooking(typeBooking).timeCheckin
                 == searchViewModel.getOnlyDayBooking(typeBooking).timeCheckOut
-                )
+            )
                 "$startTimeBooking:00 - $endTimeBooking:00, ${searchViewModel.getDayAndMonth(typeBooking).timeCheckin}"
             else if(
                 startTimeBooking != "Bất kì"
