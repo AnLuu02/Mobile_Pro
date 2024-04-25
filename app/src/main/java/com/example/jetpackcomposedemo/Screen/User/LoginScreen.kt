@@ -129,7 +129,8 @@ fun LoginScreen(
 //                )
 //            }
                 Button(
-                    onClick = { loginViewModel.send(loginViewModel.phoneNumber,activity) },
+                    onClick = { loginViewModel.send(loginViewModel.phoneNumber,activity)
+                              loginViewModel.updatePhoneNumber("")},
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Red,
                         contentColor = Color.White),

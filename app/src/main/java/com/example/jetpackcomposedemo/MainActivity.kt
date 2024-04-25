@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
@@ -29,6 +30,9 @@ import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
+import com.example.jetpackcomposedemo.Screen.Search.ListRoomScreen
+import com.example.jetpackcomposedemo.Screen.Search.MethodPaymentScreen
+import com.example.jetpackcomposedemo.Screen.Search.PaymentScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultFilterScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
@@ -38,6 +42,7 @@ import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBooking.DatePickerBookingScreen
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerScreen
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DateRangePickerScreen
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
@@ -67,6 +72,8 @@ fun MainApp(
             color = MaterialTheme.colorScheme.background
         ) {
             val searchViewModel: SearchViewModel = viewModel()
+            val bookingViewModel: BookingViewModel = viewModel()
+
             val loginUiState by loginViewModel1.uiState.collectAsState()
             NavHost(navController = navController, startDestination = "home" ){
 
@@ -74,12 +81,14 @@ fun MainApp(
                 composable("home"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
-                        topBar ={listState-> HomeTopBar(listState,onOpenScreenSearch ={
-                            navController.navigate("search")
-                        },
+                        topBar ={listState-> HomeTopBar(listState,
                             onOpenNotifications = {
-                                navController.navigate("notifications") // Chuyển hướng đến trang notifications khi icon được nhấn
-                            }) } ,
+                                navController.navigate("notification")
+                            },
+                            onOpenScreenSearch ={
+                                navController.navigate("search")
+                            }
+                        ) } ,
                         content ={ padding,listState->
                             HomeScreen(
                                 padding = padding,
@@ -96,6 +105,30 @@ fun MainApp(
                 //----------------------------------- NOTIFICATION ------------------------------
                 composable("notification"){
                     NotificationsScreen(navController = navController)
+                }
+
+
+                //----------------------------------- Booking ------------------------------
+                composable("listroom"){
+                    ListRoomScreen(bookingViewModel,navController)
+                }
+
+                composable("payment"){
+                    PaymentScreen(bookingViewModel,navController)
+                }
+                composable("methodpayment"){
+                    MethodPaymentScreen(navController,bookingViewModel)
+
+                }
+                composable("bookingcalender",
+                    popEnterTransition = null, popExitTransition = null, exitTransition = null, enterTransition = null
+                ){
+                    DatePickerBookingScreen(
+                        bookingViewModel = bookingViewModel,
+                        searchViewModel = searchViewModel,
+                        onHandleApplyTimeBooking = {
+                            navController.popBackStack()
+                        })
                 }
 
                 //----------------------------------- SEARCH ------------------------------
@@ -249,7 +282,7 @@ fun MainApp(
                         navController = navController,
                         topBar = { UserTopBar(loginUiState = loginUiState,onLoginButtonClicked = { navController.navigate("login") }) },
                         content = { padding, _ ->
-                            UserScreen(padding = padding )
+                            UserScreen(padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
                         })
                 }
 
@@ -287,11 +320,7 @@ fun MainApp(
                 ) { backStackEntry ->
 
                     val cardId = backStackEntry.arguments?.getString("cardId")
-                    CardDetailScreen(cardId = cardId,navController)
-                }
-                composable("notifications") {
-                    // Gọi hàm NotificationsScreen() để hiển thị màn hình notifications
-                    NotificationsScreen(navController = navController)
+                    CardDetailScreen(bookingViewModel=bookingViewModel,cardId = cardId,navController)
                 }
             }
         }

@@ -25,21 +25,23 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.R
 
 @Composable
 fun UserScreen(
+    onLogoutSuccess: () -> Unit = {},
+    loginUiState: LoginUiState,
     padding: PaddingValues,
 ){
     LazyColumn(
@@ -51,7 +53,7 @@ fun UserScreen(
             Column() {
                 Text(
                     text = "Cài đặt",
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(12.dp,16.dp)
                 )
@@ -63,7 +65,7 @@ fun UserScreen(
 
                 Text(
                     text = "Thông tin",
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(12.dp,16.dp)
                 )
@@ -71,7 +73,19 @@ fun UserScreen(
                 SettingElement(Icons.Filled.DateRange,"Điều khoản & Chính sách bảo mật")
                 SettingElement(Icons.Filled.AccountBox,"Phiên bản","15.35.0")
                 SettingElement(Icons.Filled.Info,"Liên hệ")
+                if(loginUiState.isLoggedIn){
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp), horizontalArrangement = Arrangement.Center, ) {
+                        OutlinedButton(
+                            onClick = onLogoutSuccess,
+                            modifier = Modifier.fillMaxWidth(),
 
+                            ) {
+                            Text(text = "Đăng xuất", color = Color.Red)
+                        }
+                    }
+                }
             }
         }
     }
@@ -120,9 +134,9 @@ fun SettingElement(
         Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically, modifier = Modifier
             .padding(12.dp)
             .fillMaxWidth()) {
-            Icon(imageVector = icon, contentDescription = null,tint = Color.Red , modifier = Modifier.size(32.dp))
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(text = text, style = MaterialTheme.typography.bodyLarge)
+            Icon(imageVector = icon, contentDescription = null,tint = Color.Red , modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(text = text, style = MaterialTheme.typography.bodyMedium,color = Color.Black.copy(0.6f))
             Spacer(modifier = Modifier.weight(1f))
             if(setting != null) {
                 Text(text = setting, style = MaterialTheme.typography.labelMedium,color = Color.Red, modifier = Modifier.padding(8.dp))
@@ -132,6 +146,58 @@ fun SettingElement(
     Spacer(modifier = Modifier
         .fillMaxWidth()
         .height(1.dp)
+        .padding(horizontal = 12.dp)
         .border(1.dp, color = colorResource(id = R.color.border)))
 }
 
+@Preview(showBackground = true)
+@Composable
+fun test() {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        item {
+            Column() {
+                Text(
+                    text = "Cài đặt",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(12.dp, 16.dp)
+                )
+
+
+                SettingElement(Icons.Filled.Notifications, "Thông báo")
+                SettingElement(Icons.Filled.AddCircle, "Ngôn ngữ", "Tiếng Việt")
+                SettingElement(Icons.Filled.LocationOn, "Khu vực", "Hồ Chí Minh")
+
+                Text(
+                    text = "Thông tin",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(12.dp, 16.dp)
+                )
+                SettingElement(Icons.Filled.Phone, "Hỏi đáp")
+                SettingElement(Icons.Filled.DateRange, "Điều khoản & Chính sách bảo mật")
+                SettingElement(Icons.Filled.AccountBox, "Phiên bản", "15.35.0")
+                SettingElement(Icons.Filled.Info, "Liên hệ")
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    OutlinedButton(
+                        onClick = { },
+                        modifier = Modifier.fillMaxWidth(),
+
+                        ) {
+                        Text(text = "Đăng xuất", color = Color.Red)
+                    }
+                }
+
+            }
+        }
+    }}
