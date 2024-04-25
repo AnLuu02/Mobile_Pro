@@ -13,6 +13,10 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,7 +60,16 @@ class LoginViewModel : ViewModel() {
     fun updatePhoneNumber(inputPhoneNumber: String) {
         phoneNumber = inputPhoneNumber
     }
-
+    fun logout() {
+        FirebaseAuth.getInstance().signOut();
+        _uiState.update { currentState ->
+            currentState.copy(
+                isLoggedIn = false,
+                phoneNumber = null,
+                uid = null
+            )
+        }
+    }
     fun send(mobileNum: String,activity: Activity) {
         val options = PhoneAuthOptions.newBuilder(mAuth)
             .setPhoneNumber("+84$mobileNum")
@@ -91,10 +104,32 @@ class LoginViewModel : ViewModel() {
                     val user = task.result?.user
                     val phoneNumber = user?.phoneNumber
                     val uid = user?.uid
+//                    val databaseRef = Firebase.database.reference.child("users").child(uid ?: "")
+//                    databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
+//                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                            // Người dùng không tồn tại trong database
+//                            if (!dataSnapshot.exists()) {
+//                                // Thực hiện việc thêm người dùng mới
+//                                databaseRef.child("phoneNumber").setValue(phoneNumber).addOnCompleteListener {
+//                                    if (it.isSuccessful) {
+//                                        Log.d("DEBUG", "User added to database")
+//                                    } else {
+//                                        Log.d("DEBUG", "Failed to add user to database")
+//                                    }
+//                                }
+//                            }
+//                        }
+//
+//                        override fun onCancelled(databaseError: DatabaseError) {
+//                            Log.d("DEBUG", "Database error: ${databaseError.message}")
+//                        }
+//                    })
+
                     _uiState.update { currentState ->
                         currentState.copy(
                             phoneNumber = phoneNumber,
-                            uid = uid
+                            uid = uid,
+                            isLoggedIn = true
                         )
                     }
                     isDialogShown = false

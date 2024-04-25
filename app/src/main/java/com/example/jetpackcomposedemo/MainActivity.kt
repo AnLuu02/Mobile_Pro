@@ -130,9 +130,6 @@ fun MainApp(
                         onHandleApplyTimeBooking = {
                             navController.popBackStack()
                         })
-
-
-
                 }
 
                 //----------------------------------- SEARCH ------------------------------
@@ -291,7 +288,7 @@ fun MainApp(
                         navController = navController,
                         topBar = { UserTopBar(loginUiState = loginUiState,onLoginButtonClicked = { navController.navigate("login") }) },
                         content = { padding, _ ->
-                            UserScreen(padding = padding )
+                            UserScreen(padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
                         })
                 }
 

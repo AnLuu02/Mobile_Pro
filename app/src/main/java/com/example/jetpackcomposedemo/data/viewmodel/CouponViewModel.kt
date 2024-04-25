@@ -1,46 +1,55 @@
 package com.example.jetpackcomposedemo.data.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.jetpackcomposedemo.data.repository.ProductsRepository
-import com.example.jetpackcomposedemo.helpper.Result
-import com.example.jetpackcomposedemo.data.models.Product
-import com.example.jetpackcomposedemo.data.models.coupon.Coupon
+import com.example.jetpackcomposedemo.data.models.Coupon
 import com.example.jetpackcomposedemo.data.repository.CouponRepository
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
+import com.example.jetpackcomposedemo.helpper.Resource
 import kotlinx.coroutines.launch
 
-class CouponViewModel(
-    private val couponRepository: CouponRepository
-):ViewModel() {
 
-    private val _product = MutableStateFlow<List<Coupon>>(emptyList())
-    val product = _product.asStateFlow()
+class CouponViewModel(private val repository: CouponRepository) : ViewModel() {
+    private val _coupons = MutableLiveData<Resource<List<Coupon>>>()
+    private val _coupon = MutableLiveData<Resource<Coupon>>()
 
-    private val _showErrorToastChannel = Channel<Boolean>()
-    val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
+    val coupons: LiveData<Resource<List<Coupon>>> = _coupons
+    val coupon: LiveData<Resource<Coupon>> = _coupon
 
     init {
+        loadDiscounts()
+    }
+    private fun loadDiscounts() {
         viewModelScope.launch {
-            couponRepository.getCouponList().collectLatest { result->
-                when(result){
-                    is Result.Error -> {
-                        _showErrorToastChannel.send(true)
-
-                    }
-                    is Result.Success -> {
-                        result.data?.let {products->
-                            _product.update { products }
-                        }
-
-                    }
+            _coupons.postValue(Resource.loading(null))
+            try {
+                val response = repository.getDiscounts()
+                if (response.isSuccessful) {
+                    _coupons.postValue(Resource.success(response.body()))
+                } else {
+                    _coupons.postValue(Resource.error(response.errorBody().toString(), null))
                 }
+            } catch (e: Exception) {
+                _coupons.postValue(Resource.error(e.toString(), null))
             }
         }
     }
+
+    private fun getCouponsById(id:String) {
+        viewModelScope.launch {
+            _coupon.postValue(Resource.loading(null))
+            try {
+                val response = repository.getDiscountsById(id)
+                if (response.isSuccessful) {
+                    _coupon.postValue(Resource.success(response.body()))
+                } else {
+                    _coupon.postValue(Resource.error(response.errorBody().toString(), null))
+                }
+            } catch (e: Exception) {
+                _coupon.postValue(Resource.error(e.toString(), null))
+            }
+        }
+    }
+
 }

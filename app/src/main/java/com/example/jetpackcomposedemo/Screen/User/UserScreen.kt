@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -35,11 +36,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.R
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.update
 
 @Composable
 fun UserScreen(
+    onLogoutSuccess: () -> Unit = {},
+    loginUiState: LoginUiState,
     padding: PaddingValues,
 ){
     LazyColumn(
@@ -71,7 +77,19 @@ fun UserScreen(
                 SettingElement(Icons.Filled.DateRange,"Điều khoản & Chính sách bảo mật")
                 SettingElement(Icons.Filled.AccountBox,"Phiên bản","15.35.0")
                 SettingElement(Icons.Filled.Info,"Liên hệ")
+                if(loginUiState.isLoggedIn){
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp), horizontalArrangement = Arrangement.Center, ) {
+                        OutlinedButton(
+                            onClick = onLogoutSuccess,
+                            modifier = Modifier.fillMaxWidth(),
 
+                            ) {
+                            Text(text = "Đăng xuất", color = Color.Red)
+                        }
+                    }
+                }
             }
         }
     }
@@ -135,3 +153,54 @@ fun SettingElement(
         .border(1.dp, color = colorResource(id = R.color.border)))
 }
 
+@Preview(showBackground = true)
+@Composable
+fun test() {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        item {
+            Column() {
+                Text(
+                    text = "Cài đặt",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(12.dp, 16.dp)
+                )
+
+
+                SettingElement(Icons.Filled.Notifications, "Thông báo")
+                SettingElement(Icons.Filled.AddCircle, "Ngôn ngữ", "Tiếng Việt")
+                SettingElement(Icons.Filled.LocationOn, "Khu vực", "Hồ Chí Minh")
+
+                Text(
+                    text = "Thông tin",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(12.dp, 16.dp)
+                )
+                SettingElement(Icons.Filled.Phone, "Hỏi đáp")
+                SettingElement(Icons.Filled.DateRange, "Điều khoản & Chính sách bảo mật")
+                SettingElement(Icons.Filled.AccountBox, "Phiên bản", "15.35.0")
+                SettingElement(Icons.Filled.Info, "Liên hệ")
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    OutlinedButton(
+                        onClick = { },
+                        modifier = Modifier.fillMaxWidth(),
+
+                        ) {
+                        Text(text = "Đăng xuất", color = Color.Red)
+                    }
+                }
+
+            }
+        }
+    }}

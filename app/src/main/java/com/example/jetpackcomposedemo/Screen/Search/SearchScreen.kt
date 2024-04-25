@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.Search
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -31,9 +32,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,14 +44,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.jetpackcomposedemo.data.models.Product
-import com.example.jetpackcomposedemo.data.network.RetrofitInstance
-import com.example.jetpackcomposedemo.data.repository.ProductsRepository
-import com.example.jetpackcomposedemo.data.repository.ProductsRepositoryImpl
-import com.example.jetpackcomposedemo.data.viewmodel.ProductsViewModel
-import com.example.jetpackcomposedemo.data.viewmodel.ProductsViewModelFactory
+import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
+import com.example.jetpackcomposedemo.data.repository.CouponRepository
+import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModelFactory
+import com.example.jetpackcomposedemo.helpper.Status
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SearchScreen(
@@ -62,31 +62,34 @@ fun SearchScreen(
 ) {
 
     //////////////////////////demooooooooooo////////////////////////////////////////////
-
-    val productsViewModel: ProductsViewModel = viewModel(factory = ProductsViewModelFactory(ProductsRepositoryImpl(RetrofitInstance.apiService)))
-    Log.e("aaa",productsViewModel.product.toString())
-
-
-    val newProduct = Product(
-        brand = "Brand",
-        category = "Category",
-        description = "Description",
-        discountPercentage = 10.0,
-        id = 0, // Giả sử đây là id mới sẽ được generated bởi server
-        images = listOf("url1", "url2"),
-        price = 100,
-        rating = 4.5,
-        stock = 50,
-        thumbnail = "thumbnail_url",
-        title = "New Product Title"
+    val couponViewModel: CouponViewModel = viewModel(
+        factory = CouponViewModelFactory(CouponRepository(apiService = apiService))
     )
-    LaunchedEffect(Unit) {
-        try {
-            productsViewModel.postProductData(newProduct)
-        } catch (e: Exception) {
-            // Handle the exception
+    val couponResource = couponViewModel.coupons.observeAsState()
+    // Xử lý UI dựa trên trạng thái của Resource
+    when (couponResource.value?.status) {
+        Status.SUCCESS -> {
+            // Xử lý dữ liệu khi load thành công
+            couponResource.value?.data?.let { coupons ->
+                Log.e("aaaádasd", coupons.toString())
+            }
         }
+        Status.ERROR -> {
+            // Xử lý khi có lỗi
+            Text(text = "Lỗi: ${couponResource.value?.message}")
+        }
+        Status.LOADING -> {
+            // Xử lý trạng thái đang tải
+
+        }
+
+        null -> Text(text = "Lỗi: nuklklklklklklklklklklklklklklklklklklkl")
     }
+
+
+    //get by id
+
+
 
     //////////////////////////demooooooooooo////////////////////////////////////////////
 

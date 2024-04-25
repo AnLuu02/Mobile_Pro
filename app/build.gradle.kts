@@ -110,7 +110,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
     // Livedata
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
-
+    implementation ("androidx.compose.runtime:runtime-livedata:1.6.6")
 
     //retrofit
     // Retrofit and GSON
