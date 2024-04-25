@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.Screen.Notifications.NotificationsListItem
+/*package com.example.jetpackcomposedemo.Screen.Notifications.NotificationsListItem
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -39,4 +39,4 @@ fun NotificationListItem(notification: NotificationItem) {
             // Thêm các thành phần khác của ListItem nếu cần
         }
     }
-}
+}*/
