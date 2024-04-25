@@ -309,7 +309,7 @@ fun <T> PriceCard(
                                     Icon(
                                         imageVector = Icons.Rounded.Star,
                                         contentDescription = "",
-                                        tint = Color.Yellow,
+                                        tint = Color(255,215,0),
                                         modifier = Modifier.size(16.dp)
 
                                     )
