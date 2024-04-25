@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.roundUpHour
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -75,14 +76,10 @@ fun ListRoomScreen(
     val listState = rememberLazyListState()
 
     val dateCheckinString = remember{ mutableStateOf(
-        bookingViewModel.getTimeCheckin()
-            ?: LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+        bookingViewModel.getTimeCheckin() ?: roundUpHour(LocalDateTime.now())
     ) }
     val dateCheckoutString = remember{ mutableStateOf(
-        bookingViewModel.getTimeCheckout()
-            ?: LocalDateTime.now().plusDays(2).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-    ) }
-
+        bookingViewModel.getTimeCheckout()?:roundUpHour(LocalDateTime.now().plusDays(1))) }
     val totalTime = remember{ mutableStateOf(bookingViewModel.getTotalTime() ?: "1")  }
     val typeBooking = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
     Scaffold(
@@ -108,21 +105,11 @@ fun ListRoomScreen(
                             .fillMaxWidth()
                             .padding(12.dp)
                             .border(
-                                BorderStroke(
-                                    1.dp, color = when (typeBooking.value) {
-                                        "hourly" -> Color.Red
-                                        "overnight" -> Color(138, 43, 226)
-                                        else -> Color(135, 206, 235)
-                                    }
-                                ),
+                                BorderStroke(1.dp, Color.Red),
                                 shape = MaterialTheme.shapes.small
                             )
                             .background(
-                                color = when (typeBooking.value) {
-                                    "hourly" -> Color.Red.copy(alpha = 0.1f)
-                                    "overnight" -> Color(138, 43, 226, alpha = 30)
-                                    else -> Color(135, 206, 235, alpha = 100)
-                                },
+                                Color.Red.copy(alpha = 0.1f),
                                 shape = MaterialTheme.shapes.small
                             )
                             .clickable(
@@ -189,11 +176,7 @@ fun ListRoomScreen(
                                     .height(1.dp)
                                     .padding(start = 16.dp, end = 16.dp)
                                 ,
-                                color = when (typeBooking.value) {
-                                    "hourly" -> Color.Red
-                                    "overnight" -> Color(138, 43, 226)
-                                    else -> Color(135, 206, 235)
-                                }
+                                color = Color.Red
                             )
 
                             Box(
@@ -219,7 +202,7 @@ fun ListRoomScreen(
                                             Spacer(modifier = Modifier.height(6.dp))
                                             Text(
                                                 text = dateCheckinString.value,
-                                                color = Color.Black, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold,
+                                                color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold,
                                             )
 
 
@@ -249,7 +232,7 @@ fun ListRoomScreen(
                                             Spacer(modifier = Modifier.height(6.dp))
                                             Text(
                                                 text = dateCheckoutString.value,
-                                                color = Color.Black, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                                color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                                         }
 
