@@ -12,13 +12,11 @@ import kotlinx.coroutines.launch
 
 class CouponViewModel(private val repository: CouponRepository) : ViewModel() {
     private val _couponList = MutableLiveData<Resource<List<Coupon>>>()
-    private val _coupon = MutableLiveData<Resource<Coupon>>()
 
     val couponList: LiveData<Resource<List<Coupon>>> = _couponList
-    val coupon: LiveData<Resource<Coupon>> = _coupon
+
 
     private var isApiCalledListCoupon = false
-    private var isApiCalledCouponById = false
 
     fun getCouponList() {
         if(!isApiCalledListCoupon){
@@ -39,25 +37,45 @@ class CouponViewModel(private val repository: CouponRepository) : ViewModel() {
         }
     }
 
-//     fun getCouponsById(id:String) {
-//       if(!isApiCalledCouponById){
-//           viewModelScope.launch {
-//               _coupon.postValue(Resource.loading(null))
-//               try {
-//                   val response = repository.getCouponsById(id)
-//                   if (response.isSuccessful) {
-//                       _coupon.postValue(Resource.success(response.body()))
-//                   } else {
-//                       _coupon.postValue(Resource.error(response.errorBody().toString(), null))
-//                   }
-//                   isApiCalledCouponById = true
-//               } catch (e: Exception) {
-//                   _coupon.postValue(Resource.error(e.toString(), null))
-//                   isApiCalledCouponById = true
-//
-//               }
-//           }
-//       }
-//    }
+
+    private val _coupons = MutableLiveData<Resource<List<Coupon>>>()
+    val coupons: LiveData<Resource<List<Coupon>>> = _coupons
+    private var isApiCalledCouponById = false
+
+    fun getCouponsById(id: String) {
+        if (!isApiCalledCouponById) {
+            _coupons.postValue(Resource.loading(null))
+            viewModelScope.launch {
+                try {
+                    val response = repository.getCouponsById(id)
+                    if (response.isSuccessful) {
+                        _coupons.postValue(Resource.success(response.body()))
+                    } else {
+                        _coupons.postValue(Resource.error("Error ${response.code()}: ${response.message()}", null))
+                    }
+                    isApiCalledCouponById = true
+                } catch (e: Exception) {
+                    _coupons.postValue(Resource.error("Exception: ${e.localizedMessage}", null))
+                }
+            }
+        }
+    }
+
+    fun postCoupon(coupon: Coupon) {
+        _coupons.postValue(Resource.loading(null))
+        viewModelScope.launch {
+            try {
+                val response = repository.postCoupon(coupon)
+                if (response.isSuccessful) {
+                    _coupons.postValue(Resource.success(response.body()))
+                } else {
+                    _coupons.postValue(Resource.error("Error ${response.code()}: ${response.message()}", null))
+                }
+            } catch (e: Exception) {
+                _coupons.postValue(Resource.error("Exception: ${e.localizedMessage}", null))
+            }
+        }
+    }
+
 
 }
