@@ -23,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +48,7 @@ fun DateRangePickerScreen(
     onHandleClickButtonDelete:()->Unit
 
 ) {
+    val enabledButtonApply = remember{ mutableStateOf(false) }
     val currentTime = remember { LocalDateTime.now() }
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val timeCheckin = remember{ mutableIntStateOf(
@@ -112,6 +114,7 @@ fun DateRangePickerScreen(
     val dateCheckinString = selectedStart?.format(dateFormatter).toString()
     val dateCheckoutString = selectedEnd?.format(dateFormatter)?.toString() ?: "Bất kì"
     val totalSelectedDay =  if(selectedEnd!=null && selectedStart != null) convertMillisToDays(selectedEnd.toMillis() - selectedStart.toMillis()) else 0
+    enabledButtonApply.value = dateCheckoutString != "Bất kì"
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -143,6 +146,7 @@ fun DateRangePickerScreen(
                     DatePickerBottomBar(
                         searchViewModel = searchViewModel,
                         typeBooking = typeBooking,
+                        enabledButtonApply = enabledButtonApply.value,
                         onHandleClickButton = {
                             if (selectedStart != null) {
                                 if (selectedEnd != null) {

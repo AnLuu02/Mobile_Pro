@@ -13,11 +13,18 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.util.concurrent.TimeUnit
 
 class LoginViewModel : ViewModel() {
     private val mAuth = Firebase.auth
     var verificationOtp = ""
+
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
     var isDialogShown by  mutableStateOf(false)
         private set
     var phoneNumber by  mutableStateOf("")
@@ -81,6 +88,15 @@ class LoginViewModel : ViewModel() {
             .addOnCompleteListener(activity) { task ->
                 if (task.isSuccessful) {
                     Log.d("DEBUG","Verify SUCCESS")
+                    val user = task.result?.user
+                    val phoneNumber = user?.phoneNumber
+                    val uid = user?.uid
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            phoneNumber = phoneNumber,
+                            uid = uid
+                        )
+                    }
                     isDialogShown = false
                     onSuccess()
                 } else {
@@ -91,7 +107,7 @@ class LoginViewModel : ViewModel() {
 
 
 }
-val correctTelephoneNumber = "12345789"
+const val correctTelephoneNumber = "12345789"
 private fun authenticateUser(
     inputTelephone: String,
     onAuthenticated: () -> Unit,

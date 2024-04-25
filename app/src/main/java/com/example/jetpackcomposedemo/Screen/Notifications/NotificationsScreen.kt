@@ -51,7 +51,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 @Composable
 fun NotificationsScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(pageCount = { HomeTabs.values().size })
+    val pagerState = rememberPagerState(pageCount = { HomeTabs.entries.size })
     val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
     var menuExpanded by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
@@ -108,7 +108,7 @@ fun NotificationsScreen(navController: NavController) {
                     )
                 }
                 ) {
-                HomeTabs.values().forEachIndexed { index, currentTab ->
+                HomeTabs.entries.forEachIndexed { index, currentTab ->
                     Tab(
                         selected = selectedTabIndex.value == index,
                         onClick = {
@@ -158,5 +158,6 @@ enum class HomeTabs(
     All("Tất cả"),
     Bookroom("Đặt phòng"),
     Promotion("Khuyến mãi")
+
 }
 

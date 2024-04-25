@@ -19,11 +19,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.components.Card.PriceCard
 
 @Composable
 fun SearchResultScreen(
     typeBooking:String,
+    searchViewModel:SearchViewModel,
     onBackSearchScreen:()->Unit,
     onOpenSearchScreen:()->Unit,
     onOpenFilter:()->Unit
@@ -31,10 +33,13 @@ fun SearchResultScreen(
     val isOpenSort = remember {
         mutableStateOf(false)
     }
-    Log.e("typeBooking",typeBooking)
+    Log.e("Filter",searchViewModel.getFilterRoom().toString())
+
     Scaffold(
         topBar = {
             SearchResultTopBar(
+                typeBooking = typeBooking,
+                searchViewModel = searchViewModel,
                 onOpenSort = {
                     isOpenSort.value = it
                 },
@@ -53,10 +58,12 @@ fun SearchResultScreen(
 
     ) {paddingValues ->
 
-        SearchResult(paddingValues = paddingValues)
+        SearchResult(searchViewModel = searchViewModel,paddingValues = paddingValues)
 
         if(isOpenSort.value){
-            SearchResultModeScreen {
+            SearchResultModeScreen(
+                searchViewModel = searchViewModel
+            ) {
                 isOpenSort.value = it
             }
         }
@@ -67,10 +74,14 @@ fun SearchResultScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResult(
+    searchViewModel:SearchViewModel,
     paddingValues:PaddingValues
 ){
     val dataTest = listOf(1, 2, 3, 4, 5)
     val sheetState = rememberBottomSheetScaffoldState()
+
+    Log.e("method sort",searchViewModel.getSortMethod().value.sortMethod.toString())
+
     LaunchedEffect(Unit) {
         sheetState.bottomSheetState.expand()
     }

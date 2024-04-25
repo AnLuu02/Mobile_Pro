@@ -31,6 +31,7 @@ import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 fun DatePickerBottomBar(
     searchViewModel: SearchViewModel,
     typeBooking:String,
+    enabledButtonApply:Boolean = false,
     onHandleClickButton:()->Unit,
     onHandleClickButtonDelete: () -> Unit
 ) {
@@ -71,6 +72,7 @@ fun DatePickerBottomBar(
 
             Button(
                 onClick = { onHandleClickButton() },
+                enabled = enabledButtonApply,
                 modifier = Modifier.clip(MaterialTheme.shapes.small),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Red,

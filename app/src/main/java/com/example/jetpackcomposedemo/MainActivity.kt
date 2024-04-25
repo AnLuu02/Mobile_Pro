@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -32,6 +34,7 @@ import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScr
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.Screen.User.LoginScreen
+import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
@@ -54,7 +57,9 @@ class MainActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainApp(){
+fun MainApp(
+    loginViewModel1: LoginViewModel = viewModel()
+){
     val navController = rememberNavController()
     JetpackComposeDemoTheme {
         Surface(
@@ -62,6 +67,7 @@ fun MainApp(){
             color = MaterialTheme.colorScheme.background
         ) {
             val searchViewModel: SearchViewModel = viewModel()
+            val loginUiState by loginViewModel1.uiState.collectAsState()
             NavHost(navController = navController, startDestination = "home" ){
 
                 //----------------------------------- HOME ------------------------------
@@ -87,6 +93,11 @@ fun MainApp(){
                         })
                 }
 
+                //----------------------------------- NOTIFICATION ------------------------------
+                composable("notification"){
+                    NotificationsScreen(navController = navController)
+                }
+
                 //----------------------------------- SEARCH ------------------------------
                 composable("search") {
                     SearchScreen(
@@ -98,7 +109,7 @@ fun MainApp(){
                             navController.navigate("search/$typeBooking/result")
                         },
                         closeSearchScreen={
-                            navController.popBackStack()
+                            navController.popBackStack("home",inclusive = false)
                         })
                 }
                 //search result
@@ -110,23 +121,37 @@ fun MainApp(){
                         })
                 ){backStackEntry ->
 
-                    val typeBooking = backStackEntry.arguments?.getString("typeBooking")
+                    val typeBooking = backStackEntry.arguments?.getString("typeBooking").toString()
                     SearchResultScreen(
-                        typeBooking = typeBooking.toString(),
+                        typeBooking = typeBooking,
+                        searchViewModel = searchViewModel,
                         onBackSearchScreen = {
                             navController.popBackStack()
                         },
                         onOpenSearchScreen = {
-                            navController.navigate("search")
+                            navController.popBackStack("search",inclusive = false)
                         },
                         onOpenFilter = {
-                            navController.navigate("search/filter")
+                            navController.navigate("search/$typeBooking/filter")
                         }
                     )
                 }
 
-                composable("search/filter"){
-                    SearchResultFilterScreen {
+                composable(
+                    "search/{typeBooking}/filter",
+                    arguments = listOf(
+                        navArgument("typeBooking") {
+                            type = NavType.StringType
+                        })
+                ){backStackEntry->
+                    val typeBooking = backStackEntry.arguments?.getString("typeBooking").toString()
+                    SearchResultFilterScreen(
+                        searchViewModel = searchViewModel,
+                        typeBooking = typeBooking,
+                        onHandleApply = {
+                            navController.popBackStack()
+                        }
+                    ) {
                         navController.popBackStack()
                     }
                 }
@@ -195,7 +220,7 @@ fun MainApp(){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
                         topBar = { ProposedTopBar() },
-                        content = {padding,listState->
+                        content = { padding, _ ->
                             ProposedScreen(padding = padding, onOpenDetailCardScreen = {cardId->
                                 navController.navigate("carddetail/$cardId")
                             })
@@ -204,7 +229,7 @@ fun MainApp(){
 
                 //----------------------------------- BOOKQUICKLY ------------------------------
                 composable("bookquickly"){
-                    ScreenWithBottomNavigationBar(navController = navController, content = {padding,listState->
+                    ScreenWithBottomNavigationBar(navController = navController, content = { padding, _ ->
                         BookQuicklyScreen(padding = padding)
                     })
                 }
@@ -213,7 +238,7 @@ fun MainApp(){
                 composable("discount"){
                     ScreenWithBottomNavigationBar(navController = navController, topBar = {
                         DiscountTopBar()
-                    }, content = {padding,listState->
+                    }, content = { padding, _ ->
                         DiscountScreen(padding = padding)
                     })
                 }
@@ -222,14 +247,15 @@ fun MainApp(){
                 composable("user"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,
-                        topBar = { UserTopBar(onLoginButtonClicked = { navController.navigate("login") }) },
-                        content = {padding,listState->
-                            UserScreen(padding = padding, )
+                        topBar = { UserTopBar(loginUiState = loginUiState,onLoginButtonClicked = { navController.navigate("login") }) },
+                        content = { padding, _ ->
+                            UserScreen(padding = padding )
                         })
                 }
 
                 composable("login") {
                     LoginScreen(
+                        loginViewModel1,
                         onCancelButtonClicked = {
                             navController.popBackStack("user", inclusive = false)
                         },

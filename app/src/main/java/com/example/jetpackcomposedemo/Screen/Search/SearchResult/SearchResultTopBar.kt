@@ -41,9 +41,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 
 @Composable
 fun SearchResultTopBar(
+    typeBooking:String,
+    searchViewModel: SearchViewModel,
     onOpenSort:(Boolean)->Unit,
     onOpenFilter:()->Unit,
     onBackSearchScreen:()->Unit,
@@ -81,7 +84,7 @@ fun SearchResultTopBar(
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            TextFieldSearchResult {onOpenSearchScreen()}
+            TextFieldSearchResult(typeBooking = typeBooking,searchViewModel=searchViewModel) {onOpenSearchScreen()}
 
         }
 
@@ -165,10 +168,45 @@ fun SearchResultTopBar(
 }
 @Composable
 fun TextFieldSearchResult(
+    typeBooking:String,
+    searchViewModel:SearchViewModel,
     onOpenScreenSearch:()->Unit
 ) {
     var text by remember {
         mutableStateOf("")
+    }
+    val typeBookingg = when(typeBooking){
+        "hourly"->"Theo giờ"
+        "overnight"->"Qua đêm"
+        else -> "Theo ngày"
+    }
+
+    var startTimeBooking:String
+    var endTimeBooking:String
+    val textHeader: String = when (typeBooking) {
+        "hourly" -> {
+            startTimeBooking = searchViewModel.getOnlyHourBooking(typeBooking).timeCheckin
+            endTimeBooking = searchViewModel.getOnlyHourBooking(typeBooking).timeCheckOut
+            if(
+                startTimeBooking != "Bất kì"
+                && searchViewModel.getOnlyDayBooking(typeBooking).timeCheckin
+                == searchViewModel.getOnlyDayBooking(typeBooking).timeCheckOut
+                )
+                "$startTimeBooking:00 - $endTimeBooking:00, ${searchViewModel.getDayAndMonth(typeBooking).timeCheckin}"
+            else if(
+                startTimeBooking != "Bất kì"
+                && searchViewModel.getOnlyDayBooking(typeBooking).timeCheckin
+                != searchViewModel.getOnlyDayBooking(typeBooking).timeCheckOut
+            ){
+                "$startTimeBooking:00, ${searchViewModel.getDayAndMonth(typeBooking).timeCheckin} - $endTimeBooking:00, ${searchViewModel.getDayAndMonth(typeBooking).timeCheckOut}"
+            }
+            else "Bất kì"
+        }
+        else ->  {
+            startTimeBooking = searchViewModel.getDayAndMonth(typeBooking).timeCheckin
+            endTimeBooking = searchViewModel.getDayAndMonth(typeBooking).timeCheckOut
+            if(startTimeBooking != "Bất kì") "$startTimeBooking - $endTimeBooking" else "Bất kì"
+        }
     }
 
     Surface(
@@ -212,7 +250,7 @@ fun TextFieldSearchResult(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Theo giờ",
+                            text = typeBookingg,
                             fontWeight = FontWeight.Medium,
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -227,7 +265,7 @@ fun TextFieldSearchResult(
 
 
                         Text(
-                            text = "Bất kì",
+                            text = textHeader,
                             fontWeight = FontWeight.Medium,
                             style = MaterialTheme.typography.bodyMedium
                         )

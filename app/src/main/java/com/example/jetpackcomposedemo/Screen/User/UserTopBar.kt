@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.User
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +22,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun UserTopBar(onLoginButtonClicked: () -> Unit = {} ) {
+fun UserTopBar(
+    loginUiState: LoginUiState,
+    onLoginButtonClicked: () -> Unit = {}
+) {
+    Log.d("DEBUG","User Telephone Number at UserTopBar : ${loginUiState.phoneNumber} " )
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -31,31 +36,38 @@ fun UserTopBar(onLoginButtonClicked: () -> Unit = {} ) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Text(
-                text = "Đăng ký ngay để nhận nhiều ưu đãi hấp dẫn.",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Light,
-                modifier = Modifier.padding(12.dp,8.dp,12.dp,4.dp)
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick =  onLoginButtonClicked )
-
-            ) {
+            if(!loginUiState.phoneNumber.equals("")){
+                Text(text = "Xin chao ${loginUiState.phoneNumber},${loginUiState.uid}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Light,
+                    modifier = Modifier.padding(12.dp,8.dp,12.dp,4.dp))
+            } else {
                 Text(
-                    text = "Đăng nhập/ Đăng ký",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Red,
-                    modifier = Modifier.padding(12.dp,8.dp,12.dp,12.dp)
+                    text = "Đăng ký ngay để nhận nhiều ưu đãi hấp dẫn.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Light,
+                    modifier = Modifier.padding(12.dp,8.dp,12.dp,4.dp)
                 )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick =  onLoginButtonClicked )
+
+                ) {
+                    Text(
+                        text = "Đăng nhập/ Đăng ký",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Red,
+                        modifier = Modifier.padding(12.dp,8.dp,12.dp,12.dp)
+                    )
+                }
+                Spacer(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .border(1.dp, color = Color.LightGray))
             }
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .border(1.dp, color = Color.LightGray))
         }
 
     }

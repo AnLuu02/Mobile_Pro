@@ -33,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,12 +55,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackcomposedemo.R
 
 @Composable
-fun LoginScreen(loginViewModel : LoginViewModel = viewModel(),
-                onCancelButtonClicked: () -> Unit = {},
-                onClickedRegisterText: () -> Unit = {},
-                paddingValues: PaddingValues = PaddingValues(16.dp),)
+fun LoginScreen(
+    loginViewModel: LoginViewModel ,
+    onCancelButtonClicked: () -> Unit = {},
+    onClickedRegisterText: () -> Unit = {},
+    paddingValues: PaddingValues = PaddingValues(16.dp),
+)
 {
     val activity = LocalContext.current as Activity
+//    val loginUiState by loginViewModel.uiState.collectAsState()
+//
+//    Log.d("DEBUG","User Telephone Number : ${loginUiState.phoneNumber} " )
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
