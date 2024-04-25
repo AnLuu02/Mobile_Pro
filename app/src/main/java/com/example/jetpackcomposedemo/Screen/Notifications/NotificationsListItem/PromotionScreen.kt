@@ -7,6 +7,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.jetpackcomposedemo.R
 
 // Khai báo một lớp dữ liệu đại diện cho thông báo
 //data class NotificationItem(val id: Int, val content: String)
@@ -16,17 +17,17 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun PromotionScreen() {
     val notifications = listOf(
-        NotificationItem(1, "Notification 1"),
-        NotificationItem(2, "Notification 2"),
-        NotificationItem(3, "Notification 3"),
-        NotificationItem(4, "Notification 4"),
-        NotificationItem(5, "Notification 5"),
-        // Thêm thông báo khác nếu cần
+        NotificationItem(1, "Giảm luôn 20k cho các bạn thỏa sức đặt phòng. Nhất bạn rồi đó, mở app xài ngay đi cho nóng!", R.drawable.coupon),
+
+    )
+    val contents = listOf(
+        ContentItem(1, "DEAL HỜI MỜI BẠN XƠI"),
+
     )
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(notifications) { notification ->
-            NotificationListItem(notification = notification)
+            NotificationListItem(notification = notification, contents = contents, times = createTimeList())
         }
     }
 }

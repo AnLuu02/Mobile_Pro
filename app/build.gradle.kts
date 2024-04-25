@@ -80,6 +80,7 @@ dependencies {
 
     //System UI Controller
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.27.0")
+    implementation("com.google.android.material:material:1.4.0")
 
     //Extended Icons
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
@@ -87,13 +88,15 @@ dependencies {
     //material 3
     implementation ("androidx.compose.material3:material3:1.1.0-alpha08")
 
+
+
     // Android Maps Compose composables for the Maps SDK for Android
     implementation ("com.google.maps.android:maps-compose:4.3.3")
 
 //auto slide
     implementation("io.coil-kt:coil-compose:2.3.0")
     implementation("com.google.accompanist:accompanist-pager:0.35.0-alpha")
-    implementation("androidx.compose.ui:ui:1.0.0-alpha01")
+    implementation("androidx.compose.ui:ui:1.4.0-beta01")
 
     //ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")

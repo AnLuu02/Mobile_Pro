@@ -1,12 +1,17 @@
 package com.example.jetpackcomposedemo.Screen.Notifications
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -16,7 +21,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +32,9 @@ import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsListItem
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsListItem.BookroomScreen
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsListItem.PromotionScreen
 import kotlinx.coroutines.launch
+import androidx.compose.ui.Alignment
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -36,6 +43,7 @@ fun NotificationsScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { HomeTabs.entries.size })
     val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
+    var menuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -45,6 +53,12 @@ fun NotificationsScreen(navController: NavController) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
                     }
+                },
+                actions = {
+                    IconButton(onClick = { menuExpanded = !menuExpanded }) {
+                        Icon(Icons.Filled.MoreVert, contentDescription = "Menu")
+                    }
+
                 }
             )
         }
@@ -54,10 +68,18 @@ fun NotificationsScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(top = it.calculateTopPadding())
         ) {
+
+
             TabRow(
                 selectedTabIndex = selectedTabIndex.value,
                 modifier = Modifier.fillMaxWidth(),
-
+                indicator = { tabPositions ->
+                    // Custom indicator
+                    TabRowDefaults.Indicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex.value]),
+                        color = Color.Red
+                    )
+                }
                 ) {
                 HomeTabs.entries.forEachIndexed { index, currentTab ->
                     Tab(
@@ -67,8 +89,14 @@ fun NotificationsScreen(navController: NavController) {
                                 pagerState.animateScrollToPage(index)
                             }
                         },
-                        text = { Text(text = currentTab.text, fontSize = 16.sp) }
+                        text = { Text(text = currentTab.text, fontSize = 16.sp,
+                            color = if (selectedTabIndex.value == index) {
+                                Color.Red // Màu đỏ khi được chọn
+                            } else {
+                                Color.Gray // Màu xám khi không được chọn
+                            }) }
                     )
+
                 }
             }
 
@@ -77,6 +105,7 @@ fun NotificationsScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
+
             ) {
                 when (it) {
                     0 -> AllScreen()
@@ -84,23 +113,29 @@ fun NotificationsScreen(navController: NavController) {
                     2 -> PromotionScreen()
                 }
             }
+
         }
     }
 }
 
+
 enum class HomeTabs(
 
-    val text: String
+    val text: String,
+    val textColor: Color
 ) {
     All(
-        text = "Tất cả"
+        text = "Tất cả",
+        Color.Red
     ),
     Bookroom(
 
-        text = "Đặt phòng"
+        text = "Đặt phòng",
+        Color.Red
     ),
     Promotion(
 
-        text = "Khuyến mãi"
+        text = "Khuyến mãi",
+        Color.Red
     )
 }
