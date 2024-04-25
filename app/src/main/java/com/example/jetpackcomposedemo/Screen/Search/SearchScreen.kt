@@ -69,7 +69,7 @@ fun SearchScreen(
     )
 //    LaunchedEffect(Unit) {
 //        couponViewModel.getCouponList()
-//        }
+//    }
 //    val couponResource = couponViewModel.couponList.observeAsState()
 //    // Xử lý UI dựa trên trạng thái của Resource
 //    when (couponResource.value?.status) {

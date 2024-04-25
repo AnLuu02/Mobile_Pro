@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.rounded.DateRange
-import androidx.compose.material.icons.rounded.HourglassTop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -40,7 +38,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.components.CalenderDatePicker.roundUpHour
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -51,10 +48,12 @@ fun BottomCardDetail(
     navController:NavHostController
 ){
     val dateCheckinString = remember{ mutableStateOf(
-        bookingViewModel.getTimeCheckin() ?: roundUpHour(LocalDateTime.now())
+        bookingViewModel.getTimeCheckin()
+            ?: LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
     ) }
     val dateCheckoutString = remember{ mutableStateOf(
-        bookingViewModel.getTimeCheckout()?: roundUpHour(LocalDateTime.now().plusDays(1))
+        bookingViewModel.getTimeCheckout()
+            ?: LocalDateTime.now().plusDays(2).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
     ) }
     val totalTime = remember{ mutableStateOf(bookingViewModel.getTotalTime() ?: "1")  }
     val typeBooking = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
@@ -84,7 +83,7 @@ fun BottomCardDetail(
                     .background(
                         color = when (typeBooking.value) {
                             "hourly" -> Color.Red.copy(alpha = 0.1f)
-                            "overnight" -> Color(138, 43, 226, alpha = 50)
+                            "overnight" -> Color(138, 43, 226, alpha = 30)
                             else -> Color(135, 206, 235, alpha = 100)
                         },
                         shape = MaterialTheme.shapes.extraLarge
