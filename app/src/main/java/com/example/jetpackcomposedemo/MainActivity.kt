@@ -282,7 +282,7 @@ fun MainApp(
                 }
 
 
-                //user Screen
+                //----------------------------------- USER ------------------------------
                 composable("user"){
                     ScreenWithBottomNavigationBar(
                         navController = navController,

@@ -28,8 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,8 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.R
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.flow.update
 
 @Composable
 fun UserScreen(
@@ -57,7 +53,7 @@ fun UserScreen(
             Column() {
                 Text(
                     text = "Cài đặt",
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(12.dp,16.dp)
                 )
@@ -69,7 +65,7 @@ fun UserScreen(
 
                 Text(
                     text = "Thông tin",
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(12.dp,16.dp)
                 )
@@ -138,9 +134,9 @@ fun SettingElement(
         Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically, modifier = Modifier
             .padding(12.dp)
             .fillMaxWidth()) {
-            Icon(imageVector = icon, contentDescription = null,tint = Color.Red , modifier = Modifier.size(32.dp))
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(text = text, style = MaterialTheme.typography.bodyLarge)
+            Icon(imageVector = icon, contentDescription = null,tint = Color.Red , modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(text = text, style = MaterialTheme.typography.bodyMedium,color = Color.Black.copy(0.6f))
             Spacer(modifier = Modifier.weight(1f))
             if(setting != null) {
                 Text(text = setting, style = MaterialTheme.typography.labelMedium,color = Color.Red, modifier = Modifier.padding(8.dp))
@@ -150,6 +146,7 @@ fun SettingElement(
     Spacer(modifier = Modifier
         .fillMaxWidth()
         .height(1.dp)
+        .padding(horizontal = 12.dp)
         .border(1.dp, color = colorResource(id = R.color.border)))
 }
 
@@ -165,7 +162,7 @@ fun test() {
             Column() {
                 Text(
                     text = "Cài đặt",
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(12.dp, 16.dp)
                 )

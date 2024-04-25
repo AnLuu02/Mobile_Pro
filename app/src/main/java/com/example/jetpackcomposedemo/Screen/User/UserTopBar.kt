@@ -13,9 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -27,8 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun UserTopBar(
@@ -85,10 +82,11 @@ fun UserTopBar(
                         modifier = Modifier.padding(12.dp,8.dp,12.dp,12.dp)
                     )
                 }
-                Spacer(modifier = Modifier
+                Divider(modifier = Modifier
                     .fillMaxWidth()
-                    .height(1.dp)
-                    .border(1.dp, color = Color.LightGray))
+                    .height(1.4.dp),
+                    color = Color.LightGray.copy(0.3f)
+                )
             }
         }
 

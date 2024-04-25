@@ -32,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.jetpackcomposedemo.data.models.Coupon
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
 import com.example.jetpackcomposedemo.data.repository.CouponRepository
 import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModel
@@ -65,31 +67,83 @@ fun SearchScreen(
     val couponViewModel: CouponViewModel = viewModel(
         factory = CouponViewModelFactory(CouponRepository(apiService = apiService))
     )
-    val couponResource = couponViewModel.coupons.observeAsState()
-    // Xử lý UI dựa trên trạng thái của Resource
-    when (couponResource.value?.status) {
+//    LaunchedEffect(Unit) {
+//        couponViewModel.getCouponList()
+//        }
+//    val couponResource = couponViewModel.couponList.observeAsState()
+//    // Xử lý UI dựa trên trạng thái của Resource
+//    when (couponResource.value?.status) {
+//        Status.SUCCESS -> {
+//            // Xử lý dữ liệu khi load thành công
+//            couponResource.value?.data?.let { coupons ->
+//                Log.e("List Coupon", coupons.toString())
+//            }
+//        }
+//        Status.ERROR -> {
+//            // Xử lý khi có lỗi
+//            Text(text = "Lỗi: ${couponResource.value?.message}")
+//        }
+//        Status.LOADING -> {
+//            // Xử lý trạng thái đang tải
+//
+//        }
+//
+//        null -> Text(text = "Lỗi: nuklklklklklklklklklklklklklklklklklklkl")
+//    }
+
+
+    //get by id
+//    LaunchedEffect(Unit) {
+//        couponViewModel.getCouponsById("1")
+//    }
+//    val couponResourceById = couponViewModel.coupons.observeAsState()
+//    Log.e("couponResourceById",couponResourceById.toString())
+//    when (couponResourceById.value?.status) {
+//        Status.SUCCESS -> {
+//            // Xử lý dữ liệu khi load thành công
+//            couponResourceById.value?.data?.let { coupon ->
+//                Log.e("ResourceByID", coupon.toString())
+//            }
+//        }
+//        Status.ERROR -> {
+//            // Xử lý khi có lỗi
+//            Log.e( "Lỗi: ", "${couponResourceById.value?.message}")
+//        }
+//        Status.LOADING -> {
+//        }
+//        null ->Log.e( "NULLLL: ", "NHULLLLLLL")
+//
+//    }
+
+
+    //post coupon
+    LaunchedEffect(Unit) {
+        couponViewModel.postCoupon(Coupon(
+            id = null,
+            name = "Quà An tặng",
+            amountDiscount = null,
+            percentDiscount = 50,
+            effectiveDate =  "2024-05-01T00:00:00.000Z",
+            expirationDate = null
+        ))
+    }
+    val newCouponResource = couponViewModel.coupons.observeAsState()
+    when (newCouponResource.value?.status) {
         Status.SUCCESS -> {
             // Xử lý dữ liệu khi load thành công
-            couponResource.value?.data?.let { coupons ->
-                Log.e("aaaádasd", coupons.toString())
+            newCouponResource.value?.data?.let { coupon ->
+                Log.e("New Coupon", coupon.toString())
             }
         }
         Status.ERROR -> {
             // Xử lý khi có lỗi
-            Text(text = "Lỗi: ${couponResource.value?.message}")
+            Log.e( "Lỗi: ", "${newCouponResource.value?.message}")
         }
         Status.LOADING -> {
-            // Xử lý trạng thái đang tải
-
         }
+        null ->Log.e( "NULLLL: ", "NHULLLLLLL")
 
-        null -> Text(text = "Lỗi: nuklklklklklklklklklklklklklklklklklklkl")
     }
-
-
-    //get by id
-
-
 
     //////////////////////////demooooooooooo////////////////////////////////////////////
 

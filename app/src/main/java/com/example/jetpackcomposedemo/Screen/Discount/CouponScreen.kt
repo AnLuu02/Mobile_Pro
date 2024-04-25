@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,7 +35,12 @@ import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInList
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInTopBar
+import com.example.jetpackcomposedemo.data.models.Coupon
+import com.example.jetpackcomposedemo.data.network.RetrofitInstance
+import com.example.jetpackcomposedemo.data.repository.CouponRepository
 import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModelFactory
+import com.example.jetpackcomposedemo.helpper.Status
 
 // Xử lý chức năng
 val showDetailCoupon: () -> Unit = {
@@ -67,11 +74,95 @@ val whiteColor = Color(android.graphics.Color.parseColor("#FFFFFF"))
 @Composable
 fun CouponScreen(navController: NavHostController) {
   var selectedButtonID by remember { mutableStateOf(buttons.firstOrNull()?.get("ID") as? Int) }
+  var lst_coupon = listOf<Coupon>()
+  var isLoadingAPIDone = true
+  // call api - begin
+  val couponViewModel: CouponViewModel = viewModel(
+    factory = CouponViewModelFactory(CouponRepository(apiService = RetrofitInstance.apiService))
+  )
+    LaunchedEffect(Unit) {
+        couponViewModel.getCouponList()
+        }
+    val couponResource = couponViewModel.couponList.observeAsState()
+
+    // Xử lý UI dựa trên trạng thái của Resource
+    when (couponResource.value?.status) {
+        Status.SUCCESS -> {
+            // Xử lý dữ liệu khi load thành công
+            couponResource.value?.data?.let { coupons ->
+                Log.e("List Coupon", coupons.toString())
+                lst_coupon = coupons
+                isLoadingAPIDone = true
+            }
+        }
+        Status.ERROR -> {
+            // Xử lý khi có lỗi
+            Text(text = "Lỗi: ${couponResource.value?.message}")
+        }
+        Status.LOADING -> {
+            // Xử lý trạng thái đang tải
+
+        }
+
+        null -> Text(text = "Lỗi: nuklklklklklklklklklklklklklklklklklklkl")
+    }
 
 
-//    val viewModel: CouponViewModel = viewModel()
+  //get by id
+//    LaunchedEffect(Unit) {
+//        couponViewModel.getCouponsById("1")
+//    }
+//    val couponResourceById = couponViewModel.coupons.observeAsState()
+//    Log.e("couponResourceById",couponResourceById.toString())
+//    when (couponResourceById.value?.status) {
+//        Status.SUCCESS -> {
+//            // Xử lý dữ liệu khi load thành công
+//            couponResourceById.value?.data?.let { coupon ->
+//                Log.e("ResourceByID", coupon.toString())
+//            }
+//        }
+//        Status.ERROR -> {
+//            // Xử lý khi có lỗi
+//            Log.e( "Lỗi: ", "${couponResourceById.value?.message}")
+//        }
+//        Status.LOADING -> {
+//        }
+//        null ->Log.e( "NULLLL: ", "NHULLLLLLL")
+//
+//    }
 
-//    Log.e("1",viewModel.toString())
+
+  //post coupon
+//  LaunchedEffect(Unit) {
+//    couponViewModel.postCoupon(
+//      Coupon(
+//      id = null,
+//      name = "Quà An tặng",
+//      amountDiscount = null,
+//      percentDiscount = 50,
+//      effectiveDate =  "2024-05-01T00:00:00.000Z",
+//      expirationDate = null
+//    )
+//    )
+//  }
+//  val newCouponResource = couponViewModel.coupons.observeAsState()
+//  when (newCouponResource.value?.status) {
+//    Status.SUCCESS -> {
+//      // Xử lý dữ liệu khi load thành công
+//      newCouponResource.value?.data?.let { coupon ->
+//        Log.e("New Coupon", coupon.toString())
+//      }
+//    }
+//    Status.ERROR -> {
+//      // Xử lý khi có lỗi
+//      Log.e( "Lỗi: ", "${newCouponResource.value?.message}")
+//    }
+//    Status.LOADING -> {
+//    }
+//    null ->Log.e( "NULLLL: ", "NHULLLLLLL")
+//
+//  }
+  // call api - end
 
   Column (
     modifier = Modifier
@@ -163,30 +254,40 @@ fun CouponScreen(navController: NavHostController) {
           .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
-        ItemInList(
-          nameDiscount = "Quà tặng bạn mới",
-          amountDiscount = "50%",
-          dateExp = "20/12/2024",
-          doLeft = showDetailCoupon,
-          doRight = handleClickCoupon)
+        if(isLoadingAPIDone) {
+          if(selectedButtonID == 0) {
+            for ((index, coupon) in lst_coupon.withIndex()) {
+              var showDiscount = ""
+              var showExpDate = ""
+              if(coupon.amountDiscount == 0F || coupon.amountDiscount == null) {
+                showDiscount = coupon.percentDiscount.toString() + "%"
+              } else {
+                var temp = coupon.amountDiscount / 1000F
+                showDiscount = temp.toInt().toString() + "K"
+              }
 
-        Spacer(modifier = Modifier.height(10.dp))
+              if(coupon.expirationDate == null) {
+                showExpDate = "None"
+              }
+              ItemInList(
+                nameDiscount = coupon.name,
+                amountDiscount = showDiscount,
+                dateExp = showExpDate,
+                doLeft = showDetailCoupon,
+                doRight = handleClickCoupon)
+              if(index != lst_coupon.size - 1) {
+                Spacer(modifier = Modifier.height(10.dp))
+              }
+            }
+          } else if (selectedButtonID == 1) {
 
-        ItemInList(
-          nameDiscount = "Quà tặng bạn mới",
-          amountDiscount = "50%",
-          dateExp = "20/12/2024",
-          doLeft = showDetailCoupon,
-          doRight = handleClickCoupon)
+          } else {
+            Text("Empty")
+          }
 
-        Spacer(modifier = Modifier.height(10.dp))
-
-        ItemInList(
-          nameDiscount = "Quà tặng bạn mới",
-          amountDiscount = "50%",
-          dateExp = "20/12/2024",
-          doLeft = showDetailCoupon,
-          doRight = handleClickCoupon)
+        } else {
+          Text("Empty")
+        }
       }
     }
   }
