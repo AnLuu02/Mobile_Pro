@@ -8,8 +8,8 @@ class CouponViewModelFactory(
     private val repository: CouponRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return if (modelClass.isAssignableFrom(DiscountViewModel::class.java)) {
-            DiscountViewModel(repository) as T
+        return if (modelClass.isAssignableFrom(CouponViewModel::class.java)) {
+            CouponViewModel(repository) as T
         } else {
             throw IllegalArgumentException("ViewModel Not Found")
         }

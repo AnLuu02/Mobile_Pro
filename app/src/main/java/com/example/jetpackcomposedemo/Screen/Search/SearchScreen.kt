@@ -65,13 +65,14 @@ fun SearchScreen(
     val couponViewModel: CouponViewModel = viewModel(
         factory = CouponViewModelFactory(CouponRepository(apiService = apiService))
     )
-    val couponResource = couponViewModel.coupons.observeAsState()
+    couponViewModel.getCouponList()
+    val couponResource = couponViewModel.couponList.observeAsState()
     // Xử lý UI dựa trên trạng thái của Resource
     when (couponResource.value?.status) {
         Status.SUCCESS -> {
             // Xử lý dữ liệu khi load thành công
             couponResource.value?.data?.let { coupons ->
-                Log.e("aaaádasd", coupons.toString())
+                Log.e("List Coupon", coupons.toString())
             }
         }
         Status.ERROR -> {
@@ -88,8 +89,27 @@ fun SearchScreen(
 
 
     //get by id
-
-
+//    couponViewModel.getCouponsById("1")
+//    val couponResourceById = couponViewModel.coupon.observeAsState()
+//    Log.e("couponResourceById",couponResourceById.toString())
+//    when (couponResourceById.value?.status) {
+//        Status.SUCCESS -> {
+//            // Xử lý dữ liệu khi load thành công
+//            couponResourceById.value?.data?.let { coupon ->
+//                Log.e("ResourceByID", coupon.toString())
+//            }
+//        }
+//        Status.ERROR -> {
+//            // Xử lý khi có lỗi
+//            Log.e( "Lỗi: ", "${couponResourceById.value?.message}")
+//        }
+//        Status.LOADING -> {
+//
+//
+//        }
+//        null ->Log.e( "NULLLL: ", "NHULLLLLLL")
+//
+//    }
 
     //////////////////////////demooooooooooo////////////////////////////////////////////
 
