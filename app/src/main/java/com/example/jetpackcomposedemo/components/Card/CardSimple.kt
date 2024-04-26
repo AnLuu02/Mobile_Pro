@@ -121,7 +121,7 @@ fun <T> CardSimple(
                             Icon(
                                 imageVector = Icons.Rounded.Star,
                                 contentDescription = "",
-                                tint = Color.Yellow,
+                                tint = Color(255,215,0),
                                 modifier = Modifier.size(14.dp),
 
                                 )

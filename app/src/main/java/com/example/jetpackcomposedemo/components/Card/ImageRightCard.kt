@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -103,7 +102,7 @@ fun<T> ImageRightCard(
                                     Icon(
                                         imageVector = Icons.Rounded.Star,
                                         contentDescription = "",
-                                        tint = Color.Yellow,
+                                        tint = Color(255,215,0),
                                         modifier = Modifier.size(16.dp)
 
                                     )
@@ -178,16 +177,15 @@ fun<T> ImageRightCard(
                 }
             }
 
-            if (index < 2) {
-                Divider(
-                    modifier = Modifier
-                        .height(0.5.dp)
-                        .fillMaxWidth()
-                        .offset(0.dp,12.dp)
-                    ,
-                    color = Color.LightGray
-                )
-            }
         }
+        Divider(
+            modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp)
+                .align(Alignment.BottomCenter)
+            ,
+            color = Color.LightGray.copy(0.5f)
+        )
     }
 }
