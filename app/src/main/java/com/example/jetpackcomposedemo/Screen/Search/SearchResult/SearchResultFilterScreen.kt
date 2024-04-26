@@ -2,7 +2,6 @@ package com.example.jetpackcomposedemo.Screen.Search.SearchResult
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -49,7 +48,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -579,7 +577,7 @@ fun StarRating(
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = "",
-                                tint = Color.Yellow,
+                                tint = Color(255,215,0),
                                 modifier = Modifier.size(26.dp)
                             )
                         }

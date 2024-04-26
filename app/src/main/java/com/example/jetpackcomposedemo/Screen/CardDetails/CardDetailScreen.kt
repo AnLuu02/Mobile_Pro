@@ -1,5 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.CardDetails
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CardDetailScreen(
     bookingViewModel:BookingViewModel,
@@ -65,7 +68,7 @@ fun CardDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = padding.calculateBottomPadding())
-                .background(Color.LightGray)
+                .background(Color.LightGray.copy(alpha = 0.3f))
         ) {
             item {
                 Column(modifier = Modifier
@@ -159,7 +162,7 @@ fun CardDetailScreen(
                                 Icon(
                                     imageVector = Icons.Rounded.Star,
                                     contentDescription = "",
-                                    tint = Color.Yellow,
+                                    tint = Color(255,215,0),
                                     modifier = Modifier
                                         .size(24.dp))
 
@@ -341,6 +344,7 @@ fun CardDetailScreen(
                 PolicyHotel()
                 Spacer(modifier = Modifier.height(3.dp))
                 RefundAndCancellationPolicy()
+                Spacer(modifier = Modifier.height(3.dp))
 
             }
         }
@@ -499,7 +503,7 @@ fun Comment(){
                 Icon(
                     imageVector = Icons.Rounded.Star,
                     contentDescription = "",
-                    tint = Color.Yellow,
+                    tint = Color(255,215,0),
                     modifier = Modifier
                         .size(24.dp)
                 )
@@ -510,7 +514,7 @@ fun Comment(){
                 Icon(
                     imageVector = Icons.Rounded.Star,
                     contentDescription = "",
-                    tint = Color.Yellow,
+                    tint = Color(255,215,0),
                     modifier = Modifier
                         .size(24.dp)
                 )
@@ -520,7 +524,7 @@ fun Comment(){
                 Icon(
                     imageVector = Icons.Rounded.Star,
                     contentDescription = "",
-                    tint = Color.Yellow,
+                    tint = Color(255,215,0),
                     modifier = Modifier
                         .size(24.dp)
                 )
@@ -531,7 +535,7 @@ fun Comment(){
                 Icon(
                     imageVector = Icons.Rounded.Star,
                     contentDescription = "",
-                    tint = Color.Yellow,
+                    tint = Color(255,215,0),
                     modifier = Modifier
                         .size(24.dp)
                 )
@@ -542,7 +546,7 @@ fun Comment(){
                 Icon(
                     imageVector = Icons.Rounded.Star,
                     contentDescription = "",
-                    tint = Color.Yellow,
+                    tint = Color(255,215,0),
                     modifier = Modifier
                         .size(24.dp)
                 )
