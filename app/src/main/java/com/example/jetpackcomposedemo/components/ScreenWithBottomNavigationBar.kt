@@ -14,7 +14,8 @@ import com.example.jetpackcomposedemo.components.FixedNavigationBar.BottomNaviga
 fun ScreenWithBottomNavigationBar(
     navController: NavHostController,
     topBar: (@Composable (LazyListState) -> Unit)? = null,
-    content: @Composable (PaddingValues,LazyListState) -> Unit
+    content: @Composable (PaddingValues,LazyListState) -> Unit,
+    isBotNav:Boolean = true,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val listState = rememberLazyListState()
@@ -24,7 +25,7 @@ fun ScreenWithBottomNavigationBar(
             topBar?.invoke(listState)
         },
         bottomBar = {
-            BottomNavigationBar(navController)
+            if(isBotNav) BottomNavigationBar(navController)
         }
 
     ) { padding ->

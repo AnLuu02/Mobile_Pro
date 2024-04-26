@@ -38,6 +38,7 @@ import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultFil
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
+import com.example.jetpackcomposedemo.Screen.User.InfoUser
 import com.example.jetpackcomposedemo.Screen.User.LoginScreen
 import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
@@ -285,10 +286,15 @@ fun MainApp(
                 //----------------------------------- USER ------------------------------
                 composable("user"){
                     ScreenWithBottomNavigationBar(
+                        isBotNav = !loginUiState.isShowingInfo,
                         navController = navController,
-                        topBar = { UserTopBar(loginUiState = loginUiState,onLoginButtonClicked = { navController.navigate("login") }) },
+                        topBar = { UserTopBar(loginUiState = loginUiState,onLoginButtonClicked = { navController.navigate("login") }, onToogleSettingInfo = {loginViewModel1.toogleSetting(loginUiState.isShowingInfo)}) },
                         content = { padding, _ ->
-                            UserScreen(padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
+                            if(loginUiState.isShowingInfo){
+                                InfoUser(padding = padding)
+                            }else{
+                                UserScreen(padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
+                            }
                         })
                 }
 
