@@ -61,6 +61,7 @@ val buttons = listOf(
     "Text" to "Sắp hết hạn"
   )
 )
+
 // Xử lý UI
 // Color
 val grayColor = Color(android.graphics.Color.parseColor("#E7E7E7"))
@@ -80,32 +81,34 @@ fun CouponScreen(navController: NavHostController) {
   val couponViewModel: CouponViewModel = viewModel(
     factory = CouponViewModelFactory(CouponRepository(apiService = RetrofitInstance.apiService))
   )
-    LaunchedEffect(Unit) {
-        couponViewModel.getCouponList()
-        }
-    val couponResource = couponViewModel.couponList.observeAsState()
+  LaunchedEffect(Unit) {
+    couponViewModel.getCouponList()
+  }
+  val couponResource = couponViewModel.couponList.observeAsState()
 
-    // Xử lý UI dựa trên trạng thái của Resource
-    when (couponResource.value?.status) {
-        Status.SUCCESS -> {
-            // Xử lý dữ liệu khi load thành công
-            couponResource.value?.data?.let { coupons ->
-                Log.e("List Coupon", coupons.toString())
-                lst_coupon = coupons
-                isLoadingAPIDone = true
-            }
-        }
-        Status.ERROR -> {
-            // Xử lý khi có lỗi
-            Text(text = "Lỗi: ${couponResource.value?.message}")
-        }
-        Status.LOADING -> {
-            // Xử lý trạng thái đang tải
-
-        }
-
-        null -> Text(text = "Lỗi: nuklklklklklklklklklklklklklklklklklklkl")
+  // Xử lý UI dựa trên trạng thái của Resource
+  when (couponResource.value?.status) {
+    Status.SUCCESS -> {
+      // Xử lý dữ liệu khi load thành công
+      couponResource.value?.data?.let { coupons ->
+        Log.e("List Coupon", coupons.toString())
+        lst_coupon = coupons
+        isLoadingAPIDone = true
+      }
     }
+
+    Status.ERROR -> {
+      // Xử lý khi có lỗi
+      Text(text = "Lỗi: ${couponResource.value?.message}")
+    }
+
+    Status.LOADING -> {
+      // Xử lý trạng thái đang tải
+
+    }
+
+    null -> Text(text = "Lỗi: nuklklklklklklklklklklklklklklklklklklkl")
+  }
 
 
   //get by id
@@ -164,7 +167,7 @@ fun CouponScreen(navController: NavHostController) {
 //  }
   // call api - end
 
-  Column (
+  Column(
     modifier = Modifier
       .padding(0.dp, 56.dp, 0.dp, 0.dp)
   ) {
@@ -226,7 +229,7 @@ fun CouponScreen(navController: NavHostController) {
         .height(40.dp),
       horizontalArrangement = Arrangement.SpaceAround
     ) {
-      buttons.forEach{button ->
+      buttons.forEach { button ->
         val idValue = button["ID"] as Int
         val textValue = button["Text"] as String
 
@@ -254,19 +257,19 @@ fun CouponScreen(navController: NavHostController) {
           .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
-        if(isLoadingAPIDone) {
-          if(selectedButtonID == 0) {
+        if (isLoadingAPIDone) {
+          if (selectedButtonID == 0) {
             for ((index, coupon) in lst_coupon.withIndex()) {
               var showDiscount = ""
               var showExpDate = ""
-              if(coupon.amountDiscount == 0F || coupon.amountDiscount == null) {
+              if (coupon.amountDiscount == 0F || coupon.amountDiscount == null) {
                 showDiscount = coupon.percentDiscount.toString() + "%"
               } else {
                 var temp = coupon.amountDiscount / 1000F
                 showDiscount = temp.toInt().toString() + "K"
               }
 
-              if(coupon.expirationDate == null) {
+              if (coupon.expirationDate == null) {
                 showExpDate = "None"
               }
               ItemInList(
@@ -274,8 +277,9 @@ fun CouponScreen(navController: NavHostController) {
                 amountDiscount = showDiscount,
                 dateExp = showExpDate,
                 doLeft = showDetailCoupon,
-                doRight = handleClickCoupon)
-              if(index != lst_coupon.size - 1) {
+                doRight = handleClickCoupon
+              )
+              if (index != lst_coupon.size - 1) {
                 Spacer(modifier = Modifier.height(10.dp))
               }
             }
@@ -299,6 +303,6 @@ fun selectButton(IDValue: String) {
 
 @Preview(showBackground = true)
 @Composable
-fun CouponScreenDemo(){
+fun CouponScreenDemo() {
 //  CouponScreen(navController)
 }
