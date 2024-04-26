@@ -272,13 +272,13 @@ fun MainApp(
                 composable("discount"){
                     ScreenWithBottomNavigationBar(navController = navController, topBar = {
                         DiscountTopBar()
-                    }, content = {padding,listState->
+                    }, content = {padding, _->
                         DiscountScreen(padding = padding, navController)
                     })
                 }
 
                 composable("CouponScreen"){
-                    CouponScreen(navController)
+                    CouponScreen(navController, 1)
                 }
 
 

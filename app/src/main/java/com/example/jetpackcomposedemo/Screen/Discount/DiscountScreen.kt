@@ -43,7 +43,6 @@ import androidx.navigation.compose.rememberNavController
 fun DiscountScreen(
     padding: PaddingValues,
     navController: NavHostController
-
 ) {
 
     val screenWidth = with(LocalDensity.current) {
