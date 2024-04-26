@@ -24,6 +24,7 @@ import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
+import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
 import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
@@ -271,10 +272,15 @@ fun MainApp(
                 composable("discount"){
                     ScreenWithBottomNavigationBar(navController = navController, topBar = {
                         DiscountTopBar()
-                    }, content = { padding, _ ->
-                        DiscountScreen(padding = padding)
+                    }, content = {padding,listState->
+                        DiscountScreen(padding = padding, navController)
                     })
                 }
+
+                composable("CouponScreen"){
+                    CouponScreen(navController)
+                }
+
 
                 //----------------------------------- USER ------------------------------
                 composable("user"){

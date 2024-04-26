@@ -7,7 +7,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
-    private const val BASE_URL = "http://192.168.1.116:8080/"
+    private const val ipv4Address = "192.168.1.163";
+    private const val port = "8080";
+    private const val BASE_URL = "http://$ipv4Address:$port/";
 
     private val intercepted: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
