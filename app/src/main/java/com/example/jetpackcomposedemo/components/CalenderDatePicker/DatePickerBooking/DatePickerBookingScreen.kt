@@ -40,7 +40,7 @@ fun DatePickerBookingScreen(
     val totalTime = remember{ mutableLongStateOf(0)  }
     val bookingRoom = remember{ mutableStateOf(Bookroom()) }
 
-    val typeBooking = remember { mutableStateOf("hourly") }
+    val typeBooking = remember { mutableStateOf("bydate") }
     Box(modifier = Modifier
         .fillMaxSize()
     ) {
