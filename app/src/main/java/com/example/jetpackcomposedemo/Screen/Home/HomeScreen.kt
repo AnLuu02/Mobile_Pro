@@ -108,7 +108,7 @@ fun HomeScreen(
 
             TitleMain(
                 title = "KHÁM PHÁ THÊM", onHandleClickShowAll = {
-                navController.navigate("search/filter?typeBooking=''")
+                navController.navigate("search/null")
             })
             ImageRightCard(index = 0, dataTest, onOpenDetailCardScreen = onOpenDetailCardScreen)
             ImageRightCard(index = 1, dataTest, isDiscount = true, onOpenDetailCardScreen = onOpenDetailCardScreen)

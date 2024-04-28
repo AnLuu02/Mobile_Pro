@@ -28,7 +28,7 @@ fun <T> CardSection(
             modifier = Modifier.fillMaxWidth()
         ) {
             TitleMain(typeBooking = typeBooking,title = titleHeader, onHandleClickShowAll = {
-                navController.navigate("search/filter?typeBooking=${it.toString()}")
+                navController.navigate("search/${it.toString()}")
             })
             LazyRow {
                 items(data.size) {

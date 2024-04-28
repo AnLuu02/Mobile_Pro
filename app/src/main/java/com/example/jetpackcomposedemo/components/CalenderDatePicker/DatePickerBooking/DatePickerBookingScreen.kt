@@ -22,7 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
-import com.example.jetpackcomposedemo.Screen.Search.Bookroom
+import com.example.jetpackcomposedemo.Screen.Search.BookRoom
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerCustom
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DateRangePickerCustom
@@ -40,7 +40,7 @@ fun DatePickerBookingScreen(
     val dateCheckinString = remember{ mutableStateOf("") }
     val dateCheckoutString = remember{ mutableStateOf("") }
     val totalTime = remember{ mutableLongStateOf(0)  }
-    val bookingRoom = remember{ mutableStateOf(Bookroom()) }
+    val bookingRoom = remember{ mutableStateOf(BookRoom()) }
     val typeBooking = remember { mutableStateOf<String?>(null) }
 
 

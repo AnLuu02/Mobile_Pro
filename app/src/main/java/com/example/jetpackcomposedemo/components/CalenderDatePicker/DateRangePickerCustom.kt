@@ -16,7 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.jetpackcomposedemo.Screen.Search.Bookroom
+import com.example.jetpackcomposedemo.Screen.Search.BookRoom
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import java.time.Instant
 import java.time.LocalDateTime
@@ -35,7 +35,7 @@ fun DateRangePickerCustom(
     onDateCheckinString:(String)->Unit,
     onDateCheckoutString:(String)->Unit,
     onTotalTime:(Long)->Unit,
-    onBookingRoom:(Bookroom)->Unit
+    onBookingRoom:(BookRoom)->Unit
 ){
 
 
@@ -102,7 +102,7 @@ fun DateRangePickerCustom(
     if (selectedStart != null) {
         if (selectedEnd != null) {
             onBookingRoom(
-                Bookroom(
+                BookRoom(
                     timeCheckin = "${timeCheckin.value}:00, ${selectedStart.format(dateFormatter)}",
                     timeCheckOut = "${timeCheckout}:00, ${selectedEnd.format(dateFormatter)}",
                     totalTime = convertMillisToDays(selectedEnd.toMillis() - selectedStart.toMillis())

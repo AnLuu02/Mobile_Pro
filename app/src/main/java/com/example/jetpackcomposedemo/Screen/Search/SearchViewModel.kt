@@ -4,11 +4,17 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
-data class Bookroom(
+data class Discount(
+    val title:String? = null,
+    val percent:Int? = null
+)
+data class BookRoom(
     val timeCheckin: String = "Bất kì",
     val timeCheckOut:String = "Bất kì",
     val totalTime:Int = 1,
+    var discount:Discount? = null
 )
+
 
 data class  FilterRoom(
     val minPriceRoom:Int? = null,
@@ -25,17 +31,20 @@ data class SortMethod(
 class SearchViewModel:ViewModel() {
 
     // Lưu trữ các trạng thái đã chọn của lịch
-    private val _hourSelectedCalendar = mutableStateOf(Bookroom())
-    private val _overnightSelectedCalendar = mutableStateOf(Bookroom())
-    private val _daySelectedCalendar  = mutableStateOf(Bookroom())
+    private val _hourSelectedCalendar = mutableStateOf(BookRoom())
+    private val _overnightSelectedCalendar = mutableStateOf(BookRoom())
+    private val _daySelectedCalendar  = mutableStateOf(BookRoom())
+
+    //trang thai filter and sorted
     private var _filterRoom  = mutableStateOf(FilterRoom())
     private var _sortRoom  = mutableStateOf(SortMethod())
 
-    fun getSelectedCalendar(typeBooking:String): MutableState<Bookroom> {
+    fun getSelectedCalendar(typeBooking:String): MutableState<BookRoom> {
         return when(typeBooking){
             "hourly"->_hourSelectedCalendar
             "overnight"->_overnightSelectedCalendar
-            else -> _daySelectedCalendar
+            else-> _daySelectedCalendar
+
         }
     }
 
@@ -54,7 +63,7 @@ class SearchViewModel:ViewModel() {
         return _sortRoom
     }
 
-    fun setSelectedCalendar(typeBooking:String,timeCheckin: Bookroom) {
+    fun setSelectedCalendar(typeBooking:String,timeCheckin: BookRoom) {
         when(typeBooking){
             "hourly"->_hourSelectedCalendar.value = timeCheckin
             "overnight"->_overnightSelectedCalendar.value = timeCheckin
@@ -62,17 +71,26 @@ class SearchViewModel:ViewModel() {
         }
     }
 
+    fun setDiscount(typeBooking: String, discount: Discount?){
+        when(typeBooking){
+            "hourly"->_hourSelectedCalendar.value.discount = discount
+            "overnight"->_overnightSelectedCalendar.value.discount = discount
+            else -> _daySelectedCalendar.value.discount = discount
+        }
+    }
+
+
     fun setFilterRoom(filterRoom: FilterRoom) {
         _filterRoom.value = filterRoom
     }
     fun setSortMethod(sortMethod: SortMethod) {
         _sortRoom.value = sortMethod
     }
-    fun getOnlyDayBooking(typeBooking: String): Bookroom {
+    fun getOnlyDayBooking(typeBooking: String): BookRoom {
         val regexDay = "\\b\\d{2}:\\d{2}, (\\d{2})/\\d{2}/\\d{4}\\b".toRegex()
         return when (typeBooking) {
             "hourly" ->
-                Bookroom(
+                BookRoom(
                     timeCheckin = regexDay.find(_hourSelectedCalendar.value.timeCheckin)?.groupValues?.get(1) ?: "Bất kì",
                     timeCheckOut = regexDay.find(_hourSelectedCalendar.value.timeCheckOut)?.groupValues?.get(1) ?: "Bất kì",
                     totalTime = _hourSelectedCalendar.value.totalTime
@@ -80,14 +98,14 @@ class SearchViewModel:ViewModel() {
 
             "overnight"->
 
-                Bookroom(
+                BookRoom(
                     timeCheckin = regexDay.find(_overnightSelectedCalendar.value.timeCheckin)?.groupValues?.get(1) ?: "Bất kì",
                     timeCheckOut = regexDay.find(_overnightSelectedCalendar.value.timeCheckOut)?.groupValues?.get(1) ?: "Bất kì",
                     totalTime = _overnightSelectedCalendar.value.totalTime
                 )
 
             else -> {
-                Bookroom(
+                BookRoom(
                     timeCheckin = regexDay.find(_daySelectedCalendar.value.timeCheckin)?.groupValues?.get(1) ?: "Bất kì",
                     timeCheckOut = regexDay.find(_daySelectedCalendar.value.timeCheckOut)?.groupValues?.get(1) ?: "Bất kì",
                     totalTime = _daySelectedCalendar.value.totalTime
@@ -95,11 +113,11 @@ class SearchViewModel:ViewModel() {
             }
         }
     }
-    fun getDateNotYear(typeBooking:String): Bookroom {
+    fun getDateNotYear(typeBooking:String): BookRoom {
         val regex = "/\\d{4}".toRegex()
         return when (typeBooking) {
             "hourly" ->
-                Bookroom(
+                BookRoom(
                     timeCheckin = if(_hourSelectedCalendar.value.timeCheckin != "Bất kì")
                         _hourSelectedCalendar.value.timeCheckin.replace(regex, "")
                     else "Bất kì",
@@ -110,7 +128,7 @@ class SearchViewModel:ViewModel() {
                 )
             "overnight"->
 
-                Bookroom(
+                BookRoom(
                     timeCheckin = if(_overnightSelectedCalendar.value.timeCheckin != "Bất kì")
                         _overnightSelectedCalendar.value.timeCheckin.replace(regex, "")
                     else "Bất kì",
@@ -123,7 +141,7 @@ class SearchViewModel:ViewModel() {
 
             else -> {
 
-                Bookroom(
+                BookRoom(
                     timeCheckin = if(_daySelectedCalendar.value.timeCheckin != "Bất kì")
                         _daySelectedCalendar.value.timeCheckin.replace(regex, "")
                     else "Bất kì",
@@ -135,11 +153,11 @@ class SearchViewModel:ViewModel() {
             }
         }
     }
-    fun getDayAndMonth(typeBooking: String): Bookroom {
+    fun getDayAndMonth(typeBooking: String): BookRoom {
         val regex = Regex("\\d{2}/\\d{2}")
         return when (typeBooking) {
             "hourly" ->
-                Bookroom(
+                BookRoom(
                     timeCheckin = _hourSelectedCalendar.value.timeCheckin.let { regex.find(it)?.value }
                         ?: "Bất kì",
                     timeCheckOut = _hourSelectedCalendar.value.timeCheckOut.let { regex.find(it)?.value }
@@ -147,23 +165,23 @@ class SearchViewModel:ViewModel() {
                     totalTime = _hourSelectedCalendar.value.totalTime
                 )
             "overnight"->
-                Bookroom(
+                BookRoom(
                     timeCheckin = _overnightSelectedCalendar.value.timeCheckin.let { regex.find(it)?.value } ?: "Bất kì",
                     timeCheckOut = _overnightSelectedCalendar.value.timeCheckOut.let { regex.find(it)?.value } ?: "Bất kì",
                     totalTime = _overnightSelectedCalendar.value.totalTime
                 )
             else ->
-                Bookroom(
+                BookRoom(
                     timeCheckin = _daySelectedCalendar.value.timeCheckin.let { regex.find(it)?.value } ?: "Bất kì",
                     timeCheckOut = _daySelectedCalendar.value.timeCheckOut.let { regex.find(it)?.value } ?: "Bất kì",
                     totalTime = _daySelectedCalendar.value.totalTime
                 )
         }
     }
-    fun getOnlyHourBooking(typeBooking:String): Bookroom {
+    fun getOnlyHourBooking(typeBooking:String): BookRoom {
         return when(typeBooking){
             "hourly"->
-                Bookroom(
+                BookRoom(
                     timeCheckin = if(_hourSelectedCalendar.value.timeCheckin!="Bất kì")
                         _hourSelectedCalendar.value.timeCheckin.split(":")[0] else "Bất kì",
                     timeCheckOut = if(_hourSelectedCalendar.value.timeCheckOut!="Bất kì")
@@ -171,7 +189,7 @@ class SearchViewModel:ViewModel() {
                     totalTime = _hourSelectedCalendar.value.totalTime
                 )
             "overnight"->
-                Bookroom(
+                BookRoom(
                     timeCheckin = if(_overnightSelectedCalendar.value.timeCheckin!="Bất kì")
                         _overnightSelectedCalendar.value.timeCheckin.split(":")[0] else "Bất kì",
                     timeCheckOut = if(_overnightSelectedCalendar.value.timeCheckOut!="Bất kì")
@@ -181,7 +199,7 @@ class SearchViewModel:ViewModel() {
 
             else ->
 
-                Bookroom(
+                BookRoom(
                     timeCheckin = if(_daySelectedCalendar.value.timeCheckin!="Bất kì")
                         _daySelectedCalendar.value.timeCheckin.split(":")[0] else "Bất kì",
                     timeCheckOut = if(_daySelectedCalendar.value.timeCheckOut!="Bất kì")
@@ -190,7 +208,7 @@ class SearchViewModel:ViewModel() {
                 )
         }
     }
-    fun getDateSearch(typeBooking: String): Bookroom {
+    fun getDateSearch(typeBooking: String): BookRoom {
         return when(typeBooking){
             "hourly"->getDateNotYear(typeBooking)
             "overnight"->getDayAndMonth(typeBooking)

@@ -105,8 +105,8 @@ fun MainApp(
                 composable("search") {
                     SearchScreen(
                         searchViewModel = searchViewModel,
-                        onHandleSearchClickButtonSearch = {typeBooking->
-                            navController.navigate("search/filter?typeBooking=$typeBooking")
+                        onHandleSearchClickButtonSearch = {filter->
+                            navController.navigate("search/$filter")
                         },
                         closeSearchScreen={
                             navController.popBackStack("home",inclusive = false)
@@ -114,14 +114,16 @@ fun MainApp(
                 }
                 //--------------------------------search result -------------------------------------------
                 composable(
-                    "search/filter?typeBooking={typeBooking}",
+                    "search/{filter}",
                     arguments = listOf(
-                        navArgument("typeBooking") {
+                        navArgument("filter") {
                             type = NavType.StringType
+                            defaultValue = null
+                            nullable = true
                         })
                 ){backStackEntry ->
 
-                    val typeBooking = backStackEntry.arguments?.getString("typeBooking").toString()
+                    val typeBooking = backStackEntry.arguments?.getString("filter").toString()
                     SearchResultScreen(
                         typeBooking = typeBooking,
                         searchViewModel = searchViewModel,

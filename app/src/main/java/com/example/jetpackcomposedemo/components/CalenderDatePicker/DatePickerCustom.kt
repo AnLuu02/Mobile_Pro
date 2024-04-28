@@ -31,7 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.jetpackcomposedemo.Screen.Search.Bookroom
+import com.example.jetpackcomposedemo.Screen.Search.BookRoom
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import java.time.Instant
 import java.time.LocalDateTime
@@ -49,7 +49,7 @@ fun DatePickerCustom(
     onDateCheckinString:(String)->Unit,
     onDateCheckoutString:(String)->Unit,
     onTotalTime:(Long)->Unit,
-    onBookingRoom:(Bookroom)->Unit
+    onBookingRoom:(BookRoom)->Unit
 ) {
     val currentTime = remember { LocalDateTime.now() }
     val timeCheckin = remember{ mutableIntStateOf(
@@ -129,7 +129,7 @@ fun DatePickerCustom(
     if (newDate != null) {
         if (selectedDate != null) {
             onBookingRoom(
-                Bookroom(
+                BookRoom(
                     timeCheckin = "${formatHourly(timeCheckin.intValue)}, ${selectedDate.format(dateFormatter)}",
                     timeCheckOut= "${formatHourly(timeCheckout)}, ${newDate.format(dateFormatter)}",
                     totalTime = totalTime.intValue
