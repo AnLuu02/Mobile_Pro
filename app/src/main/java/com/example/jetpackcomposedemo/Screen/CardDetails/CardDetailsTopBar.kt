@@ -29,14 +29,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 
 @Composable
 fun  TopCardDetail(
-    navController: NavHostController,
     listState:LazyListState,
-    cardId:String
+    cardId:String,
+    onBack:()->Unit
 ){
 
     val showBackgroundTopBar = remember { mutableStateOf(false) }
@@ -68,7 +67,7 @@ fun  TopCardDetail(
                         .size(36.dp)
                         .background(color = Color.White, shape = CircleShape)
                         .clickable {
-                            navController.popBackStack()
+                            onBack()
                         }
                     ,
                     contentAlignment = Alignment.Center

@@ -74,7 +74,7 @@ fun DatePickerCustom(
 
     val initialSelectedDateMillis = if(searchViewModel.getTimeCheckin(typeBooking) != "Bất kì")
         searchViewModel.getTimeCheckin(typeBooking).let {
-            convertStringToTimestamp(
+            convertStringToMillis(
                 it
             )
         } else currentTime.toMillis()
@@ -140,71 +140,127 @@ fun DatePickerCustom(
     padding?.let {
         Modifier
             .fillMaxSize()
-            .padding(it)
+            .padding( it)
     }?.let {
         Box(modifier = it) {
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            item{
-                androidx.compose.material3.DatePicker(
-                    state = datePickerState,
-                    title = null,
-                    headline = null,
-                    showModeToggle = false,
-                    dateValidator = {
-                        val calendarNow = Calendar.getInstance()
-                        with(calendarNow) {
-                            set(Calendar.HOUR_OF_DAY, 0)
-                            set(Calendar.MINUTE, 0)
-                            set(Calendar.SECOND, 0)
-                            set(Calendar.MILLISECOND, 0)
-                        }
-                        return@DatePicker it >= calendarNow.timeInMillis
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                item{
+                    androidx.compose.material3.DatePicker(
+                        state = datePickerState,
+                        title = null,
+                        headline = null,
+                        showModeToggle = false,
+                        dateValidator = {
+                            val calendarNow = Calendar.getInstance()
+                            with(calendarNow) {
+                                set(Calendar.HOUR_OF_DAY, 0)
+                                set(Calendar.MINUTE, 0)
+                                set(Calendar.SECOND, 0)
+                                set(Calendar.MILLISECOND, 0)
+                            }
+                            return@DatePicker it >= calendarNow.timeInMillis
 
-                    },
-                    colors = DatePickerDefaults.colors(
-                        selectedDayContainerColor = Color.Red.copy(alpha = 0.1f),
-                        todayDateBorderColor = Color.Transparent,
-                        todayContentColor = Color.Black,
-                        selectedDayContentColor = Color.Red,
-                        disabledSelectedDayContentColor = Color.Gray
+                        },
+                        colors = DatePickerDefaults.colors(
+                            selectedDayContainerColor = Color.Red.copy(alpha = 0.1f),
+                            todayDateBorderColor = Color.Transparent,
+                            todayContentColor = Color.Black,
+                            selectedDayContentColor = Color.Red,
+                            disabledSelectedDayContentColor = Color.Gray
 
-                    )
+                        )
 
-                )
-                Spacer(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(0.5.dp)
-                    .background(Color.Gray))
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp, bottom = 12.dp)
-                ) {
-                    Text(
-                        text = "Giờ nhận phòng",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start=12.dp)
                     )
                     Spacer(modifier = Modifier
-                        .height(12.dp))
-                    LazyRow {
-                        var lastPadding = 0.dp
+                        .fillMaxWidth()
+                        .height(0.5.dp)
+                        .background(Color.Gray))
 
-                        items(listOf(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)){
-                            if(it == 23){
-                                lastPadding = 12.dp
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp, bottom = 12.dp)
+                    ) {
+                        Text(
+                            text = "Giờ nhận phòng",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start=12.dp)
+                        )
+                        Spacer(modifier = Modifier
+                            .height(12.dp))
+                        LazyRow {
+                            var lastPadding = 0.dp
+
+                            items(listOf(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)){
+                                if(it == 23){
+                                    lastPadding = 12.dp
+                                }
+                                if(it >= currentHourly){
+                                    val selectedHourly = it == timeCheckin.intValue
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(start = 12.dp, end = lastPadding)
+                                            .background(
+                                                if (!selectedHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(
+                                                    alpha = 0.1f
+                                                ),
+                                                shape = MaterialTheme.shapes.small
+                                            )
+                                            .clip(MaterialTheme.shapes.small)
+                                            .clickable(
+                                                interactionSource = remember { MutableInteractionSource() },
+                                                indication = rememberRipple(bounded = true)
+                                            ) {
+                                                timeCheckin.intValue = it
+                                            },
+                                    ){
+                                        Text(
+                                            text = formatHourly(it),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if(selectedHourly) Color.Red else Color.Black,
+                                            modifier = Modifier.padding(10.dp)
+                                        )
+                                    }
+                                }
                             }
-                            if(it >= currentHourly){
-                                val selectedHourly = it == timeCheckin.intValue
+                        }
+                    }
+
+                    Spacer(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(0.5.dp)
+                        .background(Color.Gray))
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp, bottom = 12.dp)
+                    ) {
+                        Text(
+                            text = "Số giờ sử dụng",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start=12.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        LazyRow {
+                            var lastPadding = 0.dp
+                            items(listOf(1,2,3,4,5,6,7,8,9,10)){
+                                if(it == 10){
+                                    lastPadding=12.dp
+                                }
+                                val selectedTotalHourly = it == totalTime.intValue
                                 Box(
                                     modifier = Modifier
                                         .padding(start = 12.dp, end = lastPadding)
                                         .background(
-                                            if (!selectedHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(
+                                            if (!selectedTotalHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(
                                                 alpha = 0.1f
                                             ),
                                             shape = MaterialTheme.shapes.small
@@ -214,14 +270,15 @@ fun DatePickerCustom(
                                             interactionSource = remember { MutableInteractionSource() },
                                             indication = rememberRipple(bounded = true)
                                         ) {
-                                            timeCheckin.intValue = it
+                                            totalTime.intValue = it
                                         },
-                                ){
+
+                                    ){
                                     Text(
-                                        text = formatHourly(it),
+                                        text = "$it giờ",
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
-                                        color = if(selectedHourly) Color.Red else Color.Black,
+                                        color = if(selectedTotalHourly) Color.Red else Color.Black,
                                         modifier = Modifier.padding(10.dp)
                                     )
                                 }
@@ -229,65 +286,8 @@ fun DatePickerCustom(
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(0.5.dp)
-                    .background(Color.Gray))
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp, bottom = 12.dp)
-                ) {
-                    Text(
-                        text = "Số giờ sử dụng",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start=12.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    LazyRow {
-                        var lastPadding = 0.dp
-                        items(listOf(1,2,3,4,5,6,7,8,9,10)){
-                            if(it == 10){
-                                lastPadding=12.dp
-                            }
-                            val selectedTotalHourly = it == totalTime.intValue
-                            Box(
-                                modifier = Modifier
-                                    .padding(start = 12.dp, end = lastPadding)
-                                    .background(
-                                        if (!selectedTotalHourly) Color.LightGray.copy(alpha = 0.5f) else Color.Red.copy(
-                                            alpha = 0.1f
-                                        ),
-                                        shape = MaterialTheme.shapes.small
-                                    )
-                                    .clip(MaterialTheme.shapes.small)
-                                    .clickable(
-                                        interactionSource = remember { MutableInteractionSource() },
-                                        indication = rememberRipple(bounded = true)
-                                    ) {
-                                        totalTime.intValue = it
-                                    },
-
-                                ){
-                                Text(
-                                    text = "$it giờ",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if(selectedTotalHourly) Color.Red else Color.Black,
-                                    modifier = Modifier.padding(10.dp)
-                                )
-                            }
-                        }
-                    }
-                }
             }
         }
-    }
     }
 }
 fun formatHourly(hourly:Int):String{
@@ -299,7 +299,7 @@ fun formatHourly(hourly:Int):String{
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun convertStringToTimestamp(dateTimeString: String): Long {
+fun convertStringToMillis(dateTimeString: String): Long {
     val formatter = DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy")
     val dateTime = LocalDateTime.parse(dateTimeString, formatter)
     return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()

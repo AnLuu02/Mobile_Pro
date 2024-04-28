@@ -50,7 +50,7 @@ fun SearchResultTopBar(
     typeBooking:String,
     searchViewModel: SearchViewModel,
     onOpenSort:(Boolean)->Unit,
-    onOpenFilter:()->Unit,
+    onOpenFilter:(Boolean)->Unit,
     onBackSearchScreen:()->Unit,
     onOpenSearchScreen:()->Unit
 
@@ -126,7 +126,6 @@ fun SearchResultTopBar(
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.bodyMedium
                     )
-                    Log.e("method sort",searchViewModel.getSortMethod().value.sortMethod.toString())
 
                     if(searchViewModel.getSortMethod().value.sortMethod != null
                         && searchViewModel.getSortMethod().value.sortMethod != "phuhopnhat" ){
@@ -143,7 +142,7 @@ fun SearchResultTopBar(
                         .weight(1f)
                         .fillMaxSize()
                         .clickable {
-                            onOpenFilter()
+                            onOpenFilter(true)
                         },
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically

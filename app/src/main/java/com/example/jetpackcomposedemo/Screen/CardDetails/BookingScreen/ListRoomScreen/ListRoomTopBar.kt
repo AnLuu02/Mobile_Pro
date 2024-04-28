@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
-import androidx.compose.material.icons.rounded.HourglassTop
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -31,15 +30,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import com.example.jetpackcomposedemo.R
 
 @Composable
 fun ListRoomTopBar(
     listState:LazyListState,
-    navController:NavHostController
+    dateCheckinString:String,
+    dateCheckoutString:String,
+    totalTime:String,
+    typeBooking:String,
+    openDatePickerBookingScreen:(Boolean)->Unit,
+    onBack:()->Unit
 ) {
     val show = remember { mutableStateOf(false) }
     LaunchedEffect(listState.firstVisibleItemScrollOffset) {
@@ -67,7 +73,8 @@ fun ListRoomTopBar(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = false, radius = 24.dp),
-                            onClick = {navController.popBackStack()}
+                            onClick = onBack
+
                         )
                     ,
                     contentAlignment = Alignment.Center
@@ -104,13 +111,27 @@ fun ListRoomTopBar(
                     .fillMaxWidth()
                     .padding(12.dp)
                     .border(
-                        BorderStroke(1.dp, Color.Red),
+                        BorderStroke(
+                            1.dp, color = when (typeBooking) {
+                                "hourly" -> Color.Red
+                                "overnight" -> Color(138, 43, 226)
+                                else -> Color(135, 206, 235)
+                            }
+                        ),
                         shape = MaterialTheme.shapes.extraLarge
                     )
                     .background(
-                        Color.Red.copy(alpha = 0.1f),
+                        color = when (typeBooking) {
+                            "hourly" -> Color.Red.copy(alpha = 0.1f)
+                            "overnight" -> Color(138, 43, 226, alpha = 30)
+                            else -> Color(135, 206, 235, alpha = 100)
+                        },
                         shape = MaterialTheme.shapes.extraLarge
                     )
+                    .clip(MaterialTheme.shapes.extraLarge)
+                    .clickable {
+                        openDatePickerBookingScreen(true)
+                    }
             ) {
                 Row(
                     modifier = Modifier
@@ -121,9 +142,31 @@ fun ListRoomTopBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Icon(imageVector = Icons.Rounded.HourglassTop, contentDescription = "", modifier = Modifier.size(16.dp))
+                    when(typeBooking){
+                        "hourly"-> Icon(
+                            painter = painterResource(id = R.drawable.outline_hourglass_top_24),
+                            contentDescription = "", modifier = Modifier.size(16.dp),
+                            tint = Color.Red
+                        )
+                        "overnight"-> Icon(
+                            painter = painterResource(id = R.drawable.outline_dark_mode_24),
+                            contentDescription = "", modifier = Modifier.size(16.dp),
+                            tint = Color(138, 43, 226)
+                        )
+                        else -> Icon(
+                            painter = painterResource(id = R.drawable.outline_calendar_month_24),
+                            contentDescription = "", modifier = Modifier.size(16.dp),
+                            tint = Color(135, 206, 235)
+                        )
+                    }
+
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "01 giờ", style = MaterialTheme.typography.bodyMedium)
+
+                    Text(text = if(typeBooking == "hourly") "${if(totalTime.toInt() < 9) "0${totalTime}" else totalTime} giờ"
+                    else "${if(totalTime.toInt() < 9) "0${totalTime}" else totalTime} ngày" ,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
                     Spacer(modifier = Modifier.width(6.dp))
 
                     Divider(
@@ -133,12 +176,12 @@ fun ListRoomTopBar(
                     )
 
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "07:00", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = dateCheckinString, style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.width(6.dp))
 
                     Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = "", modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "08:00, 22/03", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = dateCheckoutString, style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }

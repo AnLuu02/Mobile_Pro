@@ -1,5 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -37,16 +38,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
-import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
 import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaymentBottomBar(
     bookingViewModel: BookingViewModel,
-    navController:NavHostController
+    openScreenChooseMethodPayment:(Boolean)->Unit
 ){
 
     val selectedMethodPayment = remember{ mutableStateOf(bookingViewModel.getMethodPayment()) }
@@ -67,12 +67,12 @@ fun PaymentBottomBar(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start=12.dp,end=12.dp,top=12.dp)
+                        .padding(start = 12.dp, end = 12.dp, top = 12.dp)
                         .clickable(
-                            interactionSource = remember{ MutableInteractionSource() },
+                            interactionSource = remember { MutableInteractionSource() },
                             indication = null
                         ) {
-                            navController.navigate("methodpayment")
+                            openScreenChooseMethodPayment(true)
                         }
                     ,
                     verticalAlignment = Alignment.CenterVertically,
@@ -87,7 +87,9 @@ fun PaymentBottomBar(
                             Image(
                                 painter = painterResource(id = bookingViewModel.getMethodPayment()!!.icon),
                                 contentDescription ="",
-                                modifier = Modifier.size(24.dp).clip(RoundedCornerShape(2.dp))
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clip(RoundedCornerShape(2.dp))
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
@@ -127,7 +129,10 @@ fun PaymentBottomBar(
 
             Spacer(modifier = Modifier.height(12.dp))
             Divider(
-                modifier = Modifier.fillMaxWidth().height(1.dp).padding(start=12.dp,end=12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .padding(start = 12.dp, end = 12.dp),
                 color = Color.LightGray.copy(alpha = 0.5f)
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -168,17 +173,20 @@ fun PaymentBottomBar(
             }
 
         }
-        if(openAlertDialog.value){
-            AlertDialogExample(
-                onDismissRequest = { openAlertDialog.value = false },
-                onConfirmation = {
-                    openAlertDialog.value = false
-                    println("Confirmation registered") // Add logic here to handle confirmation.
-                },
-                dialogTitle = "Yêu cầu thanh toán trả trước",
-                dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
-                icon = R.drawable.logo_app
-            )
-        }
+
     }
+    if(openAlertDialog.value){
+        AlertDialogExample(
+            onDismissRequest = { openAlertDialog.value = false },
+            onConfirmation = {
+                openAlertDialog.value = false
+                println("Confirmation registered") // Add logic here to handle confirmation.
+            },
+            dialogTitle = "Yêu cầu thanh toán trả trước",
+            dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
+            icon = R.drawable.logo_app
+        )
+    }
+
+
 }

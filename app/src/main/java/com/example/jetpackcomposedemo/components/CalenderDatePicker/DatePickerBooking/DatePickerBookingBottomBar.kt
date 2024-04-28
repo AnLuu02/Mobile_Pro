@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,17 +25,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerBookingBottomBar(
+    sheetState: SheetState,
     bookingViewModel: BookingViewModel,
     dateCheckinString:String,
     dateCheckoutString:String,
     totalTime:Long,
     typeBooking:String,
     enabledButtonApply:Boolean = false,
-    onHandleApplyTimeBooking:()->Unit,
+    onHandleApplyTimeBooking:(Boolean,String,String,String,String)->Unit,
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,8 +92,11 @@ fun DatePickerBookingBottomBar(
                     bookingViewModel.setTimeCheckin(dateCheckinString)
                     bookingViewModel.setTimeCheckout(dateCheckoutString)
                     bookingViewModel.setTotalTime(totalTime.toString())
-                    bookingViewModel.setTypeBooking( typeBooking)
-                    onHandleApplyTimeBooking()
+                    bookingViewModel.setTypeBooking(typeBooking)
+                    coroutineScope.launch {
+                        sheetState.hide()
+                        onHandleApplyTimeBooking(false,dateCheckinString,dateCheckoutString,totalTime.toString(),typeBooking)
+                    }
                 },
                 enabled = enabledButtonApply,
                 modifier = Modifier.clip(MaterialTheme.shapes.small),

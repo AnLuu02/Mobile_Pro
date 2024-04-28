@@ -13,10 +13,6 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,6 +62,7 @@ class LoginViewModel : ViewModel() {
             currentState.copy(
                 isLoggedIn = false,
                 phoneNumber = null,
+                email = null,
                 uid = null
             )
         }
@@ -129,6 +126,7 @@ class LoginViewModel : ViewModel() {
                         currentState.copy(
                             phoneNumber = phoneNumber,
                             uid = uid,
+                            email = null,
                             isLoggedIn = true
                         )
                     }

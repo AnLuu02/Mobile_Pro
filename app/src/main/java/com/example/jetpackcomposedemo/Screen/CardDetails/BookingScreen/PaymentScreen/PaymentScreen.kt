@@ -28,6 +28,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +47,8 @@ import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.PaymentBottomBar
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -55,12 +59,30 @@ fun PaymentScreen(
 ) {
     val listState = rememberLazyListState()
 
+    val dateCheckinString = remember{ mutableStateOf(
+        bookingViewModel.getTimeCheckin()
+            ?: LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    ) }
+    val dateCheckoutString = remember{ mutableStateOf(
+        bookingViewModel.getTimeCheckout()
+            ?: LocalDateTime.now().plusDays(2).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    ) }
+
+    val totalTime = remember{ mutableStateOf(bookingViewModel.getTotalTime() ?: "1")  }
+    val typeBooking = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
+
+
+    val openScreenChooseMethodPayment = remember{ mutableStateOf(false) }
+
+
     Scaffold(
         topBar = {
             PaymentTopBar(navController = navController)
         },
         bottomBar = {
-            PaymentBottomBar(bookingViewModel = bookingViewModel, navController=navController)
+            PaymentBottomBar(bookingViewModel = bookingViewModel,openScreenChooseMethodPayment = {
+                openScreenChooseMethodPayment.value = it
+            })
         }
 
     ) { padding ->
@@ -74,7 +96,7 @@ fun PaymentScreen(
         ) {
             item {
                 Spacer(modifier = Modifier.height(10.dp))
-                InfoRoom()
+                InfoRoom(dateCheckinString.value,dateCheckoutString.value,totalTime.value,typeBooking.value)
                 Spacer(modifier = Modifier.height(10.dp))
                 UserBooking()
                 Spacer(modifier = Modifier.height(10.dp))
@@ -89,11 +111,23 @@ fun PaymentScreen(
 
         }
     }
+
+    if(openScreenChooseMethodPayment.value){
+        MethodPaymentScreen(
+            bookingViewModel = bookingViewModel,
+            closeScreenChooseMethodPayment = {
+                openScreenChooseMethodPayment.value = it
+            }
+        )
+    }
 }
 
 @Composable
 fun InfoRoom(
-
+    dateCheckinString:String,
+    dateCheckoutString:String,
+    totalTime:String,
+    typeBooking:String
 ) {
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -204,7 +238,13 @@ fun InfoRoom(
                                 .clip(MaterialTheme.shapes.small)
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.sunsine),
+                                painter = painterResource(
+                                    id =     when(typeBooking){
+                                        "hourly"->R.drawable.sunsine
+                                        "overnight"-> R.drawable.nigh
+                                        else -> R.drawable.daytime
+                                    }
+                                ),
                                 contentDescription = "",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
@@ -221,20 +261,53 @@ fun InfoRoom(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier.align(Alignment.Center)
                             ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.round_dark_mode_24),
-                                    contentDescription = "",
-                                    tint = Color.White
-                                )
-                                Text(
-                                    text = "01 giờ",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    modifier = Modifier
-                                )
+                                when(typeBooking){
+                                    "hourly"->{
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.round_dark_mode_24),
+                                            contentDescription = "",
+                                            tint = Color.White
+                                        )
+                                        Text(
+                                            text = "${if(totalTime.toInt()<10) "0$totalTime" else totalTime} giờ",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                            modifier = Modifier
+                                        )
+                                    }
+                                    "overnight"->{
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.round_dark_mode_24),
+                                            contentDescription = "",
+                                            tint = Color.White
+                                        )
+                                        Text(
+                                            text = "${if(totalTime.toInt()<10) "0$totalTime" else totalTime} đêm",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                            modifier = Modifier
+                                        )
+                                    }
+                                    else ->{
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.round_dark_mode_24),
+                                            contentDescription = "",
+                                            tint = Color.White
+                                        )
+                                        Text(
+                                            text = "${if(totalTime.toInt()<10) "0$totalTime" else totalTime} ngày",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                            modifier = Modifier
+                                        )
+                                    }
+                                }
                             }
                         }
+
 
 
                         Box(
@@ -262,7 +335,7 @@ fun InfoRoom(
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        text = "22:00  -  22/04/2024",
+                                        text = dateCheckinString,
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -277,7 +350,7 @@ fun InfoRoom(
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        text = "13:00  -  23/04/2024",
+                                        text = dateCheckoutString,
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Bold
 

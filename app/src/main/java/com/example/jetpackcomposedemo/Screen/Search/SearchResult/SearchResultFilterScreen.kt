@@ -3,12 +3,6 @@ package com.example.jetpackcomposedemo.Screen.Search.SearchResult
 import android.app.Activity
 import android.content.Context
 import android.view.inputmethod.InputMethodManager
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,18 +33,23 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,16 +68,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.Screen.Search.FilterRoom
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResultFilterScreen(
     searchViewModel: SearchViewModel,
     typeBooking:String,
     visible:Boolean = true,
-    onHandleApply:()->Unit,
-    onCloseFilter:()->Unit
+    onCloseFilter:(Boolean)->Unit
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -89,6 +89,17 @@ fun SearchResultFilterScreen(
     var cleanScore = ""
     var typeRoom = ""
     var utilitiesRoom:List<String>? = null
+
+
+
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        sheetState.hide()
+
+    }
+
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -107,68 +118,78 @@ fun SearchResultFilterScreen(
                 .clickable { }
         )
 
-        AnimatedVisibility(
-            visible = visible,
-            enter = slideInVertically(initialOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 1000)) + fadeIn( initialAlpha = 1f),
-            exit = slideOutVertically(targetOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 1000)) + fadeOut(targetAlpha = 1f)
-        ) {
-            Scaffold(
-                topBar = {
-                    Box(modifier = Modifier.fillMaxWidth()){
-                        Column(
+        ModalBottomSheet(
+            sheetState = sheetState,
+            shape = RoundedCornerShape(topStartPercent = 4, topEndPercent = 4),
+            scrimColor = Color.Transparent,
+            onDismissRequest = {
+                coroutineScope.launch {
+                    sheetState.hide()
+                    onCloseFilter(false)
+                }
+            },
+            dragHandle = {
+                Box(modifier = Modifier.fillMaxWidth()){
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                        ) {
+                                .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = 6.dp),
+                        ){
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = 6.dp),
-                            ){
-                                Box(
-                                    modifier = Modifier
-                                        .size(36.dp)
-                                        .background(color = Color.White, shape = CircleShape)
-                                        .align(Alignment.CenterStart)
-                                        .clickable(
-                                            interactionSource = remember { MutableInteractionSource() },
-                                            indication = rememberRipple(
-                                                bounded = false,
-                                                radius = 24.dp
-                                            ),
-                                            onClick = onCloseFilter
-                                        )
-                                    ,
-                                    contentAlignment = Alignment.Center
-                                ){
-                                    Icon(
-                                        imageVector = Icons.Rounded.Close,
-                                        contentDescription = "Close",
-                                        modifier = Modifier
-                                            .size(20.dp)
+                                    .size(36.dp)
+                                    .background(color = Color.White, shape = CircleShape)
+                                    .align(Alignment.CenterStart)
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = rememberRipple(
+                                            bounded = false,
+                                            radius = 24.dp
+                                        ),
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                sheetState.hide()
+                                                onCloseFilter(false)
+                                            }
+                                        }
                                     )
-                                }
-                                Text(
-                                    text = "Chọn lọc theo",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    modifier = Modifier.align(Alignment.Center),
-                                    fontWeight = FontWeight.Bold
+                                ,
+                                contentAlignment = Alignment.Center
+                            ){
+                                Icon(
+                                    imageVector = Icons.Rounded.Close,
+                                    contentDescription = "Close",
+                                    modifier = Modifier
+                                        .size(20.dp)
                                 )
                             }
-
-
+                            Text(
+                                text = "Chọn lọc theo",
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.align(Alignment.Center),
+                                fontWeight = FontWeight.Bold
+                            )
                         }
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(0.5.dp)
-                                .background(Color.Black.copy(alpha = 0.2f))
-                                .align(Alignment.BottomCenter)
 
-                        )
 
                     }
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(0.5.dp)
+                            .background(Color.Black.copy(alpha = 0.2f))
+                            .align(Alignment.BottomCenter)
 
-                },
+                    )
+
+                }
+            },
+        ) {
+            Scaffold(
                 bottomBar = {
 
                     Box(
@@ -191,7 +212,10 @@ fun SearchResultFilterScreen(
                                         typeRoom = typeRoom,
                                         utilitiesRoom = utilitiesRoom
                                     ))
-                                    onHandleApply()
+                                    coroutineScope.launch {
+                                        sheetState.hide()
+                                        onCloseFilter(false)
+                                    }
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
