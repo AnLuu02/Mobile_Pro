@@ -30,7 +30,21 @@ class LoginViewModel : ViewModel() {
     var phoneNumber by  mutableStateOf("")
         private set
     var showError by  mutableStateOf(false)
-    var errorMessage by  mutableStateOf<String?>(null)
+    var errorMessage by  mutableStateOf<String?>("")
+
+    init {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        Log.d("DEBUG","User Telephone Number INIT : ${currentUser?.phoneNumber} " )
+        if(currentUser != null) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    phoneNumber = currentUser.phoneNumber,
+                    uid = currentUser.uid,
+                    isLoggedIn = true
+                )
+            }
+        }
+    }
     fun onLoginButtonClick() {
         authenticateUser(
             phoneNumber,
@@ -55,6 +69,14 @@ class LoginViewModel : ViewModel() {
 
     fun updatePhoneNumber(inputPhoneNumber: String) {
         phoneNumber = inputPhoneNumber
+        showError = false
+    }
+    fun toogleSetting(isShowingInfo:Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isShowingInfo = !isShowingInfo
+            )
+        }
     }
     fun logout() {
         FirebaseAuth.getInstance().signOut();
@@ -67,30 +89,51 @@ class LoginViewModel : ViewModel() {
             )
         }
     }
+    fun updateUserName(uid: String, name: String) {
+        val userRef = Firebase.database.reference.child("users").child(uid)
+        userRef.child("name").setValue(name).addOnCompleteListener { task ->
+            if(task.isSuccessful) {
+                Log.d("DEBUG", "Tên người dùng đã được cập nhật trong database.")
+            } else {
+                Log.d("DEBUG", "Lỗi khi cập nhật tên người dùng: ${task.exception?.message}")
+            }
+        }
+    }
     fun send(mobileNum: String,activity: Activity) {
-        val options = PhoneAuthOptions.newBuilder(mAuth)
-            .setPhoneNumber("+84$mobileNum")
-            .setTimeout(60L, TimeUnit.SECONDS)
-            .setActivity(activity)
-            .setCallbacks(/* p0 = */ object :
-                PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
-                override fun onVerificationCompleted(p0: PhoneAuthCredential) {
-                    Log.d("DEBUG","${mobileNum} send success")
+        val vietnamPhoneNumberRegex = "^(0|84)(2(0[3-9]|1[0-6|8|9]|2[0-2|5-9]|3[2-9]|4[0-9]|5[1|2|4-9]|6[0-3|9]|7[0-7]|8[0-9]|9[0-4|6|7|9])|3[2-9]|5[5|6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])([0-9]{7})\$".toRegex()
+        if(mobileNum.isEmpty()) {
+            showError = true
+            errorMessage = "Vui lòng nhập số điện thoại"
+        } else if(vietnamPhoneNumberRegex.matches(mobileNum)){
+            Log.d("DEBUG","REGREX " )
+            val options = PhoneAuthOptions.newBuilder(mAuth)
+                .setPhoneNumber("+84$mobileNum")
+                .setTimeout(60L, TimeUnit.SECONDS)
+                .setActivity(activity)
+                .setCallbacks(/* p0 = */ object :
+                    PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
+                    override fun onVerificationCompleted(p0: PhoneAuthCredential) {
+                        Log.d("DEBUG","${mobileNum} send success")
 
-                }
+                    }
 
-                override fun onVerificationFailed(p0: FirebaseException) {
-                    Log.d("DEBUG","${mobileNum} send failed")
-                }
+                    override fun onVerificationFailed(p0: FirebaseException) {
+                        Log.d("DEBUG","${mobileNum} send failed")
+                    }
 
-                override fun onCodeSent(otp: String, p1: PhoneAuthProvider.ForceResendingToken) {
-                    super.onCodeSent(otp, p1)
-                    verificationOtp = otp
-                    Log.d("DEBUG","${mobileNum} onCodeSend")
-                    isDialogShown = true
-                }
-            }).build()
-        PhoneAuthProvider.verifyPhoneNumber(options)
+                    override fun onCodeSent(otp: String, p1: PhoneAuthProvider.ForceResendingToken) {
+                        super.onCodeSent(otp, p1)
+                        verificationOtp = otp
+                        Log.d("DEBUG","${mobileNum} onCodeSend")
+                        isDialogShown = true
+                    }
+                }).build()
+            PhoneAuthProvider.verifyPhoneNumber(options)
+        } else {
+            showError = true
+            errorMessage = "Số điện thoại không hợp lệ"
+        }
+
     }
     fun otpVerification(otp: String,activity: Activity,onSuccess:()->Unit) {
         val credential = PhoneAuthProvider.getCredential(verificationOtp, otp)
@@ -101,26 +144,26 @@ class LoginViewModel : ViewModel() {
                     val user = task.result?.user
                     val phoneNumber = user?.phoneNumber
                     val uid = user?.uid
-//                    val databaseRef = Firebase.database.reference.child("users").child(uid ?: "")
-//                    databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
-//                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                            // Người dùng không tồn tại trong database
-//                            if (!dataSnapshot.exists()) {
-//                                // Thực hiện việc thêm người dùng mới
-//                                databaseRef.child("phoneNumber").setValue(phoneNumber).addOnCompleteListener {
-//                                    if (it.isSuccessful) {
-//                                        Log.d("DEBUG", "User added to database")
-//                                    } else {
-//                                        Log.d("DEBUG", "Failed to add user to database")
-//                                    }
-//                                }
-//                            }
-//                        }
-//
-//                        override fun onCancelled(databaseError: DatabaseError) {
-//                            Log.d("DEBUG", "Database error: ${databaseError.message}")
-//                        }
-//                    })
+                    val databaseRef = Firebase.database.reference.child("users").child(uid ?: "")
+                    databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+                            // Người dùng không tồn tại trong database
+                            if (!dataSnapshot.exists()) {
+                                // Thực hiện việc thêm người dùng mới
+                                databaseRef.child("phoneNumber").setValue(phoneNumber).addOnCompleteListener {
+                                    if (it.isSuccessful) {
+                                        Log.d("DEBUG", "User added to database")
+                                    } else {
+                                        Log.d("DEBUG", "Failed to add user to database")
+                                    }
+                                }
+                            }
+                        }
+
+                        override fun onCancelled(databaseError: DatabaseError) {
+                            Log.d("DEBUG", "Database error: ${databaseError.message}")
+                        }
+                    })
 
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -131,6 +174,7 @@ class LoginViewModel : ViewModel() {
                         )
                     }
                     isDialogShown = false
+                    updatePhoneNumber("")
                     onSuccess()
                 } else {
                     Log.d("DEBUG","Wrong otp")

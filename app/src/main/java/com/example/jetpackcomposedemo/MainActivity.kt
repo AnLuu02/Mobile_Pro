@@ -22,6 +22,7 @@ import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
+import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
 import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
@@ -33,6 +34,7 @@ import com.example.jetpackcomposedemo.Screen.Search.PaymentScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
+import com.example.jetpackcomposedemo.Screen.User.InfoUser
 import com.example.jetpackcomposedemo.Screen.User.LoginScreen
 import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
@@ -155,18 +157,28 @@ fun MainApp(
                 composable("discount"){
                     ScreenWithBottomNavigationBar(navController = navController, topBar = {
                         DiscountTopBar()
-                    }, content = { padding, _ ->
-                        DiscountScreen(padding = padding)
+                    }, content = {padding,listState->
+                        DiscountScreen(padding = padding, navController)
                     })
                 }
+
+                composable("CouponScreen"){
+                    CouponScreen(navController)
+                }
+
 
                 //----------------------------------- USER ------------------------------
                 composable("user"){
                     ScreenWithBottomNavigationBar(
+                        isBotNav = !loginUiState.isShowingInfo,
                         navController = navController,
-                        topBar = { UserTopBar(loginUiState = loginUiState,onLoginButtonClicked = { navController.navigate("login") }) },
+                        topBar = { UserTopBar(loginUiState = loginUiState,onLoginButtonClicked = { navController.navigate("login") }, onToogleSettingInfo = {loginViewModel1.toogleSetting(loginUiState.isShowingInfo)}) },
                         content = { padding, _ ->
-                            UserScreen(padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
+                            if(loginUiState.isShowingInfo){
+                                InfoUser(padding = padding)
+                            }else{
+                                UserScreen(padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
+                            }
                         })
                 }
 
