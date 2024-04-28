@@ -34,7 +34,8 @@ import kotlinx.coroutines.launch
 fun DatePickerBookingScreen(
     bookingViewModel:BookingViewModel,
     searchViewModel: SearchViewModel,
-    onHandleApplyTimeBooking:(Boolean,String,String,String,String)->Unit,
+    onHandleApplyTimeBooking:(String,String,String,String)->Unit,
+    onCloseDatePicker:(Boolean)->Unit
 ) {
     val dateCheckinString = remember{ mutableStateOf("") }
     val dateCheckoutString = remember{ mutableStateOf("") }
@@ -64,6 +65,7 @@ fun DatePickerBookingScreen(
             onDismissRequest = {
                 coroutineScope.launch {
                     sheetState.hide()
+                    onCloseDatePicker(false)
                 }
             },
             dragHandle = {
@@ -88,7 +90,8 @@ fun DatePickerBookingScreen(
                         totalTime = totalTime.longValue,
                         typeBooking = typeBooking.value.toString(),
                         enabledButtonApply = true,
-                        onHandleApplyTimeBooking = onHandleApplyTimeBooking
+                        onHandleApplyTimeBooking = onHandleApplyTimeBooking,
+                        onCloseDatePicker = onCloseDatePicker
                     )
                 },
                 modifier = Modifier

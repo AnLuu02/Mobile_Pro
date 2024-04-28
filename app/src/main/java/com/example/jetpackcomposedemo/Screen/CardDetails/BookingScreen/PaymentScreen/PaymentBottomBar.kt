@@ -40,16 +40,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
+import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
 import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaymentBottomBar(
     bookingViewModel: BookingViewModel,
+    payloadChoose:OptionPayment,
     openScreenChooseMethodPayment:(Boolean)->Unit
 ){
 
-    val selectedMethodPayment = remember{ mutableStateOf(bookingViewModel.getMethodPayment()) }
+    val selectedMethodPayment = remember{ mutableStateOf(payloadChoose) }
     val openAlertDialog = remember { mutableStateOf(false) }
 
     Surface(modifier = Modifier

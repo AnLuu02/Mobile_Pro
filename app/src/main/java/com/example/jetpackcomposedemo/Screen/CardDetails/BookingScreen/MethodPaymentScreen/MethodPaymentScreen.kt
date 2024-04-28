@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MethodPaymentScreen(
     bookingViewModel:BookingViewModel,
+    onPayloadChoose:(OptionPayment)->Unit,
     closeScreenChooseMethodPayment:(Boolean)->Unit
 ) {
     val listState = rememberLazyListState()
@@ -91,10 +92,11 @@ fun MethodPaymentScreen(
             Scaffold(
                 bottomBar = {
                     MethodPaymentBottomBar(
-                        bookingViewModel,
+                        bookingViewModel = bookingViewModel,
                         sheetState = sheetState,
-                        selectedMethodPayment.value,
-                        closeScreenChooseMethodPayment
+                        selectedMethodPayment = selectedMethodPayment.value,
+                        closeScreenChooseMethodPayment = closeScreenChooseMethodPayment,
+                        onPayloadChoose = onPayloadChoose
                     )
                 }
 

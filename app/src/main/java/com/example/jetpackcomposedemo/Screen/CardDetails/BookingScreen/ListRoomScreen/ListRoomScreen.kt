@@ -92,7 +92,7 @@ fun ListRoomScreen(
     val openDatePickerBookingScreen = remember {
         mutableStateOf(false)
     }
-    
+
     Scaffold(
         topBar = {
             ListRoomTopBar(
@@ -314,14 +314,16 @@ fun ListRoomScreen(
     if(openDatePickerBookingScreen.value){
         DatePickerBookingScreen(
             bookingViewModel = bookingViewModel,
-            searchViewModel = searchViewModel
-        ) {openDatepicker,checkin,checkout,total,type->
-            openDatePickerBookingScreen.value = openDatepicker
-            dateCheckinString.value = checkin
-            dateCheckoutString.value = checkout
-            totalTime.value = total
-            typeBooking.value = type
-        }
+            searchViewModel = searchViewModel,
+            {checkin,checkout,total,type->
+                dateCheckinString.value = checkin
+                dateCheckoutString.value = checkout
+                totalTime.value = total
+                typeBooking.value = type
+            },
+            onCloseDatePicker = {
+                openDatePickerBookingScreen.value = it
+            })
     }
 
 }

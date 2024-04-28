@@ -73,16 +73,18 @@ fun PaymentScreen(
 
 
     val openScreenChooseMethodPayment = remember{ mutableStateOf(false) }
-
+    val payloadChoose = remember{ mutableStateOf(OptionPayment()) }
 
     Scaffold(
         topBar = {
             PaymentTopBar(navController = navController)
         },
         bottomBar = {
-            PaymentBottomBar(bookingViewModel = bookingViewModel,openScreenChooseMethodPayment = {
-                openScreenChooseMethodPayment.value = it
-            })
+            PaymentBottomBar(bookingViewModel = bookingViewModel,
+                payloadChoose = payloadChoose.value,
+                openScreenChooseMethodPayment = {
+                    openScreenChooseMethodPayment.value = it
+                })
         }
 
     ) { padding ->
@@ -117,6 +119,9 @@ fun PaymentScreen(
             bookingViewModel = bookingViewModel,
             closeScreenChooseMethodPayment = {
                 openScreenChooseMethodPayment.value = it
+            },
+            onPayloadChoose = {
+                payloadChoose.value = it
             }
         )
     }

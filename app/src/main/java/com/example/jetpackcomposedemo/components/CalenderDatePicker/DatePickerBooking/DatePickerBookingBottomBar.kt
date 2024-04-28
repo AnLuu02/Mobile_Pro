@@ -37,7 +37,8 @@ fun DatePickerBookingBottomBar(
     totalTime:Long,
     typeBooking:String,
     enabledButtonApply:Boolean = false,
-    onHandleApplyTimeBooking:(Boolean,String,String,String,String)->Unit,
+    onHandleApplyTimeBooking:(String,String,String,String)->Unit,
+    onCloseDatePicker:(Boolean)->Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -95,7 +96,8 @@ fun DatePickerBookingBottomBar(
                     bookingViewModel.setTypeBooking(typeBooking)
                     coroutineScope.launch {
                         sheetState.hide()
-                        onHandleApplyTimeBooking(false,dateCheckinString,dateCheckoutString,totalTime.toString(),typeBooking)
+                        onHandleApplyTimeBooking(dateCheckinString,dateCheckoutString,totalTime.toString(),typeBooking)
+                        onCloseDatePicker(false)
                     }
                 },
                 enabled = enabledButtonApply,

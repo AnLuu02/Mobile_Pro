@@ -32,6 +32,7 @@ fun MethodPaymentBottomBar(
     bookingViewModel: BookingViewModel,
     sheetState:SheetState,
     selectedMethodPayment:OptionPayment,
+    onPayloadChoose:(OptionPayment)->Unit,
     closeScreenChooseMethodPayment:(Boolean)->Unit
 ){
     val coroutineScope = rememberCoroutineScope()
@@ -57,6 +58,7 @@ fun MethodPaymentBottomBar(
                     bookingViewModel.setMethodPayment(selectedMethodPayment)
                     coroutineScope.launch {
                         sheetState.hide()
+                        onPayloadChoose(selectedMethodPayment)
                         closeScreenChooseMethodPayment(false)
                     }
                 },
