@@ -212,6 +212,11 @@ fun TextFieldSearchResult(
             }
             else "Bất kì"
         }
+        "overnight" ->  {
+            startTimeBooking = searchViewModel.getDayAndMonth(typeBooking).timeCheckin
+            endTimeBooking = searchViewModel.getDayAndMonth(typeBooking).timeCheckOut
+            if(startTimeBooking != "Bất kì") "$startTimeBooking - $endTimeBooking" else "Bất kì"
+        }
         "bydate" ->  {
             startTimeBooking = searchViewModel.getDayAndMonth(typeBooking).timeCheckin
             endTimeBooking = searchViewModel.getDayAndMonth(typeBooking).timeCheckOut
@@ -222,7 +227,7 @@ fun TextFieldSearchResult(
 
     if(
         typeBooking != "hourly" &&
-        typeBooking != "overnigh" &&
+        typeBooking != "overnight" &&
         typeBooking != "bydate"){
         Column {
             Text(

@@ -666,7 +666,6 @@ fun CardListRoom(
             },
             dialogTitle = "Yêu cầu thanh toán trả trước",
             dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
-            icon = R.drawable.logo_app
         )
     }
 }

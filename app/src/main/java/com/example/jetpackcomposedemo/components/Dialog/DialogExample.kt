@@ -17,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.R
 
 @Composable
 fun AlertDialogExample(
@@ -24,11 +25,10 @@ fun AlertDialogExample(
     onConfirmation: () -> Unit,
     dialogTitle: String,
     dialogText: String,
-    icon: Int,
 ) {
     AlertDialog(
         icon={
-             Icon(painter = painterResource(id = icon), contentDescription = "",modifier = Modifier.size(24.dp))
+             Icon(painter = painterResource(id = R.drawable.logo_app), contentDescription = "",modifier = Modifier.size(24.dp))
         },
         title = {
             Text(text = dialogTitle,

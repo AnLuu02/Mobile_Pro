@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
 import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
@@ -48,10 +47,9 @@ import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
 fun PaymentBottomBar(
     bookingViewModel: BookingViewModel,
     payloadChoose:OptionPayment,
-    openScreenChooseMethodPayment:(Boolean)->Unit
+    onChooseMethodPayment:(Boolean)->Unit
 ){
 
-    val selectedMethodPayment = remember{ mutableStateOf(payloadChoose) }
     val openAlertDialog = remember { mutableStateOf(false) }
 
     Surface(modifier = Modifier
@@ -74,7 +72,7 @@ fun PaymentBottomBar(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
                         ) {
-                            openScreenChooseMethodPayment(true)
+                            onChooseMethodPayment(true)
                         }
                     ,
                     verticalAlignment = Alignment.CenterVertically,
@@ -156,7 +154,7 @@ fun PaymentBottomBar(
 
                 Button(
                     onClick = {
-                        openAlertDialog.value = selectedMethodPayment.value == null
+                        openAlertDialog.value = payloadChoose.type == null
                     },
                     modifier = Modifier.clip(MaterialTheme.shapes.small),
                     colors = ButtonDefaults.buttonColors(
@@ -184,9 +182,8 @@ fun PaymentBottomBar(
                 openAlertDialog.value = false
                 println("Confirmation registered") // Add logic here to handle confirmation.
             },
-            dialogTitle = "Yêu cầu thanh toán trả trước",
+            dialogTitle = "Chọn phương thức thanh toán",
             dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
-            icon = R.drawable.logo_app
         )
     }
 

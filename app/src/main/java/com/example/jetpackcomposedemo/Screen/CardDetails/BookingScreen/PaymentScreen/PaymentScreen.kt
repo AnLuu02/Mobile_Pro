@@ -72,7 +72,7 @@ fun PaymentScreen(
     val typeBooking = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
 
 
-    val openScreenChooseMethodPayment = remember{ mutableStateOf(false) }
+    val openChooseMethodPayment = remember{ mutableStateOf(false) }
     val payloadChoose = remember{ mutableStateOf(OptionPayment()) }
 
     Scaffold(
@@ -82,8 +82,8 @@ fun PaymentScreen(
         bottomBar = {
             PaymentBottomBar(bookingViewModel = bookingViewModel,
                 payloadChoose = payloadChoose.value,
-                openScreenChooseMethodPayment = {
-                    openScreenChooseMethodPayment.value = it
+                onChooseMethodPayment = {
+                    openChooseMethodPayment.value = it
                 })
         }
 
@@ -114,11 +114,11 @@ fun PaymentScreen(
         }
     }
 
-    if(openScreenChooseMethodPayment.value){
+    if(openChooseMethodPayment.value){
         MethodPaymentScreen(
             bookingViewModel = bookingViewModel,
             closeScreenChooseMethodPayment = {
-                openScreenChooseMethodPayment.value = it
+                openChooseMethodPayment.value = it
             },
             onPayloadChoose = {
                 payloadChoose.value = it
@@ -269,10 +269,11 @@ fun InfoRoom(
                                 when(typeBooking){
                                     "hourly"->{
                                         Icon(
-                                            painter = painterResource(id = R.drawable.round_dark_mode_24),
+                                            painter = painterResource(id = R.drawable.outline_hourglass_top_24),
                                             contentDescription = "",
                                             tint = Color.White
                                         )
+                                        Spacer(modifier = Modifier.height(4.dp))
                                         Text(
                                             text = "${if(totalTime.toInt()<10) "0$totalTime" else totalTime} giờ",
                                             style = MaterialTheme.typography.bodyMedium,
@@ -287,6 +288,7 @@ fun InfoRoom(
                                             contentDescription = "",
                                             tint = Color.White
                                         )
+                                        Spacer(modifier = Modifier.height(4.dp))
                                         Text(
                                             text = "${if(totalTime.toInt()<10) "0$totalTime" else totalTime} đêm",
                                             style = MaterialTheme.typography.bodyMedium,
@@ -297,10 +299,11 @@ fun InfoRoom(
                                     }
                                     else ->{
                                         Icon(
-                                            painter = painterResource(id = R.drawable.round_dark_mode_24),
+                                            painter = painterResource(id = R.drawable.outline_calendar_month_24),
                                             contentDescription = "",
                                             tint = Color.White
                                         )
+                                        Spacer(modifier = Modifier.height(4.dp))
                                         Text(
                                             text = "${if(totalTime.toInt()<10) "0$totalTime" else totalTime} ngày",
                                             style = MaterialTheme.typography.bodyMedium,
@@ -595,7 +598,10 @@ fun PaymentDetails(){
             )
 
             Divider(
-                modifier = Modifier.fillMaxWidth().height(1.dp).padding(start = 12.dp, end = 12.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .padding(start = 12.dp, end = 12.dp)
             )
 
             Row(
@@ -618,7 +624,10 @@ fun PaymentDetails(){
             }
 
             Divider(
-                modifier = Modifier.fillMaxWidth().height(1.dp).padding(start = 12.dp, end = 12.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .padding(start = 12.dp, end = 12.dp)
             )
 
             Row(
