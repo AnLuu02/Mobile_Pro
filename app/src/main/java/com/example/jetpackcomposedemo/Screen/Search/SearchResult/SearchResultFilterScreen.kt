@@ -66,6 +66,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.Screen.Search.FilterRoom
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import kotlinx.coroutines.launch
@@ -142,7 +143,7 @@ fun SearchResultFilterScreen(
                             Box(
                                 modifier = Modifier
                                     .size(36.dp)
-                                    .background(color = Color.White, shape = CircleShape)
+                                    .background(color = Color.Transparent, shape = CircleShape)
                                     .align(Alignment.CenterStart)
                                     .clickable(
                                         interactionSource = remember { MutableInteractionSource() },
@@ -164,7 +165,8 @@ fun SearchResultFilterScreen(
                                     imageVector = Icons.Rounded.Close,
                                     contentDescription = "Close",
                                     modifier = Modifier
-                                        .size(20.dp)
+                                        .size(24.dp)
+                                        .background(Color.Transparent)
                                 )
                             }
                             Text(
@@ -246,12 +248,11 @@ fun SearchResultFilterScreen(
 
                 },
                 modifier = Modifier
-                    .padding(top = 46.dp)
                     .clip(shape = RoundedCornerShape(topEndPercent = 8, topStartPercent = 8))
             ) { padding ->
                 Box(modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)) {
+                    .padding(bottom = padding.calculateBottomPadding())) {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -325,10 +326,10 @@ fun PriceRangeSlider(
     Box(modifier = Modifier.fillMaxWidth()){
         Column(modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)) {
+            .padding( 16.dp)) {
             Text(
                 text = "Khoảng giá",
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -544,7 +545,7 @@ fun StarRating(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding( bottom = 16.dp)
             )
@@ -593,7 +594,7 @@ fun StarRating(
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = ">= $item",
+                                text = "Trên $item",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = if(selected) Color.Red else  Color.Black
                             )
@@ -636,10 +637,10 @@ fun TypeHotel(
         ) {
             Text(
                 text = "Loại khách sạn",
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             androidx.compose.foundation.layout.FlowRow(
                 modifier = Modifier.fillMaxWidth(),
@@ -716,7 +717,7 @@ fun UtilitiesHotel(
         ) {
             Text(
                 text = "Tiện ích",
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 16.dp,end=16.dp)
 

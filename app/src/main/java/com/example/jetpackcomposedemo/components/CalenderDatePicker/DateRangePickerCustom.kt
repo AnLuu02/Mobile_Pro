@@ -113,7 +113,7 @@ fun DateRangePickerCustom(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
+            .padding(bottom = padding.calculateBottomPadding())
     ) {
         DateRangePicker(
             state = dateRangePickerState,

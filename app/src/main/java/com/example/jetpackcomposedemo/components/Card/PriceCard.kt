@@ -86,8 +86,7 @@ fun <T> PriceCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, color = Color.LightGray, MaterialTheme.shapes.small),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                .border(1.dp, color = Color.LightGray.copy(0.5f), MaterialTheme.shapes.small),
             shape = MaterialTheme.shapes.small,
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
@@ -295,7 +294,7 @@ fun <T> PriceCard(
 
                                     Text(
                                         text = "4.0",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = if (isImageFull) Color.White else Color.Black
                                     )
@@ -303,7 +302,7 @@ fun <T> PriceCard(
                                     Text(
                                         text = "(2097)",
                                         color = if (isImageFull) Color.White else Color.Gray,
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontSize = 16.sp,
                                     )
 
                                     Icon(

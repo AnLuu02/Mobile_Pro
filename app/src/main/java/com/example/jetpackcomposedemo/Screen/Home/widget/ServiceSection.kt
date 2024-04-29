@@ -7,17 +7,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.DateRange
-import androidx.compose.material.icons.rounded.Discount
-import androidx.compose.material.icons.rounded.FiberNew
-import androidx.compose.material.icons.rounded.Flight
-import androidx.compose.material.icons.rounded.HourglassTop
-import androidx.compose.material.icons.rounded.LocationOn
-import androidx.compose.material.icons.rounded.ShieldMoon
-import androidx.compose.material.icons.rounded.SupervisorAccount
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,49 +17,50 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
+import androidx.compose.ui.unit.sp
+import com.example.jetpackcomposedemo.R
 
 data class ServicesUI(
-    val icon: ImageVector,
+    val icon: Int,
     val title:String
 )
 
 
 val servicesUI = listOf(
     ServicesUI(
-        icon = Icons.Rounded.LocationOn,
+        icon = R.drawable.outline_location_on_24,
         title = "Gần bạn"
     ),
     ServicesUI(
-        icon = Icons.Rounded.HourglassTop,
+        icon = R.drawable.outline_hourglass_top_24,
         title = "Theo giờ"
     ),
     ServicesUI(
-        icon = Icons.Rounded.ShieldMoon,
+        icon = R.drawable.outline_dark_mode_24,
         title = "Qua đêm"
     ),
     ServicesUI(
-        icon = Icons.Rounded.DateRange,
+        icon = R.drawable.outline_calendar_month_24,
         title = "Theo ngày"
     ),
     ServicesUI(
-        icon = Icons.Rounded.SupervisorAccount,
+        icon = R.drawable.outline_favorite_border_24,
         title = "Tình yêu"
     ),
     ServicesUI(
-        icon = Icons.Rounded.Flight,
+        icon = R.drawable.outline_local_airport_24,
         title = "Du lịch"
     ),
     ServicesUI(
-        icon = Icons.Rounded.Discount,
-        title = "Giảm tới 50k"
+        icon = R.drawable.outline_local_offer_24,
+        title = "Ưu đãi"
     ),
     ServicesUI(
-        icon = Icons.Rounded.FiberNew,
-        title = "Đổi gió ngay"
+        icon = R.drawable.outline_fiber_new_24,
+        title = "Đổi gió"
     ),
 
     )
@@ -92,7 +85,7 @@ fun ServiceSection() {
             columns = GridCells.Fixed(4),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-                .height(min(100.dp, 300.dp))
+                .height(120.dp)
         ) {
             items(servicesUI.size) { index -> ServiceItem(index = index) }
 
@@ -113,15 +106,18 @@ fun ServiceItem(
 
     ) {
         Icon(
-            imageVector = item.icon,
+            painter = painterResource(id = item.icon),
             contentDescription = "",
-            tint = Color.Red
+            tint = Color.Red,
+            modifier = Modifier.size(24.dp)
         )
+        
+        Spacer(modifier = Modifier.height(4.dp))
 
         Text(
             text = item.title,
             color = Color.Black,
-            style = MaterialTheme.typography.bodySmall
+            fontSize = 14.sp
         )
     }
 

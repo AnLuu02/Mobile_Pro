@@ -30,6 +30,7 @@ import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
 import com.example.jetpackcomposedemo.Screen.Search.ListRoomScreen
+import com.example.jetpackcomposedemo.Screen.Search.MyBookingScreen
 import com.example.jetpackcomposedemo.Screen.Search.PaymentScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
@@ -48,6 +49,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+//            val data = listOf(1,2,3,4,5,6)
+//            LazyRow {
+//                items(data.size){
+//                    AnimatedShimmer(it,data)
+//
+//                }
+//
             MainApp()
         }
     }
@@ -68,7 +76,14 @@ fun MainApp(
             val loginUiState by loginViewModel1.uiState.collectAsState()
 
 
+
             NavHost(navController = navController, startDestination = "home" ){
+
+
+                //////////////////////////////// my booking ///////////////////////////
+                composable("mybooking"){
+                    MyBookingScreen(bookingViewModel = bookingViewModel, navController =navController )
+                }
 
                 //----------------------------------- HOME ------------------------------
                 composable("home"){

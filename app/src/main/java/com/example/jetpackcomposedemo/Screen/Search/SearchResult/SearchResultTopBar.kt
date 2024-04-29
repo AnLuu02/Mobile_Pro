@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.FilterList
-import androidx.compose.material.icons.rounded.Sort
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 
 @Composable
@@ -61,7 +62,7 @@ fun SearchResultTopBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 16.dp),
+                .padding(start = 12.dp, end = 12.dp, top = 48.dp, bottom = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -117,12 +118,12 @@ fun SearchResultTopBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Icon(imageVector = Icons.Rounded.Sort, contentDescription = "Sap xep")
-                    Spacer(modifier = Modifier.width(2.dp))
+                    Icon(imageVector = Icons.AutoMirrored.Rounded.Sort, contentDescription = "Sap xep",modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "Sắp xếp",
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium
+                        fontSize = 16.sp
                     )
 
                     if(searchViewModel.getSortMethod().value.sortMethod != null
@@ -139,6 +140,7 @@ fun SearchResultTopBar(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxSize()
+                        .background(Color.Transparent)
                         .clickable {
                             onOpenFilter(true)
                         },
@@ -146,12 +148,12 @@ fun SearchResultTopBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Icon(imageVector = Icons.Rounded.FilterList, contentDescription = "Sap xep")
-                    Spacer(modifier = Modifier.width(2.dp))
+                    Icon(imageVector = Icons.Rounded.FilterList, contentDescription = "Sap xep", modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "Chọn lọc theo",
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium
+                        fontSize = 16.sp
                     )
 
 
@@ -308,8 +310,8 @@ fun TextFieldSearchResult(
 
                             Text(
                                 text = textHeader,
-                                fontWeight = FontWeight.Medium,
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.W500,
+                                style = MaterialTheme.typography.titleSmall,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )

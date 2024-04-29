@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import kotlinx.coroutines.launch
 
@@ -69,7 +70,7 @@ fun DatePickerBookingBottomBar(
                     Text(
                         text = dateCheckinString,
                         color = Color.Red,
-                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                     )
                 }
@@ -83,7 +84,7 @@ fun DatePickerBookingBottomBar(
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = dateCheckoutString,
-                        color = Color.Red, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                        color = Color.Red, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                 }
             }

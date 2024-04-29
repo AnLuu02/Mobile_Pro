@@ -140,7 +140,7 @@ fun DatePickerCustom(
     padding?.let {
         Modifier
             .fillMaxSize()
-            .padding( it)
+            .padding( bottom = it.calculateBottomPadding())
     }?.let {
         Box(modifier = it) {
             LazyColumn(
