@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.example.jetpackcomposedemo.Screen.Home.dataTest
+import com.example.jetpackcomposedemo.Screen.Services.widget.CardSection
 
 val sortOptions = arrayOf(
     "Phù hợp nhất",
@@ -25,7 +27,9 @@ val capacityOptions = arrayOf(
 fun ServiceScreen(
     type:String?,
     onCancelButtonClicked: () -> Unit,
-    onSearchFieldClicked: () -> Unit
+    onSearchFieldClicked: () -> Unit,
+    onOpenDetailCardScreen: (String)->Unit,
+
 ) {
     val (sortOption, onSortOptionSelected) = remember {
         mutableStateOf(sortOptions[0]);
@@ -58,10 +62,16 @@ fun ServiceScreen(
                 .padding(padding)
                 .fillMaxWidth()
         ) {
-            Text(text = sortOption)
-            Text(text = minPrice.toString())
-            Text(text = maxPrice.toString())
-            Text(text = capacityOption.toString())
+            CardSection(
+                data = dataTest,
+                isDiscount = true,
+                hasPrice = true,
+                onOpenDetailCardScreen = onOpenDetailCardScreen,
+            )
+//            Text(text = sortOption)
+//            Text(text = minPrice.toString())
+//            Text(text = maxPrice.toString())
+//            Text(text = capacityOption.toString())
         }
     }
 }

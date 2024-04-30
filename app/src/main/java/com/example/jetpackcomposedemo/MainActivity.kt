@@ -285,7 +285,10 @@ fun MainApp(
                         },
                         onSearchFieldClicked = {
                             navController.navigate("search")
-                        }
+                        },
+                        onOpenDetailCardScreen = {cardId->
+                            navController.navigate("carddetail/$cardId")
+                        },
                     )
                 }
             }

@@ -71,12 +71,16 @@ fun <T> PriceCard(
 
     Box(
         modifier = Modifier
+<<<<<<< HEAD
             .then(
                 if (isColumn) Modifier.padding(start = 16.dp, end = 16.dp) else Modifier.padding(
                     start = 16.dp,
                     end = lastPaddingEnd
                 )
             )
+=======
+            .then(if(isColumn) Modifier.padding(start = 16.dp,end=16.dp, top=16.dp, bottom = 8.dp) else Modifier.padding(start = 16.dp, end = lastPaddingEnd))
+>>>>>>> origin/trang
             .clip(shape = MaterialTheme.shapes.small)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
