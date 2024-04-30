@@ -52,6 +52,7 @@ fun DatePickerTopBar(
             Box(
                 modifier = Modifier
                     .size(36.dp)
+                    .padding(top=4.dp)
                     .background(color = Color.Transparent, shape = CircleShape)
                     .align(Alignment.CenterStart)
                     .clickable(
@@ -73,7 +74,7 @@ fun DatePickerTopBar(
             Text(
                 text = "Chọn thời gian",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier.align(Alignment.Center).padding(top=4.dp),
                 fontWeight = FontWeight.Bold
             )
         }

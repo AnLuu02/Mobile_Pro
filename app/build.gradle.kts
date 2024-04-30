@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-
     id("com.google.gms.google-services")
+    id("kotlin-kapt")
 }
 
 android {
@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.material3.android)
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,6 +81,7 @@ dependencies {
 
     //System UI Controller
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.27.0")
+    implementation("com.google.android.material:material:1.4.0")
 
     //Extended Icons
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
@@ -87,13 +89,15 @@ dependencies {
     //material 3
     implementation("androidx.compose.material3:material3:1.2.1")
 
+
+
     // Android Maps Compose composables for the Maps SDK for Android
     implementation ("com.google.maps.android:maps-compose:4.3.3")
 
 //auto slide
     implementation("io.coil-kt:coil-compose:2.3.0")
     implementation("com.google.accompanist:accompanist-pager:0.35.0-alpha")
-    implementation("androidx.compose.ui:ui:1.0.0-alpha01")
+    implementation("androidx.compose.ui:ui:1.4.0-beta01")
 
     //ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
@@ -108,7 +112,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
     // Livedata
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
-
+    implementation ("androidx.compose.runtime:runtime-livedata:1.6.6")
 
     //retrofit
     // Retrofit and GSON
@@ -123,9 +127,16 @@ dependencies {
     implementation ("com.squareup.okhttp3:okhttp:4.11.0")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
 
+    //room database
+    val  room_version = "2.6.1" // Check for the latest version
+
+    implementation ("androidx.room:room-runtime:$room_version")
+    // Optional - Kotlin Extensions and Coroutines support for Room
+    implementation ("androidx.room:room-ktx:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
 
 
-    //layout tự động xuống hàng
-//    implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
+    //permission
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
 }

@@ -2,6 +2,7 @@ package com.example.jetpackcomposedemo.components.Card
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -57,13 +58,17 @@ fun <T> CardSimple(
             .padding(start = 16.dp, end = lastPaddingEnd)
             .clip(shape = MaterialTheme.shapes.small)
             .clickable(
-                interactionSource =  remember { MutableInteractionSource() },
+                interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true)
             ) { }
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth(),
-
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, color = Color.LightGray, MaterialTheme.shapes.small),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            ),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
 
@@ -116,7 +121,7 @@ fun <T> CardSimple(
                             Icon(
                                 imageVector = Icons.Rounded.Star,
                                 contentDescription = "",
-                                tint = Color.Yellow,
+                                tint = Color(255,215,0),
                                 modifier = Modifier.size(14.dp),
 
                                 )

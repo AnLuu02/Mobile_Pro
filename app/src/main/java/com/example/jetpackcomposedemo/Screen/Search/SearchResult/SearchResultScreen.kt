@@ -1,6 +1,5 @@
 package com.example.jetpackcomposedemo.Screen.Search.SearchResult
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,12 +27,12 @@ fun SearchResultScreen(
     searchViewModel:SearchViewModel,
     onBackSearchScreen:()->Unit,
     onOpenSearchScreen:()->Unit,
-    onOpenFilter:()->Unit
 ) {
     val isOpenSort = remember {
         mutableStateOf(false)
     }
-    Log.e("Filter",searchViewModel.getFilterRoom().toString())
+    val openFIlter = remember{ mutableStateOf(false) }
+
 
     Scaffold(
         topBar = {
@@ -44,7 +43,7 @@ fun SearchResultScreen(
                     isOpenSort.value = it
                 },
                 onOpenFilter={
-                    onOpenFilter()
+                    openFIlter.value = true
                 },
                 onBackSearchScreen={
                     onBackSearchScreen()
@@ -69,6 +68,15 @@ fun SearchResultScreen(
         }
 
     }
+
+    if(openFIlter.value){
+        SearchResultFilterScreen(
+            searchViewModel = searchViewModel,
+            typeBooking = typeBooking,
+        ) {
+            openFIlter.value = it
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,8 +87,6 @@ fun SearchResult(
 ){
     val dataTest = listOf(1, 2, 3, 4, 5)
     val sheetState = rememberBottomSheetScaffoldState()
-
-    Log.e("method sort",searchViewModel.getSortMethod().value.sortMethod.toString())
 
     LaunchedEffect(Unit) {
         sheetState.bottomSheetState.expand()

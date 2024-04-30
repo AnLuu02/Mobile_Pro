@@ -15,12 +15,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
+import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.Sort
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
@@ -28,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 
@@ -48,28 +48,29 @@ fun SearchResultTopBar(
     typeBooking:String,
     searchViewModel: SearchViewModel,
     onOpenSort:(Boolean)->Unit,
-    onOpenFilter:()->Unit,
+    onOpenFilter:(Boolean)->Unit,
     onBackSearchScreen:()->Unit,
     onOpenSearchScreen:()->Unit
 
 ){
     Column(
-        modifier = Modifier.fillMaxWidth().background(Color.White)
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 40.dp, bottom = 16.dp),
+                .padding(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(36.dp)
                     .background(color = Color.White, shape = CircleShape)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = rememberRipple(bounded = false, radius = 24.dp),
-                        onClick = { onBackSearchScreen()}
+                        onClick = { onBackSearchScreen() }
                     )
                 ,
                 contentAlignment = Alignment.Center
@@ -117,28 +118,36 @@ fun SearchResultTopBar(
                 ) {
 
                     Icon(imageVector = Icons.Rounded.Sort, contentDescription = "Sap xep")
+                    Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = "Sắp xếp",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.bodyMedium
                     )
 
+                    if(searchViewModel.getSortMethod().value.sortMethod != null
+                        && searchViewModel.getSortMethod().value.sortMethod != "phuhopnhat" ){
+                        Box(modifier = Modifier
+                            .size(6.dp)
+                            .background(Color.Red, shape = CircleShape))
+
+                    }
+
 
                 }
-
-
                 Row(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxSize()
                         .clickable {
-                            onOpenFilter()
+                            onOpenFilter(true)
                         },
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Icon(imageVector = Icons.Rounded.Sort, contentDescription = "Sap xep")
+                    Icon(imageVector = Icons.Rounded.FilterList, contentDescription = "Sap xep")
+                    Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = "Chọn lọc theo",
                         fontWeight = FontWeight.Bold,
@@ -175,14 +184,15 @@ fun TextFieldSearchResult(
     var text by remember {
         mutableStateOf("")
     }
-    val typeBookingg = when(typeBooking){
+    val typeBookingChoose = when(typeBooking){
         "hourly"->"Theo giờ"
         "overnight"->"Qua đêm"
-        else -> "Theo ngày"
+        "bydate" -> "Theo ngày"
+        else -> ""
     }
 
-    var startTimeBooking:String
-    var endTimeBooking:String
+    val startTimeBooking:String
+    val endTimeBooking:String
     val textHeader: String = when (typeBooking) {
         "hourly" -> {
             startTimeBooking = searchViewModel.getOnlyHourBooking(typeBooking).timeCheckin
@@ -191,7 +201,7 @@ fun TextFieldSearchResult(
                 startTimeBooking != "Bất kì"
                 && searchViewModel.getOnlyDayBooking(typeBooking).timeCheckin
                 == searchViewModel.getOnlyDayBooking(typeBooking).timeCheckOut
-                )
+            )
                 "$startTimeBooking:00 - $endTimeBooking:00, ${searchViewModel.getDayAndMonth(typeBooking).timeCheckin}"
             else if(
                 startTimeBooking != "Bất kì"
@@ -202,95 +212,135 @@ fun TextFieldSearchResult(
             }
             else "Bất kì"
         }
-        else ->  {
+        "overnight" ->  {
             startTimeBooking = searchViewModel.getDayAndMonth(typeBooking).timeCheckin
             endTimeBooking = searchViewModel.getDayAndMonth(typeBooking).timeCheckOut
             if(startTimeBooking != "Bất kì") "$startTimeBooking - $endTimeBooking" else "Bất kì"
         }
+        "bydate" ->  {
+            startTimeBooking = searchViewModel.getDayAndMonth(typeBooking).timeCheckin
+            endTimeBooking = searchViewModel.getDayAndMonth(typeBooking).timeCheckOut
+            if(startTimeBooking != "Bất kì") "$startTimeBooking - $endTimeBooking" else "Bất kì"
+        }
+        else ->  {""}
     }
 
-    Surface(
-        shadowElevation = 4.dp, // Độ nâng của đổ bóng
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.extraLarge)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(bounded = true),
-                onClick = onOpenScreenSearch
+    if(
+        typeBooking != "hourly" &&
+        typeBooking != "overnight" &&
+        typeBooking != "bydate"){
+        Column {
+            Text(
+                text = "ĐỨC ĐẶT GROUP T4 ƯU ĐÃI VÀNG 200Kl;llllllllllllllllllllllll",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-        ,
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Giảm 10% tối đã 204k",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.W500,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
 
-        ) {
-        OutlinedTextField(
-            value = text,
-            enabled = false,
-            onValueChange = {
-                text = it
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "emailIcon",
-                    modifier = Modifier.size(30.dp)
-                )
-            },
-            placeholder = {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Hồ Chí Minh",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+    }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = typeBookingg,
-                            fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Icon(
-                            imageVector = Icons.Default.Circle,
-                            contentDescription = "emailIcon",
-                            modifier = Modifier.size(4.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-
-
-                        Text(
-                            text = textHeader,
-                            fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            },
-
+    else{
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .background(
-                    Color.LightGray.copy(alpha = 0.2f),
-                    shape = MaterialTheme.shapes.extraLarge
+                .clip(MaterialTheme.shapes.extraLarge)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = rememberRipple(bounded = true),
+                    onClick = onOpenScreenSearch
                 )
-            ,
+            ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterStart)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "emailIcon",
+                        modifier = Modifier.size(24.dp)
+                    )
 
-            shape = MaterialTheme.shapes.extraLarge,
-            colors = OutlinedTextFieldDefaults.colors(
-                disabledBorderColor = Color.Transparent,
-                disabledTextColor = Color.Black,
-                disabledPlaceholderColor = Color.Black,
-                disabledLabelColor = Color.Black,
-                disabledLeadingIconColor = Color.Black
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Hồ Chí Minh",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = typeBookingChoose,
+                                fontWeight = FontWeight.W500,
+                                style = MaterialTheme.typography.titleSmall
+                            )
+
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Icon(
+                                imageVector = Icons.Default.Circle,
+                                contentDescription = "emailIcon",
+                                modifier = Modifier.size(4.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+
+
+                            Text(
+                                text = textHeader,
+                                fontWeight = FontWeight.Medium,
+                                style = MaterialTheme.typography.bodyMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                }
+
+            }
+            OutlinedTextField(
+                value = text,
+                enabled = false,
+                onValueChange = {
+                    text = it
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Color.LightGray.copy(alpha = 0.2f),
+                        shape = MaterialTheme.shapes.extraLarge
+                    )
+                ,
+                shape = MaterialTheme.shapes.extraLarge,
+                colors =  OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    disabledBorderColor = Color.Transparent
+                )
             )
-        )
+
+
+        }
     }
 
 

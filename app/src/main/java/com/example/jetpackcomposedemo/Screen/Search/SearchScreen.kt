@@ -1,7 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.Search
 
+import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,7 +31,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,26 +41,108 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.jetpackcomposedemo.data.network.RetrofitInstance
-import com.example.jetpackcomposedemo.data.repository.ProductsRepository
-import com.example.jetpackcomposedemo.data.repository.ProductsRepositoryImpl
-import com.example.jetpackcomposedemo.data.viewmodel.ProductsViewModel
-import com.example.jetpackcomposedemo.data.viewmodel.ProductsViewModelFactory
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerScreen
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DateRangePickerScreen
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel,
-    onOpenDatePickerScreen:(String)->Unit,
-    onHandleSearchClickButton:(String)->Unit,
+    onHandleSearchClickButtonSearch:(String)->Unit,
     closeSearchScreen:()->Unit
 ) {
 
-    val productsViewModel: ProductsViewModel = viewModel(factory = ProductsViewModelFactory(ProductsRepositoryImpl(RetrofitInstance.apiService)))
-    Log.e("aaa",productsViewModel.product.toString())
+    val showDatePicker = remember{ mutableStateOf("") }
+    val visibleDataPicker = remember{ mutableStateOf(false) }
 
+
+
+
+    //////////////////////////demooooooooooo////////////////////////////////////////////
+//    val couponViewModel: CouponViewModel = viewModel(
+//        factory = CouponViewModelFactory(CouponRepository(apiService = apiService))
+//    )
+//    LaunchedEffect(Unit) {
+//        couponViewModel.getCouponList()
+//        }
+//    val couponResource = couponViewModel.couponList.observeAsState()
+//    // Xử lý UI dựa trên trạng thái của Resource
+//    when (couponResource.value?.status) {
+//        Status.SUCCESS -> {
+//            // Xử lý dữ liệu khi load thành công
+//            couponResource.value?.data?.let { coupons ->
+//                Log.e("List Coupon", coupons.toString())
+//            }
+//        }
+//        Status.ERROR -> {
+//            // Xử lý khi có lỗi
+//            Text(text = "Lỗi: ${couponResource.value?.message}")
+//        }
+//        Status.LOADING -> {
+//            // Xử lý trạng thái đang tải
+//
+//        }
+//
+//        null -> Text(text = "Lỗi: nuklklklklklklklklklklklklklklklklklklkl")
+//    }
+
+
+    //get by id
+//    LaunchedEffect(Unit) {
+//        couponViewModel.getCouponsById("1")
+//    }
+//    val couponResourceById = couponViewModel.coupons.observeAsState()
+//    Log.e("couponResourceById",couponResourceById.toString())
+//    when (couponResourceById.value?.status) {
+//        Status.SUCCESS -> {
+//            // Xử lý dữ liệu khi load thành công
+//            couponResourceById.value?.data?.let { coupon ->
+//                Log.e("ResourceByID", coupon.toString())
+//            }
+//        }
+//        Status.ERROR -> {
+//            // Xử lý khi có lỗi
+//            Log.e( "Lỗi: ", "${couponResourceById.value?.message}")
+//        }
+//        Status.LOADING -> {
+//        }
+//        null ->Log.e( "NULLLL: ", "NHULLLLLLL")
+//
+//    }
+
+
+    //post coupon
+//    LaunchedEffect(Unit) {
+//        couponViewModel.postCoupon(Coupon(
+//            id = null,
+//            name = "Quà An tặng",
+//            amountDiscount = null,
+//            percentDiscount = 50,
+//            effectiveDate =  "2024-05-01T00:00:00.000Z",
+//            expirationDate = null
+//        ))
+//    }
+//    val newCouponResource = couponViewModel.coupons.observeAsState()
+//    when (newCouponResource.value?.status) {
+//        Status.SUCCESS -> {
+//            // Xử lý dữ liệu khi load thành công
+//            newCouponResource.value?.data?.let { coupon ->
+//                Log.e("New Coupon", coupon.toString())
+//            }
+//        }
+//        Status.ERROR -> {
+//            // Xử lý khi có lỗi
+//            Log.e( "Lỗi: ", "${newCouponResource.value?.message}")
+//        }
+//        Status.LOADING -> {
+//        }
+//        null ->Log.e( "NULLLL: ", "NHULLLLLLL")
+//
+//    }
+
+    //////////////////////////demooooooooooo////////////////////////////////////////////
 
     val typeBooking = remember {
         mutableStateOf("")
@@ -113,7 +194,8 @@ fun SearchScreen(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = true)
                             ) {
-                                onOpenDatePickerScreen(typeBooking.value)
+                                showDatePicker.value = typeBooking.value
+                                visibleDataPicker.value = true
                             }
                     ) {
                         Row(
@@ -191,7 +273,7 @@ fun SearchScreen(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = true)
                             ) {
-                                onHandleSearchClickButton(typeBooking.value)
+                                onHandleSearchClickButtonSearch(typeBooking.value)
                             }
                         ,
                         Alignment.Center
@@ -211,6 +293,55 @@ fun SearchScreen(
 
 
     }
+    when(showDatePicker.value){
+        "hourly"-> DatePickerScreen(
+            searchViewModel = searchViewModel,
+            typeBooking = typeBooking.value,
+            visible = visibleDataPicker.value,
+            onCloseCalenderScreen = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            },
+            onHandleClickButtonDelete = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            }
+        )
+        "overnight"-> DateRangePickerScreen(
+            searchViewModel = searchViewModel,
+            typeBooking = typeBooking.value,
+            visible = visibleDataPicker.value,
+            onCloseCalenderScreen = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            },
+            onHandleClickButtonDelete = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            }
+        )
+        "bydate"-> DateRangePickerScreen(
+            searchViewModel = searchViewModel,
+            typeBooking = typeBooking.value,
+            visible = visibleDataPicker.value,
+            onCloseCalenderScreen = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            },
+            onHandleClickButtonDelete = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            }
+        )
+        else ->{
+            showDatePicker.value = ""
+            visibleDataPicker.value = false
+        }
+
+
+    }
+
+
 }
 
 @Composable
