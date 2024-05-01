@@ -35,6 +35,7 @@ import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInList
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInTopBar
+import com.example.jetpackcomposedemo.Screen.Discount.UI_components.showError
 import com.example.jetpackcomposedemo.data.models.Coupon
 import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance
@@ -68,10 +69,12 @@ val whiteColor = Color(android.graphics.Color.parseColor("#FFFFFF"))
 
 // Màn hình
 @Composable
-fun CouponScreen(navController: NavHostController, UserID: Int?) {
+fun CouponScreen(navController: NavHostController?, UserID: Int?) {
   var selectedButtonID by remember { mutableStateOf(buttons.firstOrNull()?.get("ID") as? Int) }
   var lst_coupon = listOf<UserCoupon>()
   var isLoadingAPIDone = true
+  var isError = false
+  var errorMessage: String = ""
   // call api - begin
   val userCouponViewModel: UserCouponViewModel = viewModel(
     factory = UserCouponViewModelFactory(UserCouponRepository(apiService = RetrofitInstance.apiService))
@@ -98,7 +101,8 @@ fun CouponScreen(navController: NavHostController, UserID: Int?) {
 
       Status.ERROR -> {
         // Xử lý khi có lỗi
-        Text(text = "Lỗi: ${couponResource.value?.message}")
+        errorMessage = couponResource.value?.message.toString()
+        isError = true
       }
 
       Status.LOADING -> {
@@ -127,7 +131,7 @@ fun CouponScreen(navController: NavHostController, UserID: Int?) {
         .height(40.dp)
         .clickable {
           // navigate back
-          navController.navigate("discount");
+          navController?.navigate("discount");
         }
       ) {
         Row(
@@ -229,7 +233,7 @@ fun CouponScreen(navController: NavHostController, UserID: Int?) {
                 }
 
                 val handleClickCoupon: () -> Unit = {
-                  navController.navigate("")
+                  navController?.navigate("listroom")
                 }
 
                 ItemInList(
@@ -256,6 +260,19 @@ fun CouponScreen(navController: NavHostController, UserID: Int?) {
       }
     }
   }
+  if(isError) {
+    showError(
+      message = errorMessage,
+      onClickClose = {
+        // Xử lý khi click close
+        Log.e("Close button", "Clicked")
+        isError = false
+        Log.e("Close button", isError.toString())
+        navController?.navigate("home")
+      }
+    )
+  }
+  Log.e("Outside button", isError.toString())
 }
 
 fun selectButton(IDValue: String) {
@@ -265,5 +282,5 @@ fun selectButton(IDValue: String) {
 @Preview(showBackground = true)
 @Composable
 fun CouponScreenDemo() {
-//  CouponScreen(navController)
+  CouponScreen(null, null)
 }
