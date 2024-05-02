@@ -34,10 +34,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.jetpackcomposedemo.R
-import androidx.navigation.NavController
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import com.example.jetpackcomposedemo.R
 
 @Composable
 fun DiscountScreen(
@@ -89,7 +88,7 @@ fun DiscountScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "Ưu đãi",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                                 color = Color.Black.copy(alpha = 0.6f)
                             )
 
@@ -121,7 +120,7 @@ fun DiscountScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "Xu",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                                 color = Color.Black.copy(alpha = 0.6f)
                             )
 
@@ -153,7 +152,7 @@ fun DiscountScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "Tem",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                                 color = Color.Black.copy(alpha = 0.6f)
                             )
 
@@ -359,7 +358,7 @@ fun DiscountScreen(
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Text(
                                     text = "Chương trình",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontSize = 16.sp,
                                 )
                             }
 
@@ -406,7 +405,7 @@ fun DiscountScreen(
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Text(
                                     text = "Sự kiện",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontSize = 16.sp,
                                 )
                             }
 
@@ -452,7 +451,7 @@ fun DiscountScreen(
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Text(
                                     text = "Game hot nhận thưởng",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontSize = 16.sp,
                                 )
                             }
 

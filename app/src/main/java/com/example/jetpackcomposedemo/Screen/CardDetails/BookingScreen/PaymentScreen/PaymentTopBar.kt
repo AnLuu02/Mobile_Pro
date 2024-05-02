@@ -39,12 +39,12 @@ fun PaymentTopBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 40.dp),
+                .padding(top = 48.dp),
         ){
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 12.dp,end=12.dp, bottom = 24.dp)
+                    .padding(start = 12.dp,end=12.dp, bottom = 16.dp)
             ){
                 Box(
                     modifier = Modifier

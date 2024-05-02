@@ -2,7 +2,6 @@ package com.example.jetpackcomposedemo.Screen.Search
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,9 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,13 +41,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.jetpackcomposedemo.data.models.Coupon
-import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
-import com.example.jetpackcomposedemo.data.repository.CouponRepository
-import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModel
-import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModelFactory
-import com.example.jetpackcomposedemo.helpper.Status
+import androidx.compose.ui.unit.sp
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerScreen
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DateRangePickerScreen
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -58,15 +51,20 @@ import com.example.jetpackcomposedemo.helpper.Status
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel,
-    onOpenDatePickerScreen:(String)->Unit,
-    onHandleSearchClickButton:(String)->Unit,
+    onHandleSearchClickButtonSearch:(String)->Unit,
     closeSearchScreen:()->Unit
 ) {
 
+    val showDatePicker = remember{ mutableStateOf("") }
+    val visibleDataPicker = remember{ mutableStateOf(false) }
+
+
+
+
     //////////////////////////demooooooooooo////////////////////////////////////////////
-    val couponViewModel: CouponViewModel = viewModel(
-        factory = CouponViewModelFactory(CouponRepository(apiService = apiService))
-    )
+//    val couponViewModel: CouponViewModel = viewModel(
+//        factory = CouponViewModelFactory(CouponRepository(apiService = apiService))
+//    )
 //    LaunchedEffect(Unit) {
 //        couponViewModel.getCouponList()
 //        }
@@ -117,33 +115,33 @@ fun SearchScreen(
 
 
     //post coupon
-    LaunchedEffect(Unit) {
-        couponViewModel.postCoupon(Coupon(
-            id = null,
-            name = "Quà An tặng",
-            amountDiscount = null,
-            percentDiscount = 50,
-            effectiveDate =  "2024-05-01T00:00:00.000Z",
-            expirationDate = null
-        ))
-    }
-    val newCouponResource = couponViewModel.coupons.observeAsState()
-    when (newCouponResource.value?.status) {
-        Status.SUCCESS -> {
-            // Xử lý dữ liệu khi load thành công
-            newCouponResource.value?.data?.let { coupon ->
-                Log.e("New Coupon", coupon.toString())
-            }
-        }
-        Status.ERROR -> {
-            // Xử lý khi có lỗi
-            Log.e( "Lỗi: ", "${newCouponResource.value?.message}")
-        }
-        Status.LOADING -> {
-        }
-        null ->Log.e( "NULLLL: ", "NHULLLLLLL")
-
-    }
+//    LaunchedEffect(Unit) {
+//        couponViewModel.postCoupon(Coupon(
+//            id = null,
+//            name = "Quà An tặng",
+//            amountDiscount = null,
+//            percentDiscount = 50,
+//            effectiveDate =  "2024-05-01T00:00:00.000Z",
+//            expirationDate = null
+//        ))
+//    }
+//    val newCouponResource = couponViewModel.coupons.observeAsState()
+//    when (newCouponResource.value?.status) {
+//        Status.SUCCESS -> {
+//            // Xử lý dữ liệu khi load thành công
+//            newCouponResource.value?.data?.let { coupon ->
+//                Log.e("New Coupon", coupon.toString())
+//            }
+//        }
+//        Status.ERROR -> {
+//            // Xử lý khi có lỗi
+//            Log.e( "Lỗi: ", "${newCouponResource.value?.message}")
+//        }
+//        Status.LOADING -> {
+//        }
+//        null ->Log.e( "NULLLL: ", "NHULLLLLLL")
+//
+//    }
 
     //////////////////////////demooooooooooo////////////////////////////////////////////
 
@@ -197,7 +195,8 @@ fun SearchScreen(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = true)
                             ) {
-                                onOpenDatePickerScreen(typeBooking.value)
+                                showDatePicker.value = typeBooking.value
+                                visibleDataPicker.value = true
                             }
                     ) {
                         Row(
@@ -275,14 +274,14 @@ fun SearchScreen(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = true)
                             ) {
-                                onHandleSearchClickButton(typeBooking.value)
+                                onHandleSearchClickButtonSearch(typeBooking.value)
                             }
                         ,
                         Alignment.Center
                     ) {
                         Text(
                             text = "Tìm kiếm",
-                            style = MaterialTheme.typography.bodyMedium,
+                            fontSize = 16.sp,
                             color = Color.White,
                             modifier = Modifier
                                 .padding(10.dp)
@@ -295,6 +294,55 @@ fun SearchScreen(
 
 
     }
+    when(showDatePicker.value){
+        "hourly"-> DatePickerScreen(
+            searchViewModel = searchViewModel,
+            typeBooking = typeBooking.value,
+            visible = visibleDataPicker.value,
+            onCloseCalenderScreen = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            },
+            onHandleClickButtonDelete = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            }
+        )
+        "overnight"-> DateRangePickerScreen(
+            searchViewModel = searchViewModel,
+            typeBooking = typeBooking.value,
+            visible = visibleDataPicker.value,
+            onCloseCalenderScreen = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            },
+            onHandleClickButtonDelete = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            }
+        )
+        "bydate"-> DateRangePickerScreen(
+            searchViewModel = searchViewModel,
+            typeBooking = typeBooking.value,
+            visible = visibleDataPicker.value,
+            onCloseCalenderScreen = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            },
+            onHandleClickButtonDelete = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            }
+        )
+        else ->{
+            showDatePicker.value = ""
+            visibleDataPicker.value = false
+        }
+
+
+    }
+
+
 }
 
 @Composable

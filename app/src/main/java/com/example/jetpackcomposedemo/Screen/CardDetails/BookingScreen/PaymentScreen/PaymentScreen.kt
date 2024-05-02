@@ -28,6 +28,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,10 +43,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.PaymentBottomBar
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -55,12 +60,32 @@ fun PaymentScreen(
 ) {
     val listState = rememberLazyListState()
 
+    val dateCheckinString = remember{ mutableStateOf(
+        bookingViewModel.getTimeCheckin()
+            ?: LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    ) }
+    val dateCheckoutString = remember{ mutableStateOf(
+        bookingViewModel.getTimeCheckout()
+            ?: LocalDateTime.now().plusDays(2).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    ) }
+
+    val totalTime = remember{ mutableStateOf(bookingViewModel.getTotalTime() ?: "1")  }
+    val typeBooking = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
+
+
+    val openChooseMethodPayment = remember{ mutableStateOf(false) }
+    val payloadChoose = remember{ mutableStateOf(OptionPayment()) }
+
     Scaffold(
         topBar = {
             PaymentTopBar(navController = navController)
         },
         bottomBar = {
-            PaymentBottomBar(bookingViewModel = bookingViewModel, navController=navController)
+            PaymentBottomBar(bookingViewModel = bookingViewModel,
+                payloadChoose = payloadChoose.value,
+                onChooseMethodPayment = {
+                    openChooseMethodPayment.value = it
+                })
         }
 
     ) { padding ->
@@ -74,7 +99,7 @@ fun PaymentScreen(
         ) {
             item {
                 Spacer(modifier = Modifier.height(10.dp))
-                InfoRoom()
+                InfoRoom(dateCheckinString.value,dateCheckoutString.value,totalTime.value,typeBooking.value)
                 Spacer(modifier = Modifier.height(10.dp))
                 UserBooking()
                 Spacer(modifier = Modifier.height(10.dp))
@@ -89,11 +114,26 @@ fun PaymentScreen(
 
         }
     }
+
+    if(openChooseMethodPayment.value){
+        MethodPaymentScreen(
+            bookingViewModel = bookingViewModel,
+            closeScreenChooseMethodPayment = {
+                openChooseMethodPayment.value = it
+            },
+            onPayloadChoose = {
+                payloadChoose.value = it
+            }
+        )
+    }
 }
 
 @Composable
 fun InfoRoom(
-
+    dateCheckinString:String,
+    dateCheckoutString:String,
+    totalTime:String,
+    typeBooking:String
 ) {
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -111,7 +151,7 @@ fun InfoRoom(
             ) {
                 Text(
                     text = "Lựa chọn của bạn",
-                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                 )
@@ -119,7 +159,7 @@ fun InfoRoom(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp, bottom = 16.dp)
-                        .height(80.dp)
+                        .height(100.dp)
 
                 ) {
                     Row(
@@ -152,7 +192,7 @@ fun InfoRoom(
 
                                 Text(
                                     text = "EASYBOOKING HOTEL",
-                                    style = MaterialTheme.typography.titleMedium,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
@@ -161,7 +201,7 @@ fun InfoRoom(
 
                                 Text(
                                     text = "EASY DELUXE",
-                                    style = MaterialTheme.typography.titleMedium,
+                                    fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
@@ -170,7 +210,7 @@ fun InfoRoom(
 
                                 Text(
                                     text = "273 An Dương Vương, Phường 3, Quận 5, TP HỒ CHÍ MINH",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontSize = 16.sp,
                                     modifier = Modifier
                                 )
 
@@ -204,7 +244,13 @@ fun InfoRoom(
                                 .clip(MaterialTheme.shapes.small)
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.sunsine),
+                                painter = painterResource(
+                                    id =     when(typeBooking){
+                                        "hourly"->R.drawable.sunsine
+                                        "overnight"-> R.drawable.nigh
+                                        else -> R.drawable.daytime
+                                    }
+                                ),
                                 contentDescription = "",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
@@ -221,20 +267,58 @@ fun InfoRoom(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier.align(Alignment.Center)
                             ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.round_dark_mode_24),
-                                    contentDescription = "",
-                                    tint = Color.White
-                                )
-                                Text(
-                                    text = "01 giờ",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    modifier = Modifier
-                                )
+                                when(typeBooking){
+                                    "hourly"->{
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.outline_hourglass_top_24),
+                                            contentDescription = "",
+                                            tint = Color.White
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "${if(totalTime.toInt()<10) "0$totalTime" else totalTime} giờ",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                            modifier = Modifier
+                                        )
+                                    }
+                                    "overnight"->{
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.round_dark_mode_24),
+                                            contentDescription = "",
+                                            tint = Color.White
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "${if(totalTime.toInt()<10) "0$totalTime" else totalTime} đêm",
+                                            fontSize = 16.sp,
+
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                            modifier = Modifier
+                                        )
+                                    }
+                                    else ->{
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.outline_calendar_month_24),
+                                            contentDescription = "",
+                                            tint = Color.White
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "${if(totalTime.toInt()<10) "0$totalTime" else totalTime} ngày",
+                                            fontSize = 16.sp,
+
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                            modifier = Modifier
+                                        )
+                                    }
+                                }
                             }
                         }
+
 
 
                         Box(
@@ -254,31 +338,33 @@ fun InfoRoom(
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
 
-                                Column {
+                                Column(
+                                    verticalArrangement = Arrangement.SpaceBetween,
+                                    horizontalAlignment = Alignment.Start
+                                ) {
                                     Text(
                                         text = "Nhận phòng",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontSize = 14.sp,
                                         color = Color.Black.copy(alpha = 0.6f)
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        text = "22:00  -  22/04/2024",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        text = dateCheckinString,
+                                        fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(12.dp))
 
                                 Column {
                                     Text(
                                         text = "Trả phòng",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontSize = 14.sp,
                                         color = Color.Black.copy(alpha = 0.6f)
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        text = "13:00  -  23/04/2024",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        text = dateCheckoutString,
+                                        fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold
 
                                     )
@@ -314,7 +400,7 @@ fun UserBooking(){
             ) {
                 Text(
                     text = "Người đặt phòng",
-                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                 )
@@ -322,7 +408,7 @@ fun UserBooking(){
 
                 Text(
                     text = "Sửa",
-                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Red
                 )
@@ -340,13 +426,13 @@ fun UserBooking(){
             ) {
                 Text(
                     text = "Số điện thoại",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                 )
 
 
                 Text(
                     text = "+84 918064618",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                 )
 
@@ -364,13 +450,13 @@ fun UserBooking(){
             ) {
                 Text(
                     text = "Họ tên",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                 )
 
 
                 Text(
-                    text = "an",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "Annn",
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
 
                     )
@@ -416,7 +502,7 @@ fun DiscountBooking(){
 
                     Text(
                         text = "Ưu đãi",
-                        style = MaterialTheme.typography.titleMedium,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
                     )
@@ -465,7 +551,7 @@ fun DiscountBooking(){
 
                         Text(
                             text = "Easy Xu",
-                            style = MaterialTheme.typography.titleMedium,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black.copy(alpha = 0.6f),
                             modifier = Modifier
@@ -511,14 +597,65 @@ fun PaymentDetails(){
 
             Text(
                 text = "Chi tiết thanh toán",
-                style = MaterialTheme.typography.titleMedium,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(12.dp, 16.dp, 12.dp, 16.dp)
+                modifier = Modifier.padding(12.dp, 16.dp, 12.dp)
             )
 
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(12.dp, 16.dp, 12.dp, 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Trạng thái",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.W500,
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(painter = painterResource(id = R.drawable.momo), contentDescription = "",modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = "Chưa thanh toán",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.W500
+                    )
+                }
+            }
+
             Divider(
-                modifier = Modifier.fillMaxWidth().height(1.dp).padding(start = 12.dp, end = 12.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .padding(start = 12.dp, end = 12.dp),
+                color = Color.LightGray.copy(0.5f)
             )
+
+
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp, 16.dp, 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Tiền phòng",
+                    fontSize = 16.sp,
+                )
+
+
+                Text(
+                    text = "1.3000.000đ",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+
+                )
+            }
 
             Row(
                 modifier = Modifier
@@ -528,19 +665,26 @@ fun PaymentDetails(){
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Tiền phòng",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "Ưu đãi",
+                    fontSize = 16.sp,
                 )
 
 
                 Text(
-                    text = "1.3000.000đ",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "-80.000đ",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+
                 )
             }
 
             Divider(
-                modifier = Modifier.fillMaxWidth().height(1.dp).padding(start = 12.dp, end = 12.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .padding(start = 12.dp, end = 12.dp),
+                color = Color.LightGray.copy(0.5f)
+
             )
 
             Row(
@@ -552,13 +696,13 @@ fun PaymentDetails(){
             ) {
                 Text(
                     text = "Tổng thanh toán",
-                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = "1.300.000đ",
-                    style = MaterialTheme.typography.titleMedium,
+                    text = "1.220.000đ",
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -579,7 +723,7 @@ fun CanclePolicy(){
 
             Text(
                 text = "Chính sách hủy phòng",
-                style = MaterialTheme.typography.titleMedium,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom =  16.dp)
             )
@@ -587,13 +731,13 @@ fun CanclePolicy(){
             Text(
                 text = "Có thể hủy miễn phí trong vòng 5 phút kể từ thời đểm đặt phòng " +
                         "thành công nhưng thời điểm yêu cầu hủy không được quá giờ nhận phòng.",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
                 modifier = Modifier.padding(bottom =  12.dp)
             )
 
             Text(
                 text = "Lưu ý: Chính sách sẽ không áp dụng khi bạn sử dụng Ưu đãi không hoàn hủy.",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
                 modifier = Modifier.padding(bottom =  12.dp)
             )
 
@@ -611,7 +755,7 @@ fun CanclePolicy(){
 
                 append(" đặt phòng.")
             },
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
                 modifier = Modifier.padding(bottom =  12.dp))
 
             Text(text = buildAnnotatedString{
@@ -626,7 +770,7 @@ fun CanclePolicy(){
                     append("Liên hệ ngay")
                 }
             },
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
                 modifier = Modifier)
 
 

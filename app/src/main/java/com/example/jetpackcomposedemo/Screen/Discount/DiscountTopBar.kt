@@ -16,7 +16,7 @@ fun DiscountTopBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 46.dp, bottom = 16.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 48.dp, bottom = 16.dp)
     ) {
         Text(
             text = "Ưu đãi độc quyền",

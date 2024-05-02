@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,14 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
 
 @Composable
 fun  TopCardDetail(
-    navController: NavHostController,
     listState:LazyListState,
-    cardId:String
+    cardId:String,
+    onBack:()->Unit
 ){
 
     val showBackgroundTopBar = remember { mutableStateOf(false) }
@@ -54,7 +53,7 @@ fun  TopCardDetail(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp,end=16.dp,top=46.dp, bottom = 16.dp)
+                .padding(start = 16.dp,end=16.dp,top=48.dp, bottom = 16.dp)
 
             ,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -68,7 +67,7 @@ fun  TopCardDetail(
                         .size(36.dp)
                         .background(color = Color.White, shape = CircleShape)
                         .clickable {
-                            navController.popBackStack()
+                            onBack()
                         }
                     ,
                     contentAlignment = Alignment.Center
@@ -85,7 +84,7 @@ fun  TopCardDetail(
 
                 Text(
                     text = "LÒNG ĐỀN ĐỎ HOTEL $cardId",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (showBackgroundTopBar.value) Color.Black else Color.White
                 )

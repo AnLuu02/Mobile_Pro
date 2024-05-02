@@ -12,11 +12,11 @@ import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.jetpackcomposedemo.Screen.Search.Bookroom
+import com.example.jetpackcomposedemo.Screen.Search.BookRoom
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import java.time.Instant
 import java.time.LocalDateTime
@@ -35,34 +35,22 @@ fun DateRangePickerCustom(
     onDateCheckinString:(String)->Unit,
     onDateCheckoutString:(String)->Unit,
     onTotalTime:(Long)->Unit,
-    onBookingRoom:(Bookroom)->Unit
+    onBookingRoom:(BookRoom)->Unit
 ){
 
 
     val currentTime = remember { LocalDateTime.now() }
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-    val timeCheckin = remember{ mutableIntStateOf(
-        if(searchViewModel.getOnlyHourBooking(typeBooking).timeCheckin != "Bất kì"){
-            searchViewModel.getOnlyHourBooking(typeBooking).timeCheckin.toInt()
-        }
-        else{
-            currentTime.format(DateTimeFormatter.ofPattern("dd")).toInt()
-        }
+    val timeCheckin = remember{ mutableStateOf(
+        roundUpHour(currentTime,true)
     ) }
 
-    val timeCheckout = remember{ mutableIntStateOf(
-        if(searchViewModel.getOnlyHourBooking(typeBooking).timeCheckOut != "Bất kì"){
-            searchViewModel.getOnlyHourBooking(typeBooking).timeCheckOut.toInt()
-        }
-        else{
-            currentTime.format(DateTimeFormatter.ofPattern("dd")).toInt()
-        }
-    ) }
+    val timeCheckout = timeCheckin.value
 
     var initialSelectedStartDateMillis =
         if (searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckin != "Bất kì")
             searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckin.let {
-                convertStringToTimestamp(
+                convertStringToMillis(
                     it
                 )
             } else currentTime.toMillis()
@@ -70,7 +58,7 @@ fun DateRangePickerCustom(
     var initialSelectedEndDateMillis =
         if( searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckOut != "Bất kì")
             searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckOut.let {
-                convertStringToTimestamp(
+                convertStringToMillis(
                     it
                 )
             } else currentTime.plusDays(3).toMillis()
@@ -114,9 +102,9 @@ fun DateRangePickerCustom(
     if (selectedStart != null) {
         if (selectedEnd != null) {
             onBookingRoom(
-                Bookroom(
-                    timeCheckin = "${formatHourly(timeCheckin.intValue)}, ${selectedStart.format(dateFormatter)}",
-                    timeCheckOut = "${formatHourly(timeCheckout.intValue)}, ${selectedEnd.format(dateFormatter)}",
+                BookRoom(
+                    timeCheckin = "${timeCheckin.value}:00, ${selectedStart.format(dateFormatter)}",
+                    timeCheckOut = "${timeCheckout}:00, ${selectedEnd.format(dateFormatter)}",
                     totalTime = convertMillisToDays(selectedEnd.toMillis() - selectedStart.toMillis())
                 )
             )
@@ -125,7 +113,7 @@ fun DateRangePickerCustom(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
+            .padding(bottom = padding.calculateBottomPadding())
     ) {
         DateRangePicker(
             state = dateRangePickerState,

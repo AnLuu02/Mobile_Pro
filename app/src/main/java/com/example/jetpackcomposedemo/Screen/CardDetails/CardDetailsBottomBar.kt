@@ -26,8 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,27 +34,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun BottomCardDetail(
     bookingViewModel: BookingViewModel,
-    navController:NavHostController
+    dateCheckinString:String,
+    dateCheckoutString:String,
+    totalTime:String,
+    typeBooking:String,
+    onOpenListRoom:()->Unit,
+    openDatePickerBookingScreen:(Boolean)->Unit
 ){
-    val dateCheckinString = remember{ mutableStateOf(
-        bookingViewModel.getTimeCheckin()
-            ?: LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-    ) }
-    val dateCheckoutString = remember{ mutableStateOf(
-        bookingViewModel.getTimeCheckout()
-            ?: LocalDateTime.now().plusDays(2).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-    ) }
-    val totalTime = remember{ mutableStateOf(bookingViewModel.getTotalTime() ?: "1")  }
-    val typeBooking = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
+
 
     Surface(modifier = Modifier
         .fillMaxWidth()
@@ -72,7 +63,7 @@ fun BottomCardDetail(
                     .padding(12.dp)
                     .border(
                         BorderStroke(
-                            1.dp, color = when (typeBooking.value) {
+                            1.dp, color = when (typeBooking) {
                                 "hourly" -> Color.Red
                                 "overnight" -> Color(138, 43, 226)
                                 else -> Color(135, 206, 235)
@@ -81,7 +72,7 @@ fun BottomCardDetail(
                         shape = MaterialTheme.shapes.extraLarge
                     )
                     .background(
-                        color = when (typeBooking.value) {
+                        color = when (typeBooking) {
                             "hourly" -> Color.Red.copy(alpha = 0.1f)
                             "overnight" -> Color(138, 43, 226, alpha = 30)
                             else -> Color(135, 206, 235, alpha = 100)
@@ -97,12 +88,12 @@ fun BottomCardDetail(
                             interactionSource = null,
                             indication = null
                         ) {
-                            navController.navigate("bookingcalender")
+                            openDatePickerBookingScreen(true)
                         }
                     ,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    when(typeBooking.value){
+                    when(typeBooking){
                         "hourly"-> Icon(
                             painter = painterResource(id = R.drawable.outline_hourglass_top_24),
                             contentDescription = "", modifier = Modifier.size(16.dp),
@@ -122,8 +113,8 @@ fun BottomCardDetail(
 
 
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = if(typeBooking.value == "hourly") "${if(totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} giờ"
-                    else "${if(totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} ngày" ,
+                    Text(text = if(typeBooking == "hourly") "${if(totalTime.toInt() < 9) "0${totalTime}" else totalTime} giờ"
+                    else "${if(totalTime.toInt() < 9) "0${totalTime}" else totalTime} ngày" ,
                         style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -138,12 +129,12 @@ fun BottomCardDetail(
                     )
 
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = dateCheckinString.value, style = MaterialTheme.typography.bodyMedium)
+                    Text(text = dateCheckinString, style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.width(6.dp))
 
                     Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = "", modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    dateCheckoutString.value?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                    dateCheckoutString?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
                 }
             }
 
@@ -166,9 +157,7 @@ fun BottomCardDetail(
 
 
                 Button(
-                    onClick = {
-                        navController.navigate("listroom")
-                    },
+                    onClick = onOpenListRoom,
                     modifier = Modifier.clip(MaterialTheme.shapes.small),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Red,

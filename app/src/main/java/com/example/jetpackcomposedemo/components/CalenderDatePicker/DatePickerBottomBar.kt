@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.example.jetpackcomposedemo.Screen.Search.Bookroom
+import com.example.jetpackcomposedemo.Screen.Search.BookRoom
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 
 @Composable
@@ -60,7 +60,7 @@ fun DatePickerBottomBar(
                     indication = rememberRipple(bounded = false)
                 ) {
                     searchViewModel.setSelectedCalendar(typeBooking,
-                        Bookroom(
+                        BookRoom(
                             timeCheckin = "Bất kì",
                             timeCheckOut = "Bất kì",
                             totalTime = 1

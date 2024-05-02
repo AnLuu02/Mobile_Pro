@@ -10,25 +10,33 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MethodPaymentBottomBar(
     bookingViewModel: BookingViewModel,
-    navController:NavHostController,
-    selectedMethodPayment:OptionPayment
+    sheetState:SheetState,
+    selectedMethodPayment:OptionPayment,
+    onPayloadChoose:(OptionPayment)->Unit,
+    closeScreenChooseMethodPayment:(Boolean)->Unit
 ){
+    val coroutineScope = rememberCoroutineScope()
+
     Column(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -48,7 +56,11 @@ fun MethodPaymentBottomBar(
             Button(
                 onClick = {
                     bookingViewModel.setMethodPayment(selectedMethodPayment)
-                    navController.popBackStack()
+                    coroutineScope.launch {
+                        sheetState.hide()
+                        onPayloadChoose(selectedMethodPayment)
+                        closeScreenChooseMethodPayment(false)
+                    }
                 },
                 modifier = Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small),
                 colors = ButtonDefaults.buttonColors(

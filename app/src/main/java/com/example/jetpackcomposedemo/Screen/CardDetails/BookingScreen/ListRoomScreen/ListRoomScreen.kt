@@ -34,7 +34,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Discount
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.WarningAmber
-import androidx.compose.material.icons.rounded.HourglassTop
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -59,9 +58,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBooking.DatePickerBookingScreen
+import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -69,8 +70,10 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ListRoomScreen(
+    searchViewModel: SearchViewModel,
     bookingViewModel: BookingViewModel,
-    navController:NavHostController
+    onOpenPayment:()->Unit,
+    onBack:()->Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -85,9 +88,25 @@ fun ListRoomScreen(
 
     val totalTime = remember{ mutableStateOf(bookingViewModel.getTotalTime() ?: "1")  }
     val typeBooking = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
+
+
+    val openDatePickerBookingScreen = remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(
         topBar = {
-            ListRoomTopBar(listState = listState,navController = navController)
+            ListRoomTopBar(
+                listState = listState,
+                dateCheckinString = dateCheckinString.value,
+                dateCheckoutString = dateCheckoutString.value,
+                totalTime = totalTime.value,
+                typeBooking = typeBooking.value,
+                openDatePickerBookingScreen = {
+                    openDatePickerBookingScreen.value = it
+                },
+                onBack = onBack
+            )
         }
 
     ) { padding ->
@@ -129,7 +148,7 @@ fun ListRoomScreen(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = true)
                             ) {
-                                navController.navigate("bookingcalender")
+                                openDatePickerBookingScreen.value = true
                             }
 
                     ) {
@@ -144,11 +163,23 @@ fun ListRoomScreen(
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.HourglassTop,
-                                        contentDescription = "",
-                                        modifier = Modifier.size(16.dp)
-                                    )
+                                    when(typeBooking.value){
+                                        "hourly"-> Icon(
+                                            painter = painterResource(id = R.drawable.outline_hourglass_top_24),
+                                            contentDescription = "", modifier = Modifier.size(16.dp),
+                                            tint = Color.Red
+                                        )
+                                        "overnight"-> Icon(
+                                            painter = painterResource(id = R.drawable.outline_dark_mode_24),
+                                            contentDescription = "", modifier = Modifier.size(16.dp),
+                                            tint = Color(138, 43, 226)
+                                        )
+                                        else -> Icon(
+                                            painter = painterResource(id = R.drawable.outline_calendar_month_24),
+                                            contentDescription = "", modifier = Modifier.size(16.dp),
+                                            tint = Color(135, 206, 235)
+                                        )
+                                    }
 
                                     Spacer(modifier = Modifier.width(6.dp))
 
@@ -156,7 +187,7 @@ fun ListRoomScreen(
                                         "hourly"->"Theo giờ"
                                         "overnight"->"Qua đêm"
                                         else -> "Theo ngày"
-                                    }, style = MaterialTheme.typography.bodyMedium)
+                                    }, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.W500)
 
                                     Spacer(modifier = Modifier.width(6.dp))
 
@@ -170,12 +201,12 @@ fun ListRoomScreen(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(text = if(typeBooking.value == "hourly") "${if(totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} giờ"
                                     else "${if(totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} ngày",
-                                        style = MaterialTheme.typography.bodyMedium)
+                                        style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.W500)
                                 }
 
                                 Text(
                                     text = "Thay đổi",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.Red
                                 )
@@ -266,17 +297,36 @@ fun ListRoomScreen(
                         }
                     }
                 }
-                CardListRoom(navController)
+                CardListRoom(onOpenPayment)
                 Spacer(modifier = Modifier.height(12.dp))
-                CardListRoom(navController)
+                CardListRoom(onOpenPayment)
                 Spacer(modifier = Modifier.height(12.dp))
-                CardListRoom(navController)
+                CardListRoom(onOpenPayment)
                 Spacer(modifier = Modifier.height(12.dp))
-                CardListRoom(navController)
+                CardListRoom(onOpenPayment)
             }
 
         }
     }
+
+
+
+
+    if(openDatePickerBookingScreen.value){
+        DatePickerBookingScreen(
+            bookingViewModel = bookingViewModel,
+            searchViewModel = searchViewModel,
+            {checkin,checkout,total,type->
+                dateCheckinString.value = checkin
+                dateCheckoutString.value = checkout
+                totalTime.value = total
+                typeBooking.value = type
+            },
+            onCloseDatePicker = {
+                openDatePickerBookingScreen.value = it
+            })
+    }
+
 }
 
 
@@ -303,7 +353,7 @@ val slide = listOf(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CardListRoom(
-    navController:NavHostController
+    onOpenPayment:()->Unit
 ){
     val screenWidth = with(LocalDensity.current) {
         LocalConfiguration.current.screenWidthDp.dp
@@ -313,6 +363,8 @@ fun CardListRoom(
     val pagerState = androidx.compose.foundation.pager.rememberPagerState(0, pageCount = {
         slide.size
     })
+
+    val openAlertDialog = remember { mutableStateOf(false) }
 
 
     Box(
@@ -382,7 +434,7 @@ fun CardListRoom(
 
                             Text(
                                 text = "LỒNG ĐÈN ĐỎ HOTEL",
-                                style = MaterialTheme.typography.titleMedium,
+                                fontSize = 20.sp,
                                 color = Color.Black,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
@@ -392,13 +444,13 @@ fun CardListRoom(
 
                             Text(
                                 text = "Giường đôi",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text(
                                 text = "Wi-Fi miễn phí - Lễ tân 24/24",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                             )
 
                             Spacer(modifier = Modifier.height(20.dp))
@@ -420,7 +472,7 @@ fun CardListRoom(
 
                                         Text(
                                             text = "420.000đ",
-                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontSize = 20.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = Color.Black,
                                         )
@@ -438,7 +490,7 @@ fun CardListRoom(
                                     }
                                     Text(
                                         text = "450.000đ",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontSize = 16.sp,
                                         color = Color.Gray,
                                         textDecoration = TextDecoration.LineThrough
                                     )
@@ -447,7 +499,7 @@ fun CardListRoom(
 
                                 Button(
                                     onClick = {
-                                        navController.navigate("payment")
+                                        openAlertDialog.value = true
                                     },
                                     modifier = Modifier.clip(MaterialTheme.shapes.small),
                                     colors = ButtonDefaults.buttonColors(
@@ -602,6 +654,20 @@ fun CardListRoom(
                 }
             }
         }
+    }
+    if(openAlertDialog.value){
+        AlertDialogExample(
+            onDismissRequest = {
+                openAlertDialog.value = false
+                onOpenPayment()
+            },
+            onConfirmation = {
+                openAlertDialog.value = false
+
+            },
+            dialogTitle = "Yêu cầu thanh toán trả trước",
+            dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
+        )
     }
 }
 

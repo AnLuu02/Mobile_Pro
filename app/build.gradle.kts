@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-
     id("com.google.gms.google-services")
+    id("kotlin-kapt")
 }
 
 android {
@@ -128,4 +128,16 @@ dependencies {
     
     // Video player
     implementation("com.google.android.exoplayer:exoplayer:2.16.1")
+
+    //room database
+    val  room_version = "2.6.1" // Check for the latest version
+
+    implementation ("androidx.room:room-runtime:$room_version")
+    // Optional - Kotlin Extensions and Coroutines support for Room
+    implementation ("androidx.room:room-ktx:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
+
+
+    //permission
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 }

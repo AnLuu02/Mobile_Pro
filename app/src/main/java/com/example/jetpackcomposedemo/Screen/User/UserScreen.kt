@@ -36,6 +36,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
 
 @Composable
@@ -136,7 +137,7 @@ fun SettingElement(
             .fillMaxWidth()) {
             Icon(imageVector = icon, contentDescription = null,tint = Color.Red , modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.width(12.dp))
-            Text(text = text, style = MaterialTheme.typography.bodyMedium,color = Color.Black.copy(0.6f))
+            Text(text = text, fontSize = 16.sp,color = Color.Black.copy(0.6f))
             Spacer(modifier = Modifier.weight(1f))
             if(setting != null) {
                 Text(text = setting, style = MaterialTheme.typography.labelMedium,color = Color.Red, modifier = Modifier.padding(8.dp))

@@ -10,6 +10,13 @@ import retrofit2.http.Query
 
 interface ApiService {
 
+    //User
+    //created user
+    @POST("api/user")
+    suspend fun createUser(@Body user: User): Response<List<User>>
+
+
+
 
     //get all
     // Coupon - begin
@@ -35,4 +42,5 @@ interface ApiService {
 //        @Query("page") page: Int,
 //        @Query("api_key") apiKey: String
 //    ):Products
+
 }

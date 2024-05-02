@@ -1,7 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.Search
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,58 +21,101 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.MethodPaymentBottomBar
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
+import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MethodPaymentScreen(
-    navController:NavHostController,
-    bookingViewModel:BookingViewModel
+    bookingViewModel:BookingViewModel,
+    onPayloadChoose:(OptionPayment)->Unit,
+    closeScreenChooseMethodPayment:(Boolean)->Unit
 ) {
     val listState = rememberLazyListState()
     val selectedMethodPayment = remember {
         mutableStateOf(OptionPayment())
     }
-    Scaffold(
-        topBar = {
-            MethodPaymentTopBar(navController)
-        },
-        bottomBar = {
-            MethodPaymentBottomBar(bookingViewModel,navController,selectedMethodPayment.value)
-        }
 
-    ) { padding ->
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        sheetState.hide()
 
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+    }
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .then(if(sheetState.isVisible) Modifier.background(Color.Black.copy(alpha = 0.3f)) else Modifier)
+
+    ) {
+
+        ModalBottomSheet(
+            sheetState = sheetState,
+            shape = MaterialTheme.shapes.large,
+            scrimColor = Color.Transparent,
+            onDismissRequest = {
+                coroutineScope.launch {
+                    sheetState.hide()
+                    closeScreenChooseMethodPayment(false)
+                }
+            },
+            dragHandle = {
+                MethodPaymentTopBar(
+                    sheetState = sheetState,
+                    closeScreenChooseMethodPayment = closeScreenChooseMethodPayment
+                )
+            },
         ) {
-            item {
-                OptionsSort(bookingViewModel,onHandleChooseMethodPayment={
-                    selectedMethodPayment.value = it
-                })
-            }
+            Scaffold(
+                bottomBar = {
+                    MethodPaymentBottomBar(
+                        bookingViewModel = bookingViewModel,
+                        sheetState = sheetState,
+                        selectedMethodPayment = selectedMethodPayment.value,
+                        closeScreenChooseMethodPayment = closeScreenChooseMethodPayment,
+                        onPayloadChoose = onPayloadChoose
+                    )
+                }
 
+            ) { padding ->
+
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                ) {
+                    item {
+                        OptionsSort(bookingViewModel, onHandleChooseMethodPayment = {
+                            selectedMethodPayment.value = it
+                        })
+                    }
+
+                }
+            }
         }
     }
 }
@@ -127,7 +169,6 @@ fun OptionsSort(
     }
     onHandleChooseMethodPayment(selectedOption.value)
 
-    Log.e("aaaaaa",bookingViewModel.getBookingResult().toString())
     Column(
         modifier = Modifier
             .fillMaxWidth()

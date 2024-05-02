@@ -3,8 +3,6 @@ package com.example.jetpackcomposedemo.Screen.CardDetails
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.jetpackcomposedemo.Screen.Search.Bookroom
-import com.example.jetpackcomposedemo.Screen.Search.FilterRoom
 import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
 
 
