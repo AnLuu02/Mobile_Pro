@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.data.network
 
 import com.example.jetpackcomposedemo.data.models.Coupon
+import com.example.jetpackcomposedemo.data.models.User.User
 import com.example.jetpackcomposedemo.data.models.UserCoupon
 import retrofit2.Response
 import retrofit2.http.Body
