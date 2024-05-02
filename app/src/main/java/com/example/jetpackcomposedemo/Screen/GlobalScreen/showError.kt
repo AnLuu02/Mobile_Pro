@@ -1,6 +1,5 @@
-package com.example.jetpackcomposedemo.Screen.Discount.UI_components
+package com.example.jetpackcomposedemo.Screen.GlobalScreen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.Screen.Discount.UI_components.orangeColor
+import com.example.jetpackcomposedemo.Screen.Discount.UI_components.whiteColor
 
 
 val halfBlackColor = Color(android.graphics.Color.parseColor("#80000000"))

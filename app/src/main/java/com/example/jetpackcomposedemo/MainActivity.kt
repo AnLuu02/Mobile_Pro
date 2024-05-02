@@ -26,6 +26,7 @@ import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
 import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.VideoScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
@@ -76,7 +77,7 @@ fun MainApp(
             val bookingViewModel: BookingViewModel = viewModel()
 
             val loginUiState by loginViewModel1.uiState.collectAsState()
-            NavHost(navController = navController, startDestination = "home" ){
+            NavHost(navController = navController, startDestination = "StartingAppScreen" ){
 
                 //----------------------------------- HOME ------------------------------
                 composable("home"){
@@ -90,7 +91,7 @@ fun MainApp(
                                 navController.navigate("search")
                             }
                         ) } ,
-                        content ={ padding,listState->
+                        content = { padding,listState->
                             HomeScreen(
                                 padding = padding,
                                 listState=listState,
@@ -281,7 +282,9 @@ fun MainApp(
                     CouponScreen(navController, 1)
                 }
 
-
+                composable("StartingAppScreen"){
+                    VideoScreen(navController)
+                }
                 //----------------------------------- USER ------------------------------
                 composable("user"){
                     ScreenWithBottomNavigationBar(

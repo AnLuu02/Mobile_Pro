@@ -35,14 +35,10 @@ import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInList
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInTopBar
-import com.example.jetpackcomposedemo.Screen.Discount.UI_components.showError
-import com.example.jetpackcomposedemo.data.models.Coupon
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.showError
 import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance
-import com.example.jetpackcomposedemo.data.repository.CouponRepository
 import com.example.jetpackcomposedemo.data.repository.UserCouponRepository
-import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModel
-import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModelFactory
 import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModelFactory
 import com.example.jetpackcomposedemo.helpper.Status

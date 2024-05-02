@@ -126,5 +126,6 @@ dependencies {
     implementation ("com.squareup.okhttp3:okhttp:4.11.0")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
     
-
+    // Video player
+    implementation("com.google.android.exoplayer:exoplayer:2.16.1")
 }
