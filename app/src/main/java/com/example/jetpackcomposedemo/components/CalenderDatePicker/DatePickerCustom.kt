@@ -152,17 +152,16 @@ fun DatePickerCustom(
                         title = null,
                         headline = null,
                         showModeToggle = false,
-                        dateValidator = {
-                            val calendarNow = Calendar.getInstance()
-                            with(calendarNow) {
-                                set(Calendar.HOUR_OF_DAY, 0)
-                                set(Calendar.MINUTE, 0)
-                                set(Calendar.SECOND, 0)
-                                set(Calendar.MILLISECOND, 0)
-                            }
-                            return@DatePicker it >= calendarNow.timeInMillis
-
-                        },
+//                        dateValidator = {
+//                            val calendarNow = Calendar.getInstance()
+//                            with(calendarNow) {
+//                                set(Calendar.HOUR_OF_DAY, 0)
+//                                set(Calendar.MINUTE, 0)
+//                                set(Calendar.SECOND, 0)
+//                                set(Calendar.MILLISECOND, 0)
+//                            }
+//                            return@DatePicker it >= calendarNow.timeInMillis
+//                        },
                         colors = DatePickerDefaults.colors(
                             selectedDayContainerColor = Color.Red.copy(alpha = 0.1f),
                             todayDateBorderColor = Color.Transparent,

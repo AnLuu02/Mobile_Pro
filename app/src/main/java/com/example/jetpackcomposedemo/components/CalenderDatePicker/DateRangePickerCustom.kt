@@ -23,6 +23,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Locale
 import java.util.TimeZone
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,7 +70,8 @@ fun DateRangePickerCustom(
             initialDisplayedMonthMillis = null,
             initialSelectedEndDateMillis = initialSelectedEndDateMillis,
             initialDisplayMode = DisplayMode.Picker,
-            yearRange = (currentTime.year..3000)
+            yearRange = (currentTime.year..3000),
+            locale = Locale.KOREAN
         )
     }
 
@@ -119,18 +121,18 @@ fun DateRangePickerCustom(
             state = dateRangePickerState,
             title = null,
             headline = null,
-            dateValidator = {
-                val calendarNow =
-                    Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"))
-                with(calendarNow) {
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }
-                it >= calendarNow.timeInMillis
-
-            },
+//            dateValidator = {
+//                val calendarNow =
+//                    Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"))
+//                with(calendarNow) {
+//                    set(Calendar.HOUR_OF_DAY, 0)
+//                    set(Calendar.MINUTE, 0)
+//                    set(Calendar.SECOND, 0)
+//                    set(Calendar.MILLISECOND, 0)
+//                }
+//                it >= calendarNow.timeInMillis
+//
+//            },
             showModeToggle = false,
             colors = DatePickerDefaults.colors(
                 dayInSelectionRangeContainerColor = Color.Red,
