@@ -125,6 +125,9 @@ dependencies {
     // Logging
     implementation ("com.squareup.okhttp3:okhttp:4.11.0")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
+    
+    // Video player
+    implementation("com.google.android.exoplayer:exoplayer:2.16.1")
 
     //room database
     val  room_version = "2.6.1" // Check for the latest version
@@ -137,5 +140,4 @@ dependencies {
 
     //permission
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
-
 }

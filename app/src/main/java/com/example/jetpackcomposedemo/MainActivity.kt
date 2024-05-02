@@ -24,6 +24,7 @@ import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
 import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.VideoScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
@@ -74,10 +75,7 @@ fun MainApp(
             val searchViewModel: SearchViewModel = viewModel()
             val bookingViewModel: BookingViewModel = viewModel()
             val loginUiState by loginViewModel1.uiState.collectAsState()
-
-
-
-            NavHost(navController = navController, startDestination = "home" ){
+            NavHost(navController = navController, startDestination = "StartingAppScreen" ){
 
 
                 //////////////////////////////// my booking ///////////////////////////
@@ -97,7 +95,7 @@ fun MainApp(
                                 navController.navigate("search")
                             }
                         ) } ,
-                        content ={ padding,listState->
+                        content = { padding,listState->
                             HomeScreen(
                                 navController = navController,
                                 padding = padding,
@@ -174,16 +172,18 @@ fun MainApp(
                 composable("discount"){
                     ScreenWithBottomNavigationBar(navController = navController, topBar = {
                         DiscountTopBar()
-                    }, content = {padding,listState->
+                    }, content = {padding, _->
                         DiscountScreen(padding = padding, navController)
                     })
                 }
 
                 composable("CouponScreen"){
-                    CouponScreen(navController)
+                    CouponScreen(navController, 1)
                 }
 
-
+                composable("StartingAppScreen"){
+                    VideoScreen(navController)
+                }
                 //----------------------------------- USER ------------------------------
                 composable("user"){
                     ScreenWithBottomNavigationBar(

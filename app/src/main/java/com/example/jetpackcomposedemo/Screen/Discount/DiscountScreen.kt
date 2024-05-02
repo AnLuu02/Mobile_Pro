@@ -42,7 +42,6 @@ import com.example.jetpackcomposedemo.R
 fun DiscountScreen(
     padding: PaddingValues,
     navController: NavHostController
-
 ) {
 
     val screenWidth = with(LocalDensity.current) {
