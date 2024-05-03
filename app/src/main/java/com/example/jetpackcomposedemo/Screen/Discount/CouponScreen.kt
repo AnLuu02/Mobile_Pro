@@ -229,7 +229,7 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
                 }
 
                 val handleClickCoupon: () -> Unit = {
-                  navController?.navigate("listroom")
+//                  navController?.navigate("listroom")
                 }
 
                 ItemInList(
@@ -258,17 +258,14 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
   }
   if(isError) {
     showError(
-      message = errorMessage,
+      message = "Error: Connecting to server failed",
       onClickClose = {
         // Xử lý khi click close
-        Log.e("Close button", "Clicked")
         isError = false
-        Log.e("Close button", isError.toString())
         navController?.navigate("home")
       }
     )
   }
-  Log.e("Outside button", isError.toString())
 }
 
 fun selectButton(IDValue: String) {
