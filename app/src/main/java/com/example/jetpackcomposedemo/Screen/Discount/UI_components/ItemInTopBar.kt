@@ -35,7 +35,6 @@ fun ItemInTopBar (
       modifier = Modifier
         .width(150.dp)
         .height(40.dp)
-
     ) {
       Row(
         modifier = Modifier

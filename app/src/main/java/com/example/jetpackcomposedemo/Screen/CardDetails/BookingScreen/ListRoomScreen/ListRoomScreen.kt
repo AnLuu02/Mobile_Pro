@@ -58,6 +58,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBooking.DatePickerBookingScreen
@@ -186,7 +187,7 @@ fun ListRoomScreen(
                                         "hourly"->"Theo giờ"
                                         "overnight"->"Qua đêm"
                                         else -> "Theo ngày"
-                                    }, style = MaterialTheme.typography.bodyMedium)
+                                    }, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.W500)
 
                                     Spacer(modifier = Modifier.width(6.dp))
 
@@ -200,12 +201,12 @@ fun ListRoomScreen(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(text = if(typeBooking.value == "hourly") "${if(totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} giờ"
                                     else "${if(totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} ngày",
-                                        style = MaterialTheme.typography.bodyMedium)
+                                        style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.W500)
                                 }
 
                                 Text(
                                     text = "Thay đổi",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.Red
                                 )
@@ -433,7 +434,7 @@ fun CardListRoom(
 
                             Text(
                                 text = "LỒNG ĐÈN ĐỎ HOTEL",
-                                style = MaterialTheme.typography.titleMedium,
+                                fontSize = 20.sp,
                                 color = Color.Black,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
@@ -443,13 +444,13 @@ fun CardListRoom(
 
                             Text(
                                 text = "Giường đôi",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text(
                                 text = "Wi-Fi miễn phí - Lễ tân 24/24",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                             )
 
                             Spacer(modifier = Modifier.height(20.dp))
@@ -471,7 +472,7 @@ fun CardListRoom(
 
                                         Text(
                                             text = "420.000đ",
-                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontSize = 20.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = Color.Black,
                                         )
@@ -489,7 +490,7 @@ fun CardListRoom(
                                     }
                                     Text(
                                         text = "450.000đ",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontSize = 16.sp,
                                         color = Color.Gray,
                                         textDecoration = TextDecoration.LineThrough
                                     )

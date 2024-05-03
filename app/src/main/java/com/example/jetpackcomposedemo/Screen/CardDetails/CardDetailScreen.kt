@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBooking.DatePickerBookingScreen
@@ -203,12 +204,12 @@ fun CardDetailScreen(
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "4.4",
-                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "(17)",
-                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontSize = 20.sp,
                                     color = Color.Gray
                                 )
                             }
@@ -264,7 +265,7 @@ fun CardDetailScreen(
                         ) {
                             Text(
                                 text = "Địa danh gần khách sạn",
-                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 14.sp,
                                 color = Color.Gray,
                                 fontWeight = FontWeight.Bold
                             )
@@ -275,7 +276,7 @@ fun CardDetailScreen(
 
                                 Text(
                                     text = "Xem tất cả",
-                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 14.sp,
                                     color = Color.Red,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -284,7 +285,7 @@ fun CardDetailScreen(
                                     imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos,
                                     contentDescription = "",
                                     tint = Color.Red,
-                                    modifier = Modifier.size(10.dp)
+                                    modifier = Modifier.size(16.dp)
 
                                 )
                             }
@@ -309,13 +310,13 @@ fun CardDetailScreen(
                         ) {
                             Text(
                                 text = "Phòng tập California Gym & Fitness",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             Text(
                                 text = "0.16 km",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -331,13 +332,13 @@ fun CardDetailScreen(
                         ) {
                             Text(
                                 text = "Siêu thị Sài Gòn",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             Text(
                                 text = "0.18 km",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -352,13 +353,13 @@ fun CardDetailScreen(
                         ) {
                             Text(
                                 text = "Co.opXtra",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             Text(
                                 text = "0.18 km",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -437,7 +438,7 @@ fun DiscountTickets(){
 
                 Text(
                     text = "Giảm giá 5% tối đa 20k, đặt tối thiểu 150k",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Light
                 )
 
@@ -476,7 +477,7 @@ fun Evaluate(){
                 Column {
                     Text(
                         text ="Tuyệt vời",
-                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
 
@@ -515,7 +516,7 @@ fun Evaluate(){
 
                     Text(
                         text = "Xem tất cả",
-                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 16.sp,
                         color = Color.Red,
                         fontWeight = FontWeight.Bold
                     )
@@ -609,7 +610,7 @@ fun Comment(){
 
             Text(
                 text ="Dâu bé",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
                 color = Color.Gray
             )
 
@@ -620,7 +621,7 @@ fun Comment(){
 
         Text(
             text ="Ks cực kì tốt luôn. 100/100 điểm nha. Sẽ là khách quen của ks luôn hihi",
-            style = MaterialTheme.typography.bodyMedium,
+            fontSize = 16.sp,
             color = Color.Gray
         )
     }
@@ -638,7 +639,7 @@ fun Introduce(){
         ) {
             Text(
                 text ="Giới thiệu",
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -651,7 +652,7 @@ fun Introduce(){
 
                 Text(
                     text ="HOTLINE:",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     textDecoration = TextDecoration.Underline,
                     fontWeight = FontWeight.Bold
                 )
@@ -660,7 +661,7 @@ fun Introduce(){
 
                 Text(
                     text ="0918064618",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                 )
 
 
@@ -684,7 +685,7 @@ fun Introduce(){
 
                     append(" 243/2/30 đường Chu Văn An, phường 12, quận Bình Thạnh")
                 },
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
 
                     )
             }
@@ -707,7 +708,7 @@ fun Introduce(){
 
                     append(" Mặt tiền 4 phía, 5 lầu, cách chợ vài trăm mét aaaaaaaaaaaaaaaaaaaaaaaaaa")
                 },
-                    style = MaterialTheme.typography.bodyMedium
+                    fontSize = 16.sp,
 
                 )
 
@@ -730,7 +731,7 @@ fun CheckInCheckOut(){
         ) {
             Text(
                 text ="Giờ nhận phòng/trả phòng",
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -743,14 +744,14 @@ fun CheckInCheckOut(){
             ) {
                 Text(
                     text = "Loại đặt phòng",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
                     text = "Thời gian",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
                 )
@@ -775,13 +776,13 @@ fun CheckInCheckOut(){
             ) {
                 Text(
                     text = "Theo giờ",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
                     text = "Từ 07:00 đến 22:00",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -797,13 +798,13 @@ fun CheckInCheckOut(){
             ) {
                 Text(
                     text = "Qua đêm",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
                     text = "Từ 22:00 đến 12:00",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -819,13 +820,13 @@ fun CheckInCheckOut(){
             ) {
                 Text(
                     text = "Theo ngày",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
                     text = "Từ 13:00 đến 12:00",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -849,7 +850,7 @@ fun PolicyHotel(){
         ) {
             Text(
                 text ="Chính sách khách sạn",
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -858,7 +859,7 @@ fun PolicyHotel(){
 
             Text(
                 text ="Chính sách:",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold
             )
@@ -867,13 +868,13 @@ fun PolicyHotel(){
 
             Text(
                 text ="- Đối với khách lưu trú qua đêm: Khách cần cung cấp CMND/CCCD/PASSPORT cho lễ tân.",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
             )
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
                 text ="- Khách phải từ 18 tuổi trở lên mới có thể nhận phòng.",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
             )
 
         }
@@ -894,7 +895,7 @@ fun RefundAndCancellationPolicy(){
         ) {
             Text(
                 text ="Chính sách hoàn hủy",
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -902,7 +903,7 @@ fun RefundAndCancellationPolicy(){
 
             Text(
                 text ="Hủy miễn phí trước giờ nhận phòng 1 tiếng",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
             )
 
         }

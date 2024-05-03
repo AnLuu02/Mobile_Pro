@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerScreen
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DateRangePickerScreen
 
@@ -280,7 +281,7 @@ fun SearchScreen(
                     ) {
                         Text(
                             text = "Tìm kiếm",
-                            style = MaterialTheme.typography.bodyMedium,
+                            fontSize = 16.sp,
                             color = Color.White,
                             modifier = Modifier
                                 .padding(10.dp)

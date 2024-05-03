@@ -35,21 +35,13 @@ import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInList
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInTopBar
-import com.example.jetpackcomposedemo.data.models.Coupon
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.showError
+import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance
-import com.example.jetpackcomposedemo.data.repository.CouponRepository
-import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModel
-import com.example.jetpackcomposedemo.data.viewmodel.CouponViewModelFactory
+import com.example.jetpackcomposedemo.data.repository.UserCouponRepository
+import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModelFactory
 import com.example.jetpackcomposedemo.helpper.Status
-
-// Xử lý chức năng
-val showDetailCoupon: () -> Unit = {
-
-}
-
-val handleClickCoupon: () -> Unit = {
-
-}
 
 val buttons = listOf(
   mapOf<String, Any>(
@@ -73,98 +65,50 @@ val whiteColor = Color(android.graphics.Color.parseColor("#FFFFFF"))
 
 // Màn hình
 @Composable
-fun CouponScreen(navController: NavHostController) {
+fun CouponScreen(navController: NavHostController?, UserID: Int?) {
   var selectedButtonID by remember { mutableStateOf(buttons.firstOrNull()?.get("ID") as? Int) }
-  var lst_coupon = listOf<Coupon>()
+  var lst_coupon = listOf<UserCoupon>()
   var isLoadingAPIDone = true
+  var isError = false
+  var errorMessage: String = ""
   // call api - begin
-  val couponViewModel: CouponViewModel = viewModel(
-    factory = CouponViewModelFactory(CouponRepository(apiService = RetrofitInstance.apiService))
+  val userCouponViewModel: UserCouponViewModel = viewModel(
+    factory = UserCouponViewModelFactory(UserCouponRepository(apiService = RetrofitInstance.apiService))
   )
   LaunchedEffect(Unit) {
-    couponViewModel.getCouponList()
+    if(UserID != null) {
+      userCouponViewModel.getListCouponOfUser(UserID.toString())
+      Log.e("<UserID>", UserID.toString())
+    }
   }
-  val couponResource = couponViewModel.couponList.observeAsState()
+  val couponResource = userCouponViewModel.list.observeAsState()
 
   // Xử lý UI dựa trên trạng thái của Resource
-  when (couponResource.value?.status) {
-    Status.SUCCESS -> {
-      // Xử lý dữ liệu khi load thành công
-      couponResource.value?.data?.let { coupons ->
-        Log.e("List Coupon", coupons.toString())
-        lst_coupon = coupons
-        isLoadingAPIDone = true
+  if(UserID != null) {
+    when (couponResource.value?.status) {
+      Status.SUCCESS -> {
+        // Xử lý dữ liệu khi load thành công
+        couponResource.value?.data?.let { list ->
+          Log.e("List Coupon", list.toString())
+          lst_coupon = list
+          isLoadingAPIDone = true
+        }
       }
+
+      Status.ERROR -> {
+        // Xử lý khi có lỗi
+        errorMessage = couponResource.value?.message.toString()
+        isError = true
+      }
+
+      Status.LOADING -> {
+        // Xử lý trạng thái đang tải
+
+      }
+
+      null -> Text(text = "Lỗi: nuklklklklklklklklklklklklklklklklklklkl")
     }
-
-    Status.ERROR -> {
-      // Xử lý khi có lỗi
-      Text(text = "Lỗi: ${couponResource.value?.message}")
-    }
-
-    Status.LOADING -> {
-      // Xử lý trạng thái đang tải
-
-    }
-
-    null -> Text(text = "Lỗi: nuklklklklklklklklklklklklklklklklklklkl")
   }
-
-
-  //get by id
-//    LaunchedEffect(Unit) {
-//        couponViewModel.getCouponsById("1")
-//    }
-//    val couponResourceById = couponViewModel.coupons.observeAsState()
-//    Log.e("couponResourceById",couponResourceById.toString())
-//    when (couponResourceById.value?.status) {
-//        Status.SUCCESS -> {
-//            // Xử lý dữ liệu khi load thành công
-//            couponResourceById.value?.data?.let { coupon ->
-//                Log.e("ResourceByID", coupon.toString())
-//            }
-//        }
-//        Status.ERROR -> {
-//            // Xử lý khi có lỗi
-//            Log.e( "Lỗi: ", "${couponResourceById.value?.message}")
-//        }
-//        Status.LOADING -> {
-//        }
-//        null ->Log.e( "NULLLL: ", "NHULLLLLLL")
-//
-//    }
-
-
-  //post coupon
-//  LaunchedEffect(Unit) {
-//    couponViewModel.postCoupon(
-//      Coupon(
-//      id = null,
-//      name = "Quà An tặng",
-//      amountDiscount = null,
-//      percentDiscount = 50,
-//      effectiveDate =  "2024-05-01T00:00:00.000Z",
-//      expirationDate = null
-//    )
-//    )
-//  }
-//  val newCouponResource = couponViewModel.coupons.observeAsState()
-//  when (newCouponResource.value?.status) {
-//    Status.SUCCESS -> {
-//      // Xử lý dữ liệu khi load thành công
-//      newCouponResource.value?.data?.let { coupon ->
-//        Log.e("New Coupon", coupon.toString())
-//      }
-//    }
-//    Status.ERROR -> {
-//      // Xử lý khi có lỗi
-//      Log.e( "Lỗi: ", "${newCouponResource.value?.message}")
-//    }
-//    Status.LOADING -> {
-//    }
-//    null ->Log.e( "NULLLL: ", "NHULLLLLLL")
-//
-//  }
   // call api - end
 
   Column(
@@ -183,7 +127,7 @@ fun CouponScreen(navController: NavHostController) {
         .height(40.dp)
         .clickable {
           // navigate back
-          navController.navigate("discount");
+          navController?.navigate("discount");
         }
       ) {
         Row(
@@ -229,19 +173,23 @@ fun CouponScreen(navController: NavHostController) {
         .height(40.dp),
       horizontalArrangement = Arrangement.SpaceAround
     ) {
-      buttons.forEach { button ->
-        val idValue = button["ID"] as Int
-        val textValue = button["Text"] as String
+      if(UserID == null) {
+        Text("Hãy đăng nhập để sử dụng tính năng này!")
+      } else {
+        buttons.forEach { button ->
+          val idValue = button["ID"] as Int
+          val textValue = button["Text"] as String
 
-        Box(
-          modifier = Modifier
-            .width(150.dp)
-            .height(40.dp)
-            .clickable {
-              selectedButtonID = idValue
-            }
-        ) {
-          ItemInTopBar(isActive = selectedButtonID == idValue, textShow = textValue)
+          Box(
+            modifier = Modifier
+              .width(150.dp)
+              .height(40.dp)
+              .clickable {
+                selectedButtonID = idValue
+              }
+          ) {
+            ItemInTopBar(isActive = selectedButtonID == idValue, textShow = textValue)
+          }
         }
       }
     }
@@ -257,44 +205,70 @@ fun CouponScreen(navController: NavHostController) {
           .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
-        if (isLoadingAPIDone) {
-          if (selectedButtonID == 0) {
-            for ((index, coupon) in lst_coupon.withIndex()) {
-              var showDiscount = ""
-              var showExpDate = ""
-              if (coupon.amountDiscount == 0F || coupon.amountDiscount == null) {
-                showDiscount = coupon.percentDiscount.toString() + "%"
-              } else {
-                var temp = coupon.amountDiscount / 1000F
-                showDiscount = temp.toInt().toString() + "K"
-              }
+        if(UserID == null) {
 
-              if (coupon.expirationDate == null) {
-                showExpDate = "None"
+        } else {
+          if (isLoadingAPIDone) {
+            if (selectedButtonID == 0) {
+              for ((index, coupon) in lst_coupon.withIndex()) {
+                var showDiscount = ""
+                var showExpDate = ""
+                if (coupon.amountDiscount == 0F || coupon.amountDiscount == null) {
+                  showDiscount = coupon.percentDiscount.toString() + "%"
+                } else {
+                  var temp = coupon.amountDiscount / 1000F
+                  showDiscount = temp.toInt().toString() + "K"
+                }
+
+                if (coupon.expirationDate == null) {
+                  showExpDate = "None"
+                }
+
+                val showDetailCoupon: () -> Unit = {
+
+                }
+
+                val handleClickCoupon: () -> Unit = {
+                  navController?.navigate("listroom")
+                }
+
+                ItemInList(
+                  nameDiscount = coupon.name,
+                  amountDiscount = showDiscount,
+                  dateExp = showExpDate,
+                  doLeft = showDetailCoupon,
+                  doRight = handleClickCoupon
+                )
+                if (index != lst_coupon.size - 1) {
+                  Spacer(modifier = Modifier.height(10.dp))
+                }
               }
-              ItemInList(
-                nameDiscount = coupon.name,
-                amountDiscount = showDiscount,
-                dateExp = showExpDate,
-                doLeft = showDetailCoupon,
-                doRight = handleClickCoupon
-              )
-              if (index != lst_coupon.size - 1) {
-                Spacer(modifier = Modifier.height(10.dp))
-              }
+            } else if (selectedButtonID == 1) {
+
+            } else {
+              Text("Empty")
             }
-          } else if (selectedButtonID == 1) {
 
           } else {
             Text("Empty")
           }
-
-        } else {
-          Text("Empty")
         }
       }
     }
   }
+  if(isError) {
+    showError(
+      message = errorMessage,
+      onClickClose = {
+        // Xử lý khi click close
+        Log.e("Close button", "Clicked")
+        isError = false
+        Log.e("Close button", isError.toString())
+        navController?.navigate("home")
+      }
+    )
+  }
+  Log.e("Outside button", isError.toString())
 }
 
 fun selectButton(IDValue: String) {
@@ -304,5 +278,5 @@ fun selectButton(IDValue: String) {
 @Preview(showBackground = true)
 @Composable
 fun CouponScreenDemo() {
-//  CouponScreen(navController)
+  CouponScreen(null, null)
 }
