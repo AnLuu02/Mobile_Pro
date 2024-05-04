@@ -12,12 +12,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
@@ -29,7 +32,7 @@ import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
-import com.example.jetpackcomposedemo.Screen.Search.ListRoomScreen
+import com.example.jetpackcomposedemo.Screen.Search.ChooseDiscountScreen
 import com.example.jetpackcomposedemo.Screen.Search.MyBookingScreen
 import com.example.jetpackcomposedemo.Screen.Search.PaymentScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScreen
@@ -42,21 +45,41 @@ import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
+import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
+import com.example.jetpackcomposedemo.data.repository.RoomRepository
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModelFactory
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         setContent {
-//            val data = listOf(1,2,3,4,5,6)
-//            LazyRow {
-//                items(data.size){
-//                    AnimatedShimmer(it,data)
+            val context = LocalContext.current
+//            val db = RemindersDB.getInstance(context)
+//            val reminderRepository = ReminderRepository(db)
+//            val myViewModel = ReminderViewModel(reminderRepository)
+//            val reminders by myViewModel.reminders.collectAsState(initial = emptyList())
 //
-//                }
-//
+//           if(reminders.isNotEmpty()){
+//               reminders.forEach{
+//                   ScheduleNotification(context, it.time)
+//                   myViewModel.deleteReminder(ReminderEntity(it.id,it.time))
+//               }
+//           }
+            val delayInMillis = TimeUnit.SECONDS.toMillis(30)
+            val notificationWorkRequest = OneTimeWorkRequestBuilder<NotifyWorker>()
+                .setInitialDelay(delayInMillis, TimeUnit.MILLISECONDS) // Đặt độ trễ ban đầu là 30 giây
+                .build()
+
+            WorkManager.getInstance(context).enqueue(notificationWorkRequest)
+
             MainApp()
+//            HomeScreenReminder()
         }
     }
 }
@@ -74,8 +97,9 @@ fun MainApp(
             val searchViewModel: SearchViewModel = viewModel()
             val bookingViewModel: BookingViewModel = viewModel()
             val loginUiState by loginViewModel1.uiState.collectAsState()
-
-
+            val roomViewModel: RoomViewModel = viewModel(
+                factory = RoomViewModelFactory(RoomRepository(apiService = apiService))
+            )
 
             NavHost(navController = navController, startDestination = "home" ){
 
@@ -99,6 +123,7 @@ fun MainApp(
                         ) } ,
                         content ={ padding,listState->
                             HomeScreen(
+                                roomViewModel = roomViewModel,
                                 navController = navController,
                                 padding = padding,
                                 listState=listState,
@@ -142,11 +167,12 @@ fun MainApp(
                     SearchResultScreen(
                         typeBooking = typeBooking,
                         searchViewModel = searchViewModel,
+                        roomViewModel = roomViewModel,
                         onBackSearchScreen = {
                             navController.popBackStack()
                         },
                         onOpenSearchScreen = {
-                            navController.popBackStack("search",inclusive = false)
+                            navController.navigate("search")
                         }
                     )
                 }
@@ -233,32 +259,16 @@ fun MainApp(
                 ) { backStackEntry ->
 
                     val roomId = backStackEntry.arguments?.getString("roomId")
+
                     CardDetailScreen(
+                        loginUiState = loginUiState,
                         searchViewModel = searchViewModel,
                         bookingViewModel=bookingViewModel,
-                        roomId = roomId,
-                        onOpenListRoom = {
-                            navController.navigate("roomDetails/$roomId/listroom")
+                        roomViewModel = roomViewModel,
+                        roomId = roomId.toString(),
+                        onOpenLoginScreen = {
+                            navController.navigate("login")
                         },
-                        onBack = {
-                            navController.popBackStack()
-                        }
-                    )
-                }
-
-                //----------------------------------- Booking ------------------------------
-                composable(
-                    "roomDetails/{roomId}/listroom",
-                    arguments = listOf(
-                        navArgument("roomId") {
-                            type = NavType.StringType
-                        })
-                ){ backStackEntry ->
-
-                    val roomId = backStackEntry.arguments?.getString("roomId")
-                    ListRoomScreen(
-                        searchViewModel = searchViewModel,
-                        bookingViewModel,
                         onOpenPayment = {
                             navController.navigate("roomDetails/$roomId/payment")
                         },
@@ -267,6 +277,28 @@ fun MainApp(
                         }
                     )
                 }
+
+                //----------------------------------- Booking ------------------------------
+//                composable(
+//                    "roomDetails/{roomId}/listroom",
+//                    arguments = listOf(
+//                        navArgument("roomId") {
+//                            type = NavType.StringType
+//                        })
+//                ){ backStackEntry ->
+//
+//                    val roomId = backStackEntry.arguments?.getString("roomId")
+//                    ListRoomScreen(
+//                        searchViewModel = searchViewModel,
+//                        bookingViewModel,
+//                        onOpenPayment = {
+//                            navController.navigate("roomDetails/$roomId/payment")
+//                        },
+//                        onBack = {
+//                            navController.popBackStack()
+//                        }
+//                    )
+//                }
 
                 composable(
                     "roomDetails/{roomId}/payment",
@@ -278,6 +310,11 @@ fun MainApp(
 
                     val roomId = backStackEntry.arguments?.getString("roomId")
                     PaymentScreen(bookingViewModel,navController)
+                }
+                composable(
+                    "roomDetails/chooseDiscount",
+                ){
+                    ChooseDiscountScreen(bookingViewModel = bookingViewModel, navController = navController)
                 }
             }
         }

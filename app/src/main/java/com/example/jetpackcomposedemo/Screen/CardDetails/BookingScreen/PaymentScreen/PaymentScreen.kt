@@ -4,6 +4,8 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -45,11 +48,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Scale
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.PaymentBottomBar
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
+import com.example.jetpackcomposedemo.data.models.Room.Room
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -60,22 +66,15 @@ fun PaymentScreen(
 ) {
     val listState = rememberLazyListState()
 
-    val dateCheckinString = remember{ mutableStateOf(
-        bookingViewModel.getTimeCheckin()
-            ?: LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-    ) }
-    val dateCheckoutString = remember{ mutableStateOf(
-        bookingViewModel.getTimeCheckout()
-            ?: LocalDateTime.now().plusDays(2).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-    ) }
-
-    val totalTime = remember{ mutableStateOf(bookingViewModel.getTotalTime() ?: "1")  }
-    val typeBooking = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
+    val dateCheckinString = bookingViewModel.getTimeCheckin()
+    val dateCheckoutString = bookingViewModel.getTimeCheckout()
+    val totalTime = bookingViewModel.getTotalTime()
+    val typeBooking = bookingViewModel.getTypeBooking()
+    val infoRoom = bookingViewModel.getInfoRoom()
 
 
     val openChooseMethodPayment = remember{ mutableStateOf(false) }
     val payloadChoose = remember{ mutableStateOf(OptionPayment()) }
-
     Scaffold(
         topBar = {
             PaymentTopBar(navController = navController)
@@ -98,17 +97,19 @@ fun PaymentScreen(
                 .background(Color.LightGray.copy(alpha = 0.3f))
         ) {
             item {
-                Spacer(modifier = Modifier.height(10.dp))
-                InfoRoom(dateCheckinString.value,dateCheckoutString.value,totalTime.value,typeBooking.value)
-                Spacer(modifier = Modifier.height(10.dp))
-                UserBooking()
-                Spacer(modifier = Modifier.height(10.dp))
-                DiscountBooking()
-                Spacer(modifier = Modifier.height(10.dp))
-                PaymentDetails()
-                Spacer(modifier = Modifier.height(10.dp))
-                CanclePolicy()
-                Spacer(modifier = Modifier.height(10.dp))
+                if (infoRoom != null) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    InfoRoom(infoRoom = infoRoom,dateCheckinString.toString(),dateCheckoutString.toString(),totalTime.toString(),typeBooking.toString())
+                    Spacer(modifier = Modifier.height(10.dp))
+                    UserBooking()
+                    Spacer(modifier = Modifier.height(10.dp))
+                    DiscountBooking(navController = navController)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    PaymentDetails(infoRoom = infoRoom)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    CanclePolicy()
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
 
             }
 
@@ -130,6 +131,7 @@ fun PaymentScreen(
 
 @Composable
 fun InfoRoom(
+    infoRoom:Room,
     dateCheckinString:String,
     dateCheckoutString:String,
     totalTime:String,
@@ -171,12 +173,14 @@ fun InfoRoom(
                                 .weight(1f),
                             shape = MaterialTheme.shapes.small
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.hotel_2),
-                                contentScale = ContentScale.Crop,
-                                contentDescription = null,
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                                    .crossfade(true).data(infoRoom.images?.get(0)).build(),
+                                contentDescription = "",
                                 modifier = Modifier.fillMaxSize(),
-                            )
+                                contentScale = ContentScale.Crop,
+
+                                )
                         }
 
                         Box(
@@ -200,7 +204,7 @@ fun InfoRoom(
                                 )
 
                                 Text(
-                                    text = "EASY DELUXE",
+                                    text = infoRoom.name.toString(),
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                     maxLines = 1,
@@ -210,7 +214,7 @@ fun InfoRoom(
 
                                 Text(
                                     text = "273 An Dương Vương, Phường 3, Quận 5, TP HỒ CHÍ MINH",
-                                    fontSize = 16.sp,
+                                    fontSize = 12.sp,
                                     modifier = Modifier
                                 )
 
@@ -350,7 +354,7 @@ fun InfoRoom(
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = dateCheckinString,
-                                        fontSize = 14.sp,
+                                        fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
@@ -364,7 +368,7 @@ fun InfoRoom(
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = dateCheckoutString,
-                                        fontSize = 14.sp,
+                                        fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold
 
                                     )
@@ -470,7 +474,9 @@ fun UserBooking(){
 }
 
 @Composable
-fun DiscountBooking(){
+fun DiscountBooking(
+    navController:NavHostController
+){
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -483,6 +489,12 @@ fun DiscountBooking(){
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp, 16.dp, 12.dp, 16.dp)
+                    .clickable(
+                        interactionSource = remember{ MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        navController.navigate("roomDetails/chooseDiscount")
+                    }
                 ,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -494,7 +506,7 @@ fun DiscountBooking(){
                     Icon(painter = painterResource(id = R.drawable.outline_local_offer_24),
                         contentDescription = "",
                         tint = Color.Red,
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier.size(24.dp)
 
                     )
 
@@ -585,7 +597,9 @@ fun DiscountBooking(){
 }
 
 @Composable
-fun PaymentDetails(){
+fun PaymentDetails(
+    infoRoom: Room
+){
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -650,7 +664,7 @@ fun PaymentDetails(){
 
 
                 Text(
-                    text = "1.3000.000đ",
+                    text = infoRoom.roomTypes?.let { formatCurrencyVND(it.prices) }.toString(),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
 

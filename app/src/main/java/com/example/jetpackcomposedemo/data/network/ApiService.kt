@@ -1,7 +1,7 @@
 package com.example.jetpackcomposedemo.data.network
 
 import com.example.jetpackcomposedemo.data.models.Coupon
-import com.example.jetpackcomposedemo.data.models.User.User
+import com.example.jetpackcomposedemo.data.models.Room.Room
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -10,12 +10,12 @@ import retrofit2.http.Query
 
 interface ApiService {
 
-    //User
-    //created user
-    @POST("api/user")
-    suspend fun createUser(@Body user: User): Response<List<User>>
-
-
+    /////////////////////// data lít Room ///////////////////////////////////////
+    @GET("api/rooms")
+    suspend fun getRooms(): Response<List<Room>>
+    //// get room by id ////
+    @GET("api/room")
+    suspend fun getRoomsById(@Query("id") id:String): Response<List<Room>>
 
 
     //get all

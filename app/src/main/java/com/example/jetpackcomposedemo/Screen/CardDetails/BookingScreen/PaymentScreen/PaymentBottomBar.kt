@@ -149,7 +149,7 @@ fun PaymentBottomBar(
                     Text(text = "Tổng thanh toán", style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    Text(text = "420.000đ", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(text = "1.220.000đ", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 }
 
                 Button(

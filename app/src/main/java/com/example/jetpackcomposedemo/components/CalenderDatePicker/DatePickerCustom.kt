@@ -104,20 +104,20 @@ fun DatePickerCustom(
     val currentHourly = if(selectedDate?.format(DateTimeFormatter.ofPattern("dd")) == currentDay) roundUpHour(currentTime,true).toInt() else 0
 
     val dateCheckinString = if(searchViewModel.getDateNotYear(typeBooking).timeCheckin == "Bất kì")
-        "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
-    else if("${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}" != searchViewModel.getDateNotYear(typeBooking).timeCheckin
+        "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(dateFormatter)}"
+    else if("${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(dateFormatter)}" != searchViewModel.getDateNotYear(typeBooking).timeCheckin
     ){
-        "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
+        "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(dateFormatter)}"
     }
     else searchViewModel.getDateNotYear(typeBooking).timeCheckin
 
 
     val dateCheckoutString = if(searchViewModel.getDateNotYear(typeBooking).timeCheckOut == "Bất kì")
-        "${formatHourly(timeCheckout)}, ${newDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
+        "${formatHourly(timeCheckout)}, ${newDate?.format(dateFormatter)}"
     else if(
-        "${formatHourly(timeCheckout)}, ${newDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}" != searchViewModel.getDateNotYear(typeBooking).timeCheckOut
+        "${formatHourly(timeCheckout)}, ${newDate?.format(dateFormatter)}" != searchViewModel.getDateNotYear(typeBooking).timeCheckOut
     ){
-        "${formatHourly(timeCheckout)}, ${newDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
+        "${formatHourly(timeCheckout)}, ${newDate?.format(dateFormatter)}"
 
     }
     else

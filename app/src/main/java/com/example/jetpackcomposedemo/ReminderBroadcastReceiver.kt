@@ -9,15 +9,18 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.core.app.NotificationCompat
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.toMillis
+import java.time.LocalDateTime
 
 class ReminderBroadcastReceiver : BroadcastReceiver() {
     @SuppressLint("ServiceCast")
     override fun onReceive(context: Context, intent: Intent) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "Channel Name"
             val descriptionText = "Channel Description"
@@ -29,7 +32,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
         }
 
         val builder = NotificationCompat.Builder(context, "CHANNEL_ID")
-            .setSmallIcon(R.drawable.logo_app)
+            .setSmallIcon(R.drawable.email_icon)
             .setContentTitle("Check-in Reminder")
             .setContentText("Your hotel check-in is today at 12:00 PM.")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -38,8 +41,10 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
     }
 
 }
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
 @SuppressLint("ServiceCast", "ScheduleExactAlarm")
-fun scheduleNotification(context: Context, timeInMillis: Long) {
+fun ScheduleNotification(context: Context, timeInMillis: Long) {
     val intent = Intent(context, ReminderBroadcastReceiver::class.java)
     val pendingIntent = PendingIntent.getBroadcast(
         context,
@@ -49,11 +54,18 @@ fun scheduleNotification(context: Context, timeInMillis: Long) {
     )
 
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    alarmManager.setExactAndAllowWhileIdle(
-        AlarmManager.RTC_WAKEUP,
-        timeInMillis,
-        pendingIntent
-    )
+
+    val currentTime = remember { LocalDateTime.now() }
+
+    if((timeInMillis - currentTime.toMillis()).toInt() == 0){
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            timeInMillis,
+            pendingIntent
+        )
+    }
+
+
 }
 //
 //package com.example.jetpackcomposedemo

@@ -316,6 +316,7 @@ fun ListRoomScreen(
         DatePickerBookingScreen(
             bookingViewModel = bookingViewModel,
             searchViewModel = searchViewModel,
+            typeBooking = typeBooking.value,
             {checkin,checkout,total,type->
                 dateCheckinString.value = checkin
                 dateCheckoutString.value = checkout
