@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -95,9 +96,6 @@ fun PriceCard(
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
                             .crossfade(true).data(data.images?.get(0)).build(),
-                        onLoading = {
-
-                        },
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize()
@@ -134,7 +132,9 @@ fun PriceCard(
                                         .crossfade(true).data(data.images?.get(0)).build(),
                                     contentScale = ContentScale.Crop,
                                     contentDescription = null,
-                                    modifier = Modifier.fillMaxWidth().height(sizeCard/2)
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(sizeCard / 2)
                                 )
 
                             }
@@ -160,14 +160,17 @@ fun PriceCard(
                         }
                         Column(
                             modifier = Modifier
-                                .padding(16.dp),
+                                .padding(16.dp)
+                            ,
                         ) {
                             Text(
                                 text = data.name.toString(),
-                                style = MaterialTheme.typography.titleLarge,
+                                fontSize = 20.sp,
                                 color = if (isImageFull) Color.White else Color.Black,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.fillMaxWidth()
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             Row(

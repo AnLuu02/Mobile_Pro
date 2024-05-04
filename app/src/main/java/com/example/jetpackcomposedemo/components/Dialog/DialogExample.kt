@@ -52,13 +52,11 @@ fun AlertDialogExample(
                 onClick = {
                     onDismissRequest()
                 },
-                modifier = Modifier.border(BorderStroke(1.dp,Color.Red), shape = MaterialTheme.shapes.extraLarge),
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = Color.Red,
-                    containerColor = Color.White,
+                    containerColor = Color.Transparent,
 
                 ),
-                shape = MaterialTheme.shapes.extraLarge
             ) {
                 Text(
                     text = "Hủy",
@@ -87,6 +85,6 @@ fun AlertDialogExample(
                     fontWeight = FontWeight.Bold,
                 )
             }
-        }
+        },
     )
 }

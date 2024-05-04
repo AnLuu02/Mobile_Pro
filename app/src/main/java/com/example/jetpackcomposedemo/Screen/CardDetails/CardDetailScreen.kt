@@ -98,9 +98,12 @@ fun CardDetailScreen(
             roomResource.value?.data?.let { room ->
                 data.value = room[0]
                 typeBooking = room[0].roomTypes?.type ?: "hourly"
+                if(bookingViewModel.getTypeBooking() !=  room[0].roomTypes?.type){
+                    bookingViewModel.setBookingResult(BookingResult())
+                }
                 when(room[0].roomTypes?.type){
                     "hourly"->{
-                        dateCheckinString = bookingViewModel.getTimeCheckin() ?: LocalDateTime.now().plusHours(1).format(
+                        dateCheckinString = bookingViewModel.getTimeCheckin() ?:  LocalDateTime.now().plusHours(1).format(
                             DateTimeFormatter.ofPattern("HH:00, dd/MM"))
                         dateCheckoutString =  bookingViewModel.getTimeCheckout() ?: LocalDateTime.now().plusHours(2).format(
                             DateTimeFormatter.ofPattern("HH:00, dd/MM"))
@@ -129,11 +132,11 @@ fun CardDetailScreen(
                 bookingViewModel.setTypeBooking(typeBooking)
                 val currentHour = LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("HH:00"))
                 val saveDateCheckin = when(typeBooking){
-                    "hourly"->dateCheckinString
+                    "hourly"->"$dateCheckinString/${LocalDateTime.now().year}"
                     else->"$currentHour, $dateCheckinString"
                 }
                 val saveDateCheckout = when(typeBooking){
-                    "hourly"->dateCheckoutString
+                    "hourly"-> "$dateCheckoutString/${LocalDateTime.now().year}"
                     else->"$currentHour, $dateCheckoutString"
                 }
                 searchViewModel.setSelectedCalendar(typeBooking, BookRoom(
