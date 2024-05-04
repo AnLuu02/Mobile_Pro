@@ -594,8 +594,9 @@ fun StarRating(
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "Trên $item",
-                                style = MaterialTheme.typography.bodyLarge,
+                                text = "> $item",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.W500,
                                 color = if(selected) Color.Red else  Color.Black
                             )
                             Spacer(modifier = Modifier.height(4.dp))
@@ -603,7 +604,7 @@ fun StarRating(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = "",
                                 tint = Color(255,215,0),
-                                modifier = Modifier.size(26.dp)
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     }

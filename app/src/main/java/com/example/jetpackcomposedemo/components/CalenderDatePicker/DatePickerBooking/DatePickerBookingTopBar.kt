@@ -18,7 +18,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,22 +26,23 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.SearchSubNav
-import com.example.jetpackcomposedemo.Screen.Search.itemsSubNav
 
 @Composable
 fun DatePickerBookingTopBar(
     bookingViewModel:BookingViewModel,
-    typeBooking:(String)->Unit,
+    typeBooking:String,
     checkIn:String,
     checkOut:String,
-    totalDate: Long = 1,
-    totalHourlyCheckin: Long = 1,
+    totalTime: Long = 1,
 ) {
-    val currentNavItem = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
-    typeBooking(currentNavItem.value)
-
+//    val currentNavItem = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
+//    typeBooking(currentNavItem.value)
+    val pattern = Regex("/\\d{4}$")
+    val dateCheckinStringFormat =  if(typeBooking == "hourly")  checkIn.replace(pattern, "") else checkIn
+    val dateCheckoutStringFormat =  if(typeBooking == "hourly")  checkOut.replace(pattern, "") else checkOut
     Column {
 
         Box(
@@ -57,16 +57,31 @@ fun DatePickerBookingTopBar(
                 horizontalArrangement = Arrangement.Center
             ){
 
-                itemsSubNav.forEach { item->
-                    SubNavItemNoIcon(
-                        item,
-                        currentNavItem.value == item.route,
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            currentNavItem.value = item.route
-                            typeBooking(item.route)
-                        })
+                Box(
+                    modifier = Modifier
+                        .padding(start = 12.dp, end = 12.dp, top = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = when(typeBooking){"hourly"->"Chọn giờ" else ->"Chọn ngày"},
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
                 }
+
+//                itemsSubNav.forEach { item->
+//                    SubNavItemNoIcon(
+//                        item,
+//                        currentNavItem.value == item.route,
+//                        modifier = Modifier.weight(1f),
+//                        onClick = {
+//                            currentNavItem.value = item.route
+//                            typeBooking(item.route)
+//                        })
+//                }
             }
             Divider(
                 modifier = Modifier
@@ -102,7 +117,7 @@ fun DatePickerBookingTopBar(
                     ) {
                         Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text(text = checkIn, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                        Text(text = dateCheckinStringFormat, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                     }
 
@@ -128,7 +143,7 @@ fun DatePickerBookingTopBar(
                     ) {
                         Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text(text = checkOut, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                        Text(text = dateCheckoutStringFormat, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                     }
 
@@ -151,9 +166,9 @@ fun DatePickerBookingTopBar(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.padding(start=12.dp)
                     ) {
-                        Text(text = if(currentNavItem.value == "hourly") "Số giờ" else "Số ngày", style = MaterialTheme.typography.bodySmall)
+                        Text(text = if(typeBooking == "hourly") "Số giờ" else "Số ngày", style = MaterialTheme.typography.bodySmall)
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text(text = if(currentNavItem.value == "hourly") totalHourlyCheckin.toString() else totalDate.toString(), color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                        Text(text = totalTime.toString(), color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                     }
 

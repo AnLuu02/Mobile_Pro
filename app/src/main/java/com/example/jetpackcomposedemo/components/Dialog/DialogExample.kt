@@ -50,7 +50,7 @@ fun AlertDialogExample(
         confirmButton = {
             Button(
                 onClick = {
-                    onConfirmation()
+                    onDismissRequest()
                 },
                 modifier = Modifier.border(BorderStroke(1.dp,Color.Red), shape = MaterialTheme.shapes.extraLarge),
                 colors = ButtonDefaults.outlinedButtonColors(
@@ -71,7 +71,7 @@ fun AlertDialogExample(
 
             Button(
                 onClick = {
-                    onDismissRequest()
+                    onConfirmation()
                 },
                 modifier = Modifier.background(Color.Red, shape = MaterialTheme.shapes.extraLarge),
                 colors = ButtonDefaults.buttonColors(

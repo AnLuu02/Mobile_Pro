@@ -35,19 +35,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
+import com.example.jetpackcomposedemo.Screen.User.LoginUiState
+import com.example.jetpackcomposedemo.data.models.Room.Room
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun BottomCardDetail(
+    loginUiState:LoginUiState,
     bookingViewModel: BookingViewModel,
+    data:Room,
     dateCheckinString:String,
     dateCheckoutString:String,
     totalTime:String,
     typeBooking:String,
-    onOpenListRoom:()->Unit,
+    onOpenPayment:()->Unit,
+    openDialogLoginRequired:(Boolean)->Unit,
     openDatePickerBookingScreen:(Boolean)->Unit
 ){
-
+    val pattern = Regex("/\\d{4}$")
+    val dateCheckinStringFormat =  if(typeBooking == "hourly")  dateCheckinString.replace(pattern, "") else dateCheckinString
+    val dateCheckoutStringFormat =  if(typeBooking == "hourly")  dateCheckoutString.replace(pattern, "") else dateCheckoutString
 
     Surface(modifier = Modifier
         .fillMaxWidth()
@@ -129,12 +137,12 @@ fun BottomCardDetail(
                     )
 
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = dateCheckinString, style = MaterialTheme.typography.bodyMedium)
+                    Text(text = dateCheckinStringFormat, style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.width(6.dp))
 
                     Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = "", modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    dateCheckoutString?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                    Text(text = dateCheckoutStringFormat, style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
@@ -152,12 +160,19 @@ fun BottomCardDetail(
                     Text(text = "Chỉ từ", style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    Text(text = "420.000đ", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(text = data.roomTypes?.let { formatCurrencyVND(it.prices) }.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 }
 
 
                 Button(
-                    onClick = onOpenListRoom,
+                    onClick = {
+                        if(loginUiState.isLoggedIn){
+                            onOpenPayment()
+                        }
+                        else{
+                            openDialogLoginRequired(true)
+                        }
+                    },
                     modifier = Modifier.clip(MaterialTheme.shapes.small),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Red,
