@@ -140,4 +140,9 @@ dependencies {
 
     //permission
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+
+    //work manager
+    implementation ("androidx.work:work-runtime-ktx:2.7.0")
+    implementation ("androidx.core:core-ktx:1.6.0")
+    implementation ("androidx.appcompat:appcompat:1.3.0")
 }
