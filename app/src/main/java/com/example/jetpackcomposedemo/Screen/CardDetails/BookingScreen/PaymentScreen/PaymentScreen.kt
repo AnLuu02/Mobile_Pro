@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -69,8 +70,8 @@ fun PaymentScreen(
 
     val year = LocalDateTime.now().year
     val typeBooking = bookingViewModel.getTypeBooking()
-    val dateCheckinString = bookingViewModel.getTimeCheckin()
-    val dateCheckoutString =bookingViewModel.getTimeCheckout()
+    val dateCheckinString = if(typeBooking == "hourly") "${bookingViewModel.getTimeCheckin()}/$year" else bookingViewModel.getTimeCheckin()
+    val dateCheckoutString =  if(typeBooking == "hourly") "${bookingViewModel.getTimeCheckout()}/$year" else bookingViewModel.getTimeCheckout()
     val totalTime = bookingViewModel.getTotalTime()
     val infoRoom = bookingViewModel.getInfoRoom()
 
@@ -199,11 +200,12 @@ fun InfoRoom(
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize(),
+                                verticalArrangement = Arrangement.SpaceBetween
                             ) {
 
                                 Text(
                                     text = "EASYBOOKING HOTEL HCM",
-                                    fontSize = 16.sp,
+                                    fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
@@ -220,7 +222,8 @@ fun InfoRoom(
 
                                 Text(
                                     text = "273 An Dương Vương, Phường 3, Quận 5, TP Hồ Chí Minh",
-                                    fontSize = 16.sp,
+                                    fontSize = 14.sp,
+                                    lineHeight = TextUnit.Unspecified,
                                     modifier = Modifier
                                 )
 
@@ -344,12 +347,11 @@ fun InfoRoom(
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(12.dp),
+                                    .padding(horizontal = 12.dp, vertical = 8.dp),
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
 
                                 Column(
-                                    verticalArrangement = Arrangement.SpaceBetween,
                                     horizontalAlignment = Alignment.Start
                                 ) {
                                     Text(
@@ -357,7 +359,6 @@ fun InfoRoom(
                                         fontSize = 14.sp,
                                         color = Color.Black.copy(alpha = 0.6f)
                                     )
-                                    Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = dateCheckinString,
                                         fontSize = 16.sp,
@@ -365,13 +366,14 @@ fun InfoRoom(
                                     )
                                 }
 
-                                Column {
+                                Column(
+                                    horizontalAlignment = Alignment.Start
+                                ) {
                                     Text(
                                         text = "Trả phòng",
                                         fontSize = 14.sp,
                                         color = Color.Black.copy(alpha = 0.6f)
                                     )
-                                    Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = dateCheckoutString,
                                         fontSize = 16.sp,

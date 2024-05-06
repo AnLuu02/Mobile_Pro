@@ -90,7 +90,7 @@ fun DatePickerBookingScreen(
                         dateCheckoutString = dateCheckoutString.value,
                         totalTime = totalTime.longValue,
                         typeBooking = typeBooking,
-                        enabledButtonApply = true,
+                        enabledButtonApply = enabledButtonApply.value,
                         onHandleApplyTimeBooking = onHandleApplyTimeBooking,
                         onCloseDatePicker = onCloseDatePicker
                     )
