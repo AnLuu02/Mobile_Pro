@@ -43,6 +43,7 @@ import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MyBookingScreen(
+    uid:String,
     bookingViewModel:BookingViewModel,
     navController:NavHostController
 ) {
@@ -54,7 +55,7 @@ fun MyBookingScreen(
         },
 
 
-    ) { padding ->
+        ) { padding ->
 
         LazyColumn(
             state = listState,
@@ -79,109 +80,109 @@ fun CardMyBooKing(){
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)){
-       Column(
-           modifier = Modifier
-               .fillMaxWidth()
-               .padding(16.dp)
-           ,
-           horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
-       ) {
-           Row(
-               modifier = Modifier
-                   .fillMaxWidth(),
-               verticalAlignment = Alignment.Top
-           ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+            ,
+            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
 
-               Column(
-                   modifier = Modifier
-                       .weight(1.2f)
-                       .padding(4.dp)
-               ) {
-                   Text(
-                       text = "22/04/2024",
-                       style = MaterialTheme.typography.bodySmall
-                   )
-                   Spacer(modifier = Modifier.height(4.dp))
-                   Text(
-                       text = "01:28",
-                       style = MaterialTheme.typography.titleLarge,
-                       fontWeight = FontWeight.Bold
-                   )
-               }
+                Column(
+                    modifier = Modifier
+                        .weight(1.2f)
+                        .padding(4.dp)
+                ) {
+                    Text(
+                        text = "22/04/2024",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "01:28",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 
-               Column(
-                   modifier = Modifier.weight(2.8f),
-                   horizontalAlignment = Alignment.Start
-               ) {
-                   Box(modifier = Modifier.background(Color.Red.copy(0.1f), shape = RoundedCornerShape(4.dp))){
-                       Text(
-                           text = "Chờ thanh toán",
-                           style = MaterialTheme.typography.bodySmall,
-                           color = Color.Red,
-                           modifier = Modifier.padding(6.dp)
-                       )
-                   }
-                   Spacer(modifier = Modifier.height(8.dp))
-                   Text(
-                       text = "Mã đặt phòng: 2591090",
-                       style = MaterialTheme.typography.titleMedium,
-                       fontWeight = FontWeight.Bold
-                   )
-                   Spacer(modifier = Modifier.height(8.dp))
-                   Text(
-                       text = "MIDAS HOTEL",
-                       style = MaterialTheme.typography.titleMedium,
-                       fontWeight = FontWeight.Bold
-                   )
-                   Spacer(modifier = Modifier.height(8.dp))
-                   Text(
-                       text = "FlashSale - TOP 3",
-                       style = MaterialTheme.typography.bodyLarge,
-                   )
-                   Spacer(modifier = Modifier.height(8.dp))
-                   Text(
-                       text = "Theo giờ",
-                       style = MaterialTheme.typography.bodyLarge,
-                       fontWeight = FontWeight.Bold
-                   )
-                   Spacer(modifier = Modifier.height(8.dp))
+                Column(
+                    modifier = Modifier.weight(2.8f),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Box(modifier = Modifier.background(Color.Red.copy(0.1f), shape = RoundedCornerShape(4.dp))){
+                        Text(
+                            text = "Chờ thanh toán",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Red,
+                            modifier = Modifier.padding(6.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Mã đặt phòng: 2591090",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "MIDAS HOTEL",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "FlashSale - TOP 3",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Theo giờ",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                   Row(
-                       verticalAlignment = Alignment.CenterVertically
-                   ) {
-                       Image(painter = painterResource(id = R.drawable.momo), contentDescription = "",modifier = Modifier.size(24.dp))
-                       Spacer(modifier = Modifier.width(10.dp))
-                       Text(
-                           text = "582.000đ",
-                           style = MaterialTheme.typography.bodyLarge,
-                           fontWeight = FontWeight.Bold
-                       )
-                   }
-               }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(painter = painterResource(id = R.drawable.momo), contentDescription = "",modifier = Modifier.size(24.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "582.000đ",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
 
-           }
+            }
 
-           Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-           Button(
-               onClick = {
-               },
-               modifier = Modifier
-                   .fillMaxWidth()
-                   .clip(MaterialTheme.shapes.small),
-               colors = ButtonDefaults.buttonColors(
-                   containerColor = Color.LightGray.copy(0.5f),
-                   contentColor = Color.Black,
-               )
-           ) {
-               Text(
-                   text = "Tiếp tục thanh toán",
-                   style = MaterialTheme.typography.titleMedium,
-                   color = Color.Black,
-                   fontWeight = FontWeight.Bold,
-               )
-           }
-       }
+            Button(
+                onClick = {
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.small),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.LightGray.copy(0.5f),
+                    contentColor = Color.Black,
+                )
+            ) {
+                Text(
+                    text = "Tiếp tục thanh toán",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
 
 
         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "", modifier = Modifier

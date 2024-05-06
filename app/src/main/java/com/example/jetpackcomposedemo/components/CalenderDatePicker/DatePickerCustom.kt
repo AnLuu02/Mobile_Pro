@@ -17,10 +17,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -37,7 +39,6 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +84,12 @@ fun DatePickerCustom(
         initialSelectedDateMillis  = initialSelectedDateMillis,
         initialDisplayedMonthMillis = null,
         initialDisplayMode = DisplayMode.Picker,
-        yearRange = (currentTime.year..3000)
+        yearRange = (currentTime.year..3000),
+        selectableDates =  object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis >= LocalDateTime.now().toMillis() + 1000000
+            }
+        }
     )
 
     val currentDay = currentTime.format(DateTimeFormatter.ofPattern("dd"))
@@ -147,22 +153,14 @@ fun DatePickerCustom(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 item{
-                    androidx.compose.material3.DatePicker(
+                    DatePicker(
                         state = datePickerState,
                         title = null,
                         headline = null,
                         showModeToggle = false,
-                        dateValidator = {
-                            val calendarNow = Calendar.getInstance()
-                            with(calendarNow) {
-                                set(Calendar.HOUR_OF_DAY, 0)
-                                set(Calendar.MINUTE, 0)
-                                set(Calendar.SECOND, 0)
-                                set(Calendar.MILLISECOND, 0)
-                            }
-                            return@DatePicker it >= calendarNow.timeInMillis
+                        dateFormatter = DatePickerDefaults.dateFormatter(
 
-                        },
+                        ),
                         colors = DatePickerDefaults.colors(
                             selectedDayContainerColor = Color.Red.copy(alpha = 0.1f),
                             todayDateBorderColor = Color.Transparent,
