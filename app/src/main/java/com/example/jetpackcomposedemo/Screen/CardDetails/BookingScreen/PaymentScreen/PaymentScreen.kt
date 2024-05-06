@@ -56,6 +56,7 @@ import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentSc
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
 import com.example.jetpackcomposedemo.data.models.Room.Room
+import java.time.LocalDateTime
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -66,10 +67,11 @@ fun PaymentScreen(
 ) {
     val listState = rememberLazyListState()
 
-    val dateCheckinString = bookingViewModel.getTimeCheckin()
-    val dateCheckoutString = bookingViewModel.getTimeCheckout()
-    val totalTime = bookingViewModel.getTotalTime()
+    val year = LocalDateTime.now().year
     val typeBooking = bookingViewModel.getTypeBooking()
+    val dateCheckinString = when(typeBooking){ "hourly"-> "${bookingViewModel.getTimeCheckin()}/$year" else-> bookingViewModel.getTimeCheckin()}
+    val dateCheckoutString = when(typeBooking){ "hourly"-> "${bookingViewModel.getTimeCheckout()}/$year" else-> bookingViewModel.getTimeCheckout()}
+    val totalTime = bookingViewModel.getTotalTime()
     val infoRoom = bookingViewModel.getInfoRoom()
 
 
@@ -191,11 +193,10 @@ fun InfoRoom(
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize(),
-                                verticalArrangement = Arrangement.SpaceBetween
                             ) {
 
                                 Text(
-                                    text = "EASYBOOKING HOTEL",
+                                    text = "EASYBOOKING HOTEL HCM",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
                                     maxLines = 1,
@@ -209,12 +210,11 @@ fun InfoRoom(
                                     fontWeight = FontWeight.Bold,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier
                                 )
 
                                 Text(
-                                    text = "273 An Dương Vương, Phường 3, Quận 5, TP HỒ CHÍ MINH",
-                                    fontSize = 12.sp,
+                                    text = "273 An Dương Vương, Phường 3, Quận 5, TP Hồ Chí Minh",
+                                    fontSize = 16.sp,
                                     modifier = Modifier
                                 )
 

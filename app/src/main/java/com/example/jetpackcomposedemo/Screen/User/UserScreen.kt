@@ -19,8 +19,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.HeartBroken
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.LockClock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Icon
@@ -37,10 +39,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 
 @Composable
 fun UserScreen(
+    navController: NavHostController,
     onLogoutSuccess: () -> Unit = {},
     loginUiState: LoginUiState,
     padding: PaddingValues,
@@ -52,11 +56,27 @@ fun UserScreen(
     ) {
         item {
             Column() {
+
+                if(loginUiState.isLoggedIn){
+                    Text(
+                        text = "Trang của tôi",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(12.dp,20.dp,12.dp,16.dp)
+                    )
+
+
+                    SettingElement(Icons.Filled.LockClock,"Đặt phòng của tôi", onClick = {
+                        navController.navigate("user/${loginUiState.uid}/mybooking")
+                    })
+                    SettingElement(Icons.Filled.HeartBroken,"Khách sạn yêu thích")
+                }
+
                 Text(
                     text = "Cài đặt",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(12.dp,16.dp)
+                    modifier = Modifier.padding(12.dp,20.dp,12.dp,16.dp)
                 )
 
 
@@ -68,7 +88,7 @@ fun UserScreen(
                     text = "Thông tin",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(12.dp,16.dp)
+                    modifier = Modifier.padding(12.dp,20.dp,12.dp,16.dp)
                 )
                 SettingElement(Icons.Filled.Phone,"Hỏi đáp")
                 SettingElement(Icons.Filled.DateRange,"Điều khoản & Chính sách bảo mật")
@@ -126,11 +146,16 @@ fun SettingElement(
     icon: ImageVector,
     text: String,
     setting: String? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit?)? = null,
 ) {
     Box(modifier = modifier
         .fillMaxWidth()
-        .clickable(onClick = { /* handle click here */ })
+        .clickable(onClick = {
+            if (onClick != null) {
+                onClick()
+            }
+        })
     ) {
         Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically, modifier = Modifier
             .padding(12.dp)

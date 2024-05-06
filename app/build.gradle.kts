@@ -86,7 +86,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
     //material 3
-    implementation ("androidx.compose.material3:material3:1.1.0-alpha08")
+    implementation ("androidx.compose.material3:material3:1.2.1")
 
 
 

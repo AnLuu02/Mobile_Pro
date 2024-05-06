@@ -23,6 +23,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.WaitingPaymentScreen.MethodWaitingPaymentScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
@@ -45,6 +46,7 @@ import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
+import com.example.jetpackcomposedemo.components.LoadingSpinner
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
 import com.example.jetpackcomposedemo.data.repository.RoomRepository
@@ -101,14 +103,12 @@ fun MainApp(
             val roomViewModel: RoomViewModel = viewModel(
                 factory = RoomViewModelFactory(RoomRepository(apiService = apiService))
             )
-            NavHost(navController = navController, startDestination = "StartingAppScreen" ){
-                //////////////////////////////// my booking ///////////////////////////
-                composable("mybooking"){
-                    MyBookingScreen(bookingViewModel = bookingViewModel, navController =navController )
-                }
+            NavHost(navController = navController, startDestination = "roomDetails/waitingpayment" ){
+
 
                 //----------------------------------- HOME ------------------------------
                 composable("home"){
+                    LoadingSpinner()
                     ScreenWithBottomNavigationBar(
                         navController = navController,
                         topBar ={listState-> HomeTopBar(listState,
@@ -220,7 +220,7 @@ fun MainApp(
                             if(loginUiState.isShowingInfo){
                                 InfoUser(padding = padding)
                             }else{
-                                UserScreen(padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
+                                UserScreen(navController = navController,padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
                             }
                         })
                 }
@@ -229,7 +229,7 @@ fun MainApp(
                     LoginScreen(
                         loginViewModel1,
                         onCancelButtonClicked = {
-                            navController.popBackStack("user", inclusive = false)
+                            navController.popBackStack()
                         },
                         onClickedRegisterText = {
                             navController.navigate("register")
@@ -246,6 +246,22 @@ fun MainApp(
                         onClickedLoginText = {
                             navController.navigate("login")
                         }
+                    )
+                }
+
+                //////////////////////////////// my booking ///////////////////////////
+                composable(
+                    "user/{uid}/mybooking",
+                    arguments = listOf(
+                        navArgument("uid") {
+                            type = NavType.StringType
+                        })
+                ){backStackEntry->
+                    val uid = backStackEntry.arguments?.getString("uid").toString()
+                    MyBookingScreen(
+                        uid = uid,
+                        bookingViewModel = bookingViewModel,
+                        navController = navController
                     )
                 }
 
@@ -316,6 +332,19 @@ fun MainApp(
                 ){
                     ChooseDiscountScreen(bookingViewModel = bookingViewModel, navController = navController)
                 }
+
+
+                composable(
+                    "roomDetails/waitingpayment",
+                ){
+                    MethodWaitingPaymentScreen(bookingViewModel = bookingViewModel, onPayloadChoose = {
+
+                    }) {
+
+                    }
+                }
+
+
             }
         }
     }

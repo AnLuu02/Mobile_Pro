@@ -40,6 +40,11 @@ fun DatePickerTopBar(
     totalHourlyCheckin: Long = 1,
     onCloseCalenderScreen: ()->Unit
 ) {
+
+    val pattern = Regex("/\\d{4}$")
+    val dateCheckinStringFormat =  if(isHourly)  checkIn.replace(pattern, "") else checkIn
+    val dateCheckoutStringFormat =  if(isHourly)  checkOut.replace(pattern, "") else checkOut
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -106,7 +111,7 @@ fun DatePickerTopBar(
                 ) {
                     Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = checkIn, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(text = dateCheckinStringFormat, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                 }
 
@@ -132,7 +137,7 @@ fun DatePickerTopBar(
                 ) {
                     Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = checkOut, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(text = dateCheckoutStringFormat, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                 }
 
