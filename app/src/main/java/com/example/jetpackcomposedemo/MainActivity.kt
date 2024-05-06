@@ -103,7 +103,7 @@ fun MainApp(
             val roomViewModel: RoomViewModel = viewModel(
                 factory = RoomViewModelFactory(RoomRepository(apiService = apiService))
             )
-            NavHost(navController = navController, startDestination = "roomDetails/waitingpayment" ){
+            NavHost(navController = navController, startDestination = "StartingAppScreen" ){
 
 
                 //----------------------------------- HOME ------------------------------
