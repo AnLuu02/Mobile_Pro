@@ -1,17 +1,27 @@
 package com.example.jetpackcomposedemo.Screen.Services
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.jetpackcomposedemo.data.models.Room
 import com.example.jetpackcomposedemo.Screen.Home.dataTest
 import com.example.jetpackcomposedemo.Screen.Services.widget.CardSection
+import com.example.jetpackcomposedemo.data.network.RetrofitInstance
+import com.example.jetpackcomposedemo.data.repository.RoomRepository
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelFactory
+import com.example.jetpackcomposedemo.helpper.Status
 
 val sortOptions = arrayOf(
     "Phù hợp nhất",
@@ -31,6 +41,39 @@ fun ServiceScreen(
     onOpenDetailCardScreen: (String)->Unit,
 
 ) {
+    var lst_room = listOf<Room>()
+    var isLoadingAPIDone = true
+    var isError = false
+    var errorMessage: String = ""
+    //call api
+    val roomViewModel: RoomViewModel = viewModel(
+        factory = RoomViewModelFactory(RoomRepository(apiService = RetrofitInstance.apiService))
+    )
+    LaunchedEffect(Unit) {
+        roomViewModel.getListRoom()
+    }
+    val roomResource = roomViewModel.list.observeAsState()
+    when (roomResource.value?.status) {
+        Status.SUCCESS -> {
+            roomResource.value?.data?.let { list ->
+                lst_room = list
+                isLoadingAPIDone = true
+                Log.e("List room", lst_room[0].name)
+            }
+        }
+
+        Status.ERROR -> {
+            errorMessage = roomResource.value?.message.toString()
+            isError = true
+            Log.e("Error", errorMessage);
+        }
+
+        Status.LOADING -> {
+
+        }
+        null -> Text(text = errorMessage)
+    }
+    //end call api
     val (sortOption, onSortOptionSelected) = remember {
         mutableStateOf(sortOptions[0]);
     }
@@ -63,9 +106,10 @@ fun ServiceScreen(
                 .fillMaxWidth()
         ) {
             CardSection(
-                data = dataTest,
+                data = lst_room,
                 isDiscount = true,
                 hasPrice = true,
+                isImageFull = true,
                 onOpenDetailCardScreen = onOpenDetailCardScreen,
             )
 //            Text(text = sortOption)

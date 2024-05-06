@@ -30,23 +30,23 @@ fun <T> CardSection(
             TitleMain(typeBooking = typeBooking,title = titleHeader, onHandleClickShowAll = {
                 navController.navigate("search/${it.toString()}")
             })
-            LazyRow {
-                items(data.size) {
-                    if (hasPrice) {
-                        PriceCard(
-                            it,
-                            data,
-                            isSale = isSale,
-                            isDiscount = isDiscount,
-                            isImageFull = isImageFull,
-                            onOpenDetailCardScreen = onOpenDetailCardScreen
-                        )
-                    } else {
-                        CardSimple(index = it, data)
-                    }
-
-                }
-            }
+//            LazyRow {
+//                items(data.size) {
+//                    if (hasPrice) {
+//                        PriceCard(
+//                            it,
+//                            data,
+//                            isSale = isSale,
+//                            isDiscount = isDiscount,
+//                            isImageFull = isImageFull,
+//                            onOpenDetailCardScreen = onOpenDetailCardScreen
+//                        )
+//                    } else {
+//                        CardSimple(index = it, data)
+//                    }
+//
+//                }
+//            }
 
         }
     }

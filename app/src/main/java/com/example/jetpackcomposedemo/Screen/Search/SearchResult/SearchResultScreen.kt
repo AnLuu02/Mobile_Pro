@@ -101,22 +101,22 @@ fun SearchResult(
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        LazyColumn {
-                            items(dataTest.size) {
-                                PriceCard(
-                                    it,
-                                    dataTest,
-                                    isSale = true,
-                                    isDiscount = true,
-                                    isImageFull = false,
-                                    isColumn = true,
-                                    onOpenDetailCardScreen = {  }
-                                )
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                            }
-                        }
+//                        LazyColumn {
+//                            items(dataTest.size) {
+//                                PriceCard(
+//                                    it,
+//                                    dataTest,
+//                                    isSale = true,
+//                                    isDiscount = true,
+//                                    isImageFull = false,
+//                                    isColumn = true,
+//                                    onOpenDetailCardScreen = {  }
+//                                )
+//
+//                                Spacer(modifier = Modifier.height(10.dp))
+//
+//                            }
+//                        }
 
                     }
                 }

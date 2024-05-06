@@ -8,10 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.jetpackcomposedemo.components.Card.CardSimple
 import com.example.jetpackcomposedemo.components.Card.PriceCard
+import com.example.jetpackcomposedemo.data.models.Room
 
 @Composable
-fun <T> CardSection(
-    data: List<T>,
+fun CardSection(
+    data: List<Room>,
     isSale: Boolean = false,
     isImageFull: Boolean = false,
     isDiscount: Boolean = false,
@@ -30,7 +31,8 @@ fun <T> CardSection(
                     if (hasPrice) {
                         PriceCard(
                             it,
-                            data,
+                            data[it],
+                            isLastItem = (it == data.size - 1),
                             isSale = isSale,
                             isDiscount = isDiscount,
                             isImageFull = isImageFull,

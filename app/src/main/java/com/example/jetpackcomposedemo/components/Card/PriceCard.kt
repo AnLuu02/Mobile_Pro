@@ -44,19 +44,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.data.models.Room
+import java.text.DecimalFormat
 
 
 @Composable
-fun <T> PriceCard(
+fun PriceCard(
     index: Int,
-    data: List<T>,
+    data: Room,
+    isLastItem: Boolean = false,
     isSale: Boolean = false,
     isDiscount: Boolean = false,
     isImageFull: Boolean = false,
     isColumn:Boolean = false,
     onOpenDetailCardScreen: (String)->Unit
 ) {
+    val image = data.images.split(",")[0].trim();
 
     val screenWidth = with(LocalDensity.current) {
         LocalConfiguration.current.screenWidthDp.dp
@@ -65,7 +70,7 @@ fun <T> PriceCard(
 
     var lastPaddingEnd = 0.dp
 
-    if (index == data.size - 1) {
+    if (isLastItem) {
         lastPaddingEnd = 16.dp
     }
 
@@ -94,8 +99,9 @@ fun <T> PriceCard(
                 ,
             ) {
                 if (isImageFull) {
-                    Image(
-                        painter = painterResource(id = R.drawable.hotel_2),
+                    AsyncImage(
+                        model = image,
+//                        painter = painterResource(id = R.drawable.hotel_2),
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize()
@@ -167,7 +173,8 @@ fun <T> PriceCard(
                         ) {
 
                             Text(
-                                text = "LỒNG ĐÈN ĐỎ HOTEL",
+                                text = data.name.trim(),
+//                                text = "LỒNG ĐÈN ĐỎ HOTEL",
                                 style = MaterialTheme.typography.titleLarge,
                                 color = if (isImageFull) Color.White else Color.Black,
                                 fontWeight = FontWeight.Bold,
@@ -276,8 +283,10 @@ fun <T> PriceCard(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
+                                val price = DecimalFormat("#,###đ").format(data.price)
                                 Text(
-                                    text = "420.000đ",
+                                    text = price,
+//                                    text = "420.000đ",
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.Bold,
                                     color = if (isImageFull) Color.White else Color.Black,
@@ -288,7 +297,8 @@ fun <T> PriceCard(
                                 ) {
 
                                     Text(
-                                        text = "4.0",
+                                        text = data.rating.toString(),
+//                                        text = "4.0",
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = if (isImageFull) Color.White else Color.Black

@@ -85,7 +85,7 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
 
   // Xử lý UI dựa trên trạng thái của Resource
   if(UserID != null) {
-    when (couponResource.value?.status) {
+    when (couponResource.value?.status) { // dou co dou ô
       Status.SUCCESS -> {
         // Xử lý dữ liệu khi load thành công
         couponResource.value?.data?.let { list ->
