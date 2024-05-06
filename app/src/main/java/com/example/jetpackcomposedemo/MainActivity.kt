@@ -171,7 +171,7 @@ fun MainApp(
                 //----------------------------------- DISCOUNT ------------------------------
                 composable("discount"){
                     ScreenWithBottomNavigationBar(navController = navController, topBar = {
-                        DiscountTopBar()
+
                     }, content = {padding, _->
                         DiscountScreen(padding = padding, navController)
                     })
