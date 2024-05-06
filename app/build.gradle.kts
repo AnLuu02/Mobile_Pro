@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("com.google.gms.google-services")
     id("kotlin-kapt")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
 }
 
 android {
@@ -65,6 +66,10 @@ dependencies {
     implementation(libs.material)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.database.ktx)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.media3.common)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -125,9 +130,6 @@ dependencies {
     // Logging
     implementation ("com.squareup.okhttp3:okhttp:4.11.0")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
-    
-    // Video player
-    implementation("com.google.android.exoplayer:exoplayer:2.16.1")
 
     //room database
     val  room_version = "2.6.1" // Check for the latest version
@@ -141,8 +143,12 @@ dependencies {
     //permission
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
-    //work manager
-    implementation ("androidx.work:work-runtime-ktx:2.7.0")
-    implementation ("androidx.core:core-ktx:1.6.0")
-    implementation ("androidx.appcompat:appcompat:1.3.0")
+// Retrofit ViDAT
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // Retrofit with Kotlin serialization Converter
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    // Kotlin serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 }

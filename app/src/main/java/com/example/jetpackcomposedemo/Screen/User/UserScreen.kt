@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.User
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Icon
@@ -45,6 +47,7 @@ fun UserScreen(
     loginUiState: LoginUiState,
     padding: PaddingValues,
 ){
+    Log.d("DEBUG","User FULLNAME INIT : ${loginUiState.fullName} " )
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -58,8 +61,6 @@ fun UserScreen(
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(12.dp,16.dp)
                 )
-
-
                 SettingElement(Icons.Filled.Notifications,"Thông báo")
                 SettingElement(Icons.Filled.AddCircle,"Ngôn ngữ","Tiếng Việt")
                 SettingElement(Icons.Filled.LocationOn,"Khu vực","Hồ Chí Minh")
@@ -75,17 +76,7 @@ fun UserScreen(
                 SettingElement(Icons.Filled.AccountBox,"Phiên bản","15.35.0")
                 SettingElement(Icons.Filled.Info,"Liên hệ")
                 if(loginUiState.isLoggedIn){
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp), horizontalArrangement = Arrangement.Center, ) {
-                        OutlinedButton(
-                            onClick = onLogoutSuccess,
-                            modifier = Modifier.fillMaxWidth(),
-
-                            ) {
-                            Text(text = "Đăng xuất", color = Color.Red)
-                        }
-                    }
+                    SettingElement(Icons.Filled.Logout,"Đăng xuất", onClick = onLogoutSuccess)
                 }
             }
         }
@@ -126,15 +117,17 @@ fun SettingElement(
     icon: ImageVector,
     text: String,
     setting: String? = null,
+    onClick: () -> Unit= {},
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier
         .fillMaxWidth()
-        .clickable(onClick = { /* handle click here */ })
+        .clickable {onClick()}
     ) {
         Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically, modifier = Modifier
             .padding(12.dp)
-            .fillMaxWidth()) {
+            .fillMaxWidth()
+            ) {
             Icon(imageVector = icon, contentDescription = null,tint = Color.Red , modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.width(12.dp))
             Text(text = text, fontSize = 16.sp,color = Color.Black.copy(0.6f))

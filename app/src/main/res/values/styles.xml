@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">#ff0000</item> <!-- Màu chính cho nút và tiêu đề -->
+        <item name="android:textColorPrimary">#333</item> <!-- Màu chữ cho tiêu đề -->
+        <item name="android:windowBackground">#fff</item> <!-- Màu nền của Dialog -->
+        <!-- Thêm các item khác tùy chỉnh theo yêu cầu -->
+    </style>
+</resources>

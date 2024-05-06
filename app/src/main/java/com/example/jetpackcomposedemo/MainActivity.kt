@@ -86,15 +86,14 @@ class MainActivity : ComponentActivity() {
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainApp(
-    loginViewModel1: LoginViewModel = viewModel()
-){
+fun MainApp(){
     val navController = rememberNavController()
     JetpackComposeDemoTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
+            val loginViewModel1: LoginViewModel = viewModel(factory = LoginViewModel.Factory)
             val searchViewModel: SearchViewModel = viewModel()
             val bookingViewModel: BookingViewModel = viewModel()
             val loginUiState by loginViewModel1.uiState.collectAsState()
@@ -215,10 +214,15 @@ fun MainApp(
                     ScreenWithBottomNavigationBar(
                         isBotNav = !loginUiState.isShowingInfo,
                         navController = navController,
-                        topBar = { UserTopBar(loginUiState = loginUiState,onLoginButtonClicked = { navController.navigate("login") }, onToogleSettingInfo = {loginViewModel1.toogleSetting(loginUiState.isShowingInfo)}) },
+                        topBar = { UserTopBar( loginUiState = loginUiState,
+                            onLoginButtonClicked = { navController.navigate("login") },
+                            onToogleSettingInfo = {
+                                loginViewModel1.toogleSetting(loginUiState.isShowingInfo)
+                                loginViewModel1.reset()
+                            }) },
                         content = { padding, _ ->
                             if(loginUiState.isShowingInfo){
-                                InfoUser(padding = padding)
+                                InfoUser(padding = padding,loginUiState = loginUiState, loginViewModel = loginViewModel1)
                             }else{
                                 UserScreen(padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
                             }
@@ -320,5 +324,3 @@ fun MainApp(
         }
     }
 }
-
-
