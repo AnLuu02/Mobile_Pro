@@ -175,8 +175,7 @@ fun PriceCard(
                             Spacer(modifier = Modifier.height(12.dp))
                             Row(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(18.dp),
+                                    .fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 if (isSale) {
@@ -184,7 +183,6 @@ fun PriceCard(
                                         text = "FLASH SALE",
                                         fontSize = 14.sp,
                                         fontStyle = FontStyle.Italic,
-                                        style = MaterialTheme.typography.titleLarge,
                                         fontWeight = FontWeight.SemiBold,
                                         color = Color.Red
 

@@ -341,11 +341,11 @@ fun MainApp(){
                 composable(
                     "roomDetails/waitingpayment",
                 ){
-                    MethodWaitingPaymentScreen(bookingViewModel = bookingViewModel, onPayloadChoose = {
-
-                    }) {
-
-                    }
+                    MethodWaitingPaymentScreen(
+                        bookingViewModel = bookingViewModel,
+                        onPayloadChoose = {},
+                        closeScreenChooseMethodPayment = {}
+                        )
                 }
 
 

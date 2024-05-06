@@ -69,8 +69,8 @@ fun PaymentScreen(
 
     val year = LocalDateTime.now().year
     val typeBooking = bookingViewModel.getTypeBooking()
-    val dateCheckinString = when(typeBooking){ "hourly"-> "${bookingViewModel.getTimeCheckin()}/$year" else-> bookingViewModel.getTimeCheckin()}
-    val dateCheckoutString = when(typeBooking){ "hourly"-> "${bookingViewModel.getTimeCheckout()}/$year" else-> bookingViewModel.getTimeCheckout()}
+    val dateCheckinString = bookingViewModel.getTimeCheckin()
+    val dateCheckoutString =bookingViewModel.getTimeCheckout()
     val totalTime = bookingViewModel.getTotalTime()
     val infoRoom = bookingViewModel.getInfoRoom()
 
@@ -101,7 +101,13 @@ fun PaymentScreen(
             item {
                 if (infoRoom != null) {
                     Spacer(modifier = Modifier.height(10.dp))
-                    InfoRoom(infoRoom = infoRoom,dateCheckinString.toString(),dateCheckoutString.toString(),totalTime.toString(),typeBooking.toString())
+                    InfoRoom(
+                        infoRoom = infoRoom,
+                        dateCheckinString.toString(),
+                        dateCheckoutString.toString(),
+                        totalTime ?: "1",
+                        typeBooking.toString()
+                    )
                     Spacer(modifier = Modifier.height(10.dp))
                     UserBooking()
                     Spacer(modifier = Modifier.height(10.dp))

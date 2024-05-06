@@ -17,12 +17,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.HeartBroken
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.LockClock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Icon
@@ -39,10 +41,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 
 @Composable
 fun UserScreen(
+    navController: NavHostController,
     onLogoutSuccess: () -> Unit = {},
     loginUiState: LoginUiState,
     padding: PaddingValues,
@@ -55,11 +59,25 @@ fun UserScreen(
     ) {
         item {
             Column() {
+
+                if(loginUiState.isLoggedIn){
+                    Text(
+                        text = "Trang của tôi",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(12.dp,20.dp,12.dp,16.dp)
+                    )
+                    SettingElement(Icons.Filled.LockClock,"Đặt phòng của tôi", onClick = {
+                        navController.navigate("user/${loginUiState.uid}/mybooking")
+                    })
+                    SettingElement(Icons.Filled.HeartBroken,"Khách sạn yêu thích")
+                }
+
                 Text(
                     text = "Cài đặt",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(12.dp,16.dp)
+                    modifier = Modifier.padding(12.dp,20.dp,12.dp,16.dp)
                 )
                 SettingElement(Icons.Filled.Notifications,"Thông báo")
                 SettingElement(Icons.Filled.AddCircle,"Ngôn ngữ","Tiếng Việt")
@@ -69,14 +87,14 @@ fun UserScreen(
                     text = "Thông tin",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(12.dp,16.dp)
+                    modifier = Modifier.padding(12.dp,20.dp,12.dp,16.dp)
                 )
                 SettingElement(Icons.Filled.Phone,"Hỏi đáp")
                 SettingElement(Icons.Filled.DateRange,"Điều khoản & Chính sách bảo mật")
                 SettingElement(Icons.Filled.AccountBox,"Phiên bản","15.35.0")
                 SettingElement(Icons.Filled.Info,"Liên hệ")
                 if(loginUiState.isLoggedIn){
-                    SettingElement(Icons.Filled.Logout,"Đăng xuất", onClick = onLogoutSuccess)
+                    SettingElement(Icons.AutoMirrored.Filled.Logout,"Đăng xuất", onClick = onLogoutSuccess)
                 }
             }
         }
@@ -118,7 +136,7 @@ fun SettingElement(
     text: String,
     setting: String? = null,
     onClick: () -> Unit= {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier
         .fillMaxWidth()

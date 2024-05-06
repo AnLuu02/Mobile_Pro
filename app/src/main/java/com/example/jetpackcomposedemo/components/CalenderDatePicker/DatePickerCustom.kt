@@ -74,11 +74,9 @@ fun DatePickerCustom(
         else timeCheckin.intValue + totalTime.intValue
 
     val initialSelectedDateMillis = if(searchViewModel.getTimeCheckin(typeBooking) != "Bất kì")
-        searchViewModel.getTimeCheckin(typeBooking).let {
-            convertStringToMillis(
-                it
-            )
-        } else currentTime.toMillis()
+        convertStringToMillis(
+            searchViewModel.getTimeCheckin(typeBooking)
+        ) else currentTime.toMillis()
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis  = initialSelectedDateMillis,
@@ -87,7 +85,7 @@ fun DatePickerCustom(
         yearRange = (currentTime.year..3000),
         selectableDates =  object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis >= LocalDateTime.now().toMillis() + 1000000
+                return utcTimeMillis >= LocalDateTime.now().toMillis()
             }
         }
     )
@@ -192,12 +190,12 @@ fun DatePickerCustom(
                         LazyRow {
                             var lastPadding = 0.dp
 
-                            items(listOf(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)){
-                                if(it == 23){
+                            items(listOf(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)){ item->
+                                if(item == 23){
                                     lastPadding = 12.dp
                                 }
-                                if(it >= currentHourly){
-                                    val selectedHourly = it == timeCheckin.intValue
+                                if(item >= currentHourly){
+                                    val selectedHourly = item == timeCheckin.intValue
                                     Box(
                                         modifier = Modifier
                                             .padding(start = 12.dp, end = lastPadding)
@@ -212,11 +210,11 @@ fun DatePickerCustom(
                                                 interactionSource = remember { MutableInteractionSource() },
                                                 indication = rememberRipple(bounded = true)
                                             ) {
-                                                timeCheckin.intValue = it
+                                                timeCheckin.intValue = item
                                             },
                                     ){
                                         Text(
-                                            text = formatHourly(it),
+                                            text = formatHourly(item),
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.Bold,
                                             color = if(selectedHourly) Color.Red else Color.Black,
@@ -249,7 +247,7 @@ fun DatePickerCustom(
 
                         LazyRow {
                             var lastPadding = 0.dp
-                            items(listOf(1,2,3,4,5,6,7,8,9,10)){
+                            items(listOf(1,2,3,4,5,6,7,8,9,10)){it->
                                 if(it == 10){
                                     lastPadding=12.dp
                                 }

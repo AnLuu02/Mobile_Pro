@@ -6,10 +6,12 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+
+
 object RetrofitInstance {
-    private const val ipv4Address = "192.168.1.116";
-    private const val port = "8080";
-    private const val BASE_URL = "http://$ipv4Address:$port/";
+    private const val IPV4ADDRESS = "192.168.1.116";
+    private const val PORT = "8080";
+    const val BASE_URL = "http://$IPV4ADDRESS:$PORT/";
 
     private val intercepted: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
