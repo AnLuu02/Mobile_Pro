@@ -23,8 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.Screen.Discount.UI_components.orangeColor
-import com.example.jetpackcomposedemo.Screen.Discount.UI_components.whiteColor
 
 
 val halfBlackColor = Color(android.graphics.Color.parseColor("#80000000"))
@@ -36,6 +34,7 @@ fun showError (
   message: String = "Somethings went wrong",
   onClickClose: (() -> Unit)? = null
 ) {
+  val appColor = AppColor()
   Column (
       modifier = Modifier
         .fillMaxHeight()
@@ -51,13 +50,13 @@ fun showError (
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
         Text(
-          color = whiteColor,
+          color = appColor.white,
           fontSize = 26.sp,
           text = title,
           fontWeight = FontWeight.Bold
         )
         Text(
-          color = whiteColor,
+          color = appColor.white,
           fontSize = 22.sp,
           text = message
         )
@@ -74,7 +73,7 @@ fun showError (
         modifier = Modifier
           .width(150.dp)
           .height(60.dp)
-          .background(whiteColor, shape = RoundedCornerShape(100.dp))
+          .background(appColor.white, shape = RoundedCornerShape(100.dp))
           .clickable {
             if (onClickClose != null) {
               onClickClose()
@@ -96,11 +95,12 @@ fun showError (
 @Preview(showBackground = true)
 @Composable
 fun demoShowError () {
+  val appColor = AppColor()
   Column (
     modifier = Modifier
       .fillMaxHeight()
       .fillMaxWidth()
-      .background(orangeColor)
+      .background(appColor.orange)
   ) {
 
   }

@@ -21,14 +21,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,20 +40,19 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.Screen.Discount.whiteColor
-import androidx.compose.ui.graphics.Color as ComposeColor
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.AppColor
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
+import java.util.Timer
 import kotlin.concurrent.scheduleAtFixedRate
 
-val darkGrayColor = ComposeColor(android.graphics.Color.parseColor("#31302E"))
-val redColor = ComposeColor(android.graphics.Color.parseColor("#FF0000"))
-val lightGrayColor = ComposeColor(android.graphics.Color.parseColor("#F5F5F5"))
 
 @Composable
 fun ItemA(
@@ -67,6 +63,7 @@ fun ItemA(
     onClickItem: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    val appColor = AppColor()
 
     Box(
         modifier = Modifier
@@ -97,7 +94,7 @@ fun ItemA(
             Text(
                 text = titleBtn,
                 fontSize = 12.sp,
-                color = darkGrayColor,
+                color = appColor.darkGray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -175,17 +172,19 @@ fun TopInfoView(
     userName: String = "Nguyễn Quốc An",
     phoneNumber: String = "0123456789"
 ) {
+    val appColor = AppColor()
+
     Column (
         modifier = Modifier
             .fillMaxWidth()
-            .background(redColor)
+            .background(appColor.red)
     ) {
 
         Row (
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp)
-                .background(redColor),
+                .background(appColor.red),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
         ) {
@@ -204,7 +203,7 @@ fun TopInfoView(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(80.dp)
-                .background(redColor),
+                .background(appColor.red),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -220,7 +219,7 @@ fun TopInfoView(
             ) {
                 Text(
                     text = userName,
-                    color = whiteColor,
+                    color = appColor.white,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
 
@@ -230,7 +229,7 @@ fun TopInfoView(
 
                 Text(
                     text = maskString(phoneNumber),
-                    color = whiteColor,
+                    color = appColor.white,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -244,16 +243,17 @@ fun LineFunctions (
     screenWidth: Dp,
     navController: NavHostController?= null
 ) {
+    val appColor = AppColor()
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(whiteColor)
+            .background(appColor.white)
     ) {
         Column (
             modifier = Modifier
                 .padding(localPadding)
-                .background(whiteColor)
+                .background(appColor.white)
         ) {
             Row(
                 modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 10.dp)
@@ -323,16 +323,16 @@ fun LineFunctions2 (
     screenWidth: Dp,
     navController: NavHostController?= null
 ) {
-
+    val appColor = AppColor()
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(whiteColor)
+            .background(appColor.white)
     ) {
         Column (
             modifier = Modifier
                 .padding(localPadding)
-                .background(whiteColor)
+                .background(appColor.white)
         ) {
             Row(
                 modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 10.dp)
@@ -364,7 +364,7 @@ fun LineFunctions2 (
                     titleBtn = "Điểm danh",
                     description = "",
                     onClickItem = {
-
+                        navController?.navigate("RollUpScreen")
                     }
                 )
             }
@@ -441,16 +441,17 @@ fun LineCountdown (
     navController: NavHostController?= null,
     timeCheckOut: String?
 ) {
+    val appColor = AppColor()
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(whiteColor)
+            .background(appColor.white)
     ) {
         Column (
             modifier = Modifier
                 .padding(localPadding)
-                .background(whiteColor)
+                .background(appColor.white)
         ) {
             Row(
                 modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 10.dp)
@@ -471,8 +472,13 @@ fun LineCountdown (
 
 @Composable
 fun DiscountScreen(
-    padding: PaddingValues,
-    navController: NavHostController,
+    padding: PaddingValues = PaddingValues(
+        start = 16.dp, // Left padding
+        top = 8.dp,    // Top padding
+        end = 16.dp,   // Right padding
+        bottom = 8.dp  // Bottom padding
+    ),
+    navController: NavHostController? = null,
     isLoggedIn: Boolean = true,
     isCheckedIn: Boolean = true,
     timeCheckOut: String = "06/05/2024 18:01:00"
@@ -482,13 +488,14 @@ fun DiscountScreen(
         LocalConfiguration.current.screenWidthDp.dp
     }
     val localPadding = 16.dp
+    val appColor = AppColor()
     // Config screen - end
 
     Column (
         modifier = Modifier
             .padding(padding)
             .fillMaxSize()
-            .background(lightGrayColor)
+            .background(appColor.gray3)
     ) {
         if(isLoggedIn) {
             TopInfoView()
@@ -535,7 +542,7 @@ fun DiscountScreen(
 
                     Button(
                         onClick = {
-                            navController.navigate("login")
+                            navController?.navigate("login")
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
@@ -643,7 +650,7 @@ fun DiscountScreen(
 
                     Button(
                         onClick = {
-                            navController.navigate("register")
+                            navController?.navigate("register")
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
@@ -660,4 +667,10 @@ fun DiscountScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun demoDiscountScreen() {
+    DiscountScreen()
 }
