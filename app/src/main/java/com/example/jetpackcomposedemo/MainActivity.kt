@@ -28,6 +28,7 @@ import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
 import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
+import com.example.jetpackcomposedemo.Screen.Discount.RollUpScreen
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.VideoScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
@@ -194,9 +195,10 @@ fun MainApp(){
                 }
 
                 //----------------------------------- DISCOUNT ------------------------------
+
                 composable("discount"){
                     ScreenWithBottomNavigationBar(navController = navController, topBar = {
-                        DiscountTopBar()
+
                     }, content = {padding, _->
                         DiscountScreen(padding = padding, navController)
                     })
@@ -204,6 +206,12 @@ fun MainApp(){
 
                 composable("CouponScreen"){
                     CouponScreen(navController, 1)
+                }
+
+                composable("RollUpScreen"){
+                    RollUpScreen(
+                        navController = navController
+                    )
                 }
 
                 composable("StartingAppScreen"){
