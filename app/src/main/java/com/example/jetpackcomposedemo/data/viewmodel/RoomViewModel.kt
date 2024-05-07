@@ -9,7 +9,7 @@ import com.example.jetpackcomposedemo.data.repository.RoomRepository
 import com.example.jetpackcomposedemo.helpper.Resource
 import kotlinx.coroutines.launch
 
-class RoomViewModel(private val repsitory: RoomRepository) : ViewModel() {
+class RoomViewModel(private val repository: RoomRepository) : ViewModel() {
     private val _list = MutableLiveData<Resource<List<Room>>>()
     val list: LiveData<Resource<List<Room>>> = _list
     private var isCallApi_getListRoom = false
@@ -19,7 +19,7 @@ class RoomViewModel(private val repsitory: RoomRepository) : ViewModel() {
             _list.postValue(Resource.loading(null))
             viewModelScope.launch {
                 try {
-                    val response = repsitory.getAllRoom() 
+                    val response = repository.getAllRoom()
                     if (response.isSuccessful) {
                         _list.postValue(Resource.success(response.body()))
                     } else {

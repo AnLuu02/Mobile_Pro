@@ -28,6 +28,7 @@ import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.VideoScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
+import com.example.jetpackcomposedemo.Screen.Map.MapScreen
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
@@ -107,8 +108,8 @@ fun MainApp(
                                 onOpenDetailCardScreen = {roomId->
                                     navController.navigate("roomDetails/$roomId")
                                 },
-                                onSelectService = {service ->
-                                    navController.navigate("service/$service")
+                                onSelectService = {filter->
+                                    navController.navigate("service/$filter")
                                 })
                         })
                 }
@@ -123,7 +124,7 @@ fun MainApp(
                     SearchScreen(
                         searchViewModel = searchViewModel,
                         onHandleSearchClickButtonSearch = {filter->
-                            navController.navigate("search/$filter")
+                            navController.navigate("service/$filter")
                         },
                         closeSearchScreen={
                             navController.popBackStack("home",inclusive = false)
@@ -292,19 +293,28 @@ fun MainApp(
                         },
                     )
                 ){ backStackEntry ->
-                    val type = backStackEntry.arguments?.getString("type");
+                    val type = backStackEntry.arguments?.getString("type").toString();
                     ServiceScreen(
-                        type = type,
+                        serviceType = type,
                         onCancelButtonClicked = {
                             navController.popBackStack()
                         },
                         onSearchFieldClicked = {
                             navController.navigate("search")
                         },
-                        onOpenDetailCardScreen = {cardId->
-                            navController.navigate("carddetail/$cardId")
+                        onOpenDetailCardScreen = {roomId->
+                            navController.navigate("roomDetails/$roomId")
                         },
+                        onMapViewButtonClicked = {
+                            navController.navigate("map")
+                        }
                     )
+                }
+
+                composable(
+                    "map"
+                ) {
+                    MapScreen()
                 }
             }
         }

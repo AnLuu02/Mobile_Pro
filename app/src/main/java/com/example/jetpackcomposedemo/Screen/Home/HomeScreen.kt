@@ -52,7 +52,7 @@ fun HomeScreen(
             LocationSection(onOpenScreenSearch)
             ServiceSection(onSelectService = onSelectService)
 
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             AdvCard(
                 sliderList = sliderList

@@ -39,7 +39,8 @@ fun SortBottomSheet (
     onDismissRequest: () -> Unit,
     sheetState: SheetState,
     sortOption: String,
-    onSortOptionSelected: (String) -> Unit = {}
+    onSortOptionSelected: (String) -> Unit,
+    onSort: () -> Unit = {}
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -51,6 +52,7 @@ fun SortBottomSheet (
             onSortOptionSelected = onSortOptionSelected,
             sortOption = sortOption,
             onDismissRequest = onDismissRequest,
+            onSort = onSort,
         )
     }
 }
@@ -61,6 +63,7 @@ fun SheetContent(
     sortOption: String,
     onSortOptionSelected: (String) -> Unit,
     onDismissRequest: () -> Unit,
+    onSort: () -> Unit,
 ) {
     val closeButtonInteractionResource = remember { MutableInteractionSource() }
     Column (
@@ -114,6 +117,7 @@ fun SheetContent(
                                 selected = (value == sortOption),
                                 onClick = {
                                     onSortOptionSelected(value)
+                                    onSort()
                                     onDismissRequest()
                                 }
                             )
@@ -127,6 +131,7 @@ fun SheetContent(
                             selected = (value == sortOption),
                             onClick = {
                                 onSortOptionSelected(value)
+                                onSort()
                                 onDismissRequest()
                             }
                         )

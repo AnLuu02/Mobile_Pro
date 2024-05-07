@@ -43,22 +43,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.components.BottomSheet.Filter.FilterBottomSheet
 import com.example.jetpackcomposedemo.components.BottomSheet.Sort.SortBottomSheet
+import com.example.jetpackcomposedemo.data.models.RoomType
 import java.util.logging.Filter
 
-const val location = "Đồng Tháp"
+const val location = "Hồ Chí Minh"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServiceTopBar (
+    currentType: String,
     onCancelButtonClicked: () -> Unit = {},
     onSearchFieldClicked: () -> Unit = {},
     onSortOptionSelected: (String) -> Unit = {},
     sortOption: String = "",
-    onCapacityOptionSelected: (Int) -> Unit = {},
-    capacityOption: Int,
+    roomTypes: MutableList<RoomType>,
+    onTypeOptionSelected: (String) -> Unit = {},
+    typeOption: String,
     setMinPrice: (Int) -> Unit = {},
     setMaxPrice: (Int) -> Unit = {},
-    onFilterApplied: () -> Unit
+    onFilterApplied: () -> Unit,
+    onSort: () -> Unit
 ) {
     val closeButtonInteractionSource = remember { MutableInteractionSource() }
     val searchInteractionSource = remember { MutableInteractionSource() }
@@ -123,7 +127,7 @@ fun ServiceTopBar (
                             .align(Alignment.CenterVertically)
                             .padding(start = 12.dp),
                     )
-                    SearchTextField()
+                    SearchTextField(currentType = currentType)
                 }
             }
         }
@@ -217,7 +221,8 @@ fun ServiceTopBar (
                 },
                 sheetState = sortSheetState,
                 onSortOptionSelected = onSortOptionSelected,
-                sortOption = sortOption
+                sortOption = sortOption,
+                onSort = onSort
             )
         }
         else if(showFilterBottomSheet) {
@@ -228,8 +233,9 @@ fun ServiceTopBar (
                 sheetState = filterSheetState,
                 setMaxPrice = setMaxPrice,
                 setMinPrice = setMinPrice,
-                onCapacityOptionSelected = onCapacityOptionSelected,
-                capacityOption = capacityOption,
+                roomTypes = roomTypes,
+                onTypeOptionSelected = onTypeOptionSelected,
+                typeOption = typeOption,
                 onFilterApplied = onFilterApplied,
             )
         }
@@ -239,6 +245,7 @@ fun ServiceTopBar (
 
 @Composable
 fun SearchTextField(
+    currentType: String
 ) {
     Box(
         modifier = Modifier
@@ -259,8 +266,9 @@ fun SearchTextField(
                 modifier = Modifier
                     .background(Color.White)
             )
+            val txt = if(currentType.equals("")) "Bất kỳ" else currentType
             Text(
-                text = "Theo giờ - Bất kỳ",
+                text = "$txt - Bất kỳ",
                 color = Color.Black,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,

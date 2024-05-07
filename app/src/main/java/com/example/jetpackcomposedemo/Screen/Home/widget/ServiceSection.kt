@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.Home.widget
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,42 +31,47 @@ import com.example.jetpackcomposedemo.R
 
 data class ServicesUI(
     val icon: Int,
-    val title:String
+    val title:String,
+    val type: String,
 )
 
 val servicesUI = listOf(
     ServicesUI(
         icon = R.drawable.outline_location_on_24,
-        title = "Gần bạn"
+        title = "Gần bạn",
+        type = "other"
     ),
     ServicesUI(
         icon = R.drawable.outline_hourglass_top_24,
-        title = "Theo giờ"
+        title = "Theo giờ",
+        type = "hourly"
     ),
     ServicesUI(
         icon = R.drawable.outline_dark_mode_24,
-        title = "Qua đêm"
+        title = "Qua đêm",
+        type = "overnight"
     ),
     ServicesUI(
         icon = R.drawable.outline_calendar_month_24,
-        title = "Theo ngày"
+        title = "Theo ngày",
+        type = "bydate"
     ),
-    ServicesUI(
-        icon = R.drawable.outline_favorite_border_24,
-        title = "Tình yêu"
-    ),
-    ServicesUI(
-        icon = R.drawable.outline_local_airport_24,
-        title = "Du lịch"
-    ),
-    ServicesUI(
-        icon = R.drawable.outline_local_offer_24,
-        title = "Ưu đãi"
-    ),
-    ServicesUI(
-        icon = R.drawable.outline_fiber_new_24,
-        title = "Đổi gió"
-    ),
+//    ServicesUI(
+//        icon = R.drawable.outline_favorite_border_24,
+//        title = "Tình yêu"
+//    ),
+//    ServicesUI(
+//        icon = R.drawable.outline_local_airport_24,
+//        title = "Du lịch"
+//    ),
+//    ServicesUI(
+//        icon = R.drawable.outline_local_offer_24,
+//        title = "Ưu đãi"
+//    ),
+//    ServicesUI(
+//        icon = R.drawable.outline_fiber_new_24,
+//        title = "Đổi gió"
+//    ),
 )
 
 @Composable
@@ -92,7 +98,7 @@ fun ServiceSection(
             modifier = Modifier
                 .height(120.dp)
         ) {
-            items(servicesUI.size) { index -> ServiceItem(index = index, onSelectService = onSelectService) }
+            items(servicesUI.size) { ServiceItem(index = it, onSelectService = onSelectService) }
 
         }
     }
@@ -104,11 +110,11 @@ fun ServiceItem(
     onSelectService: (String) -> Unit
 ) {
     val item = servicesUI[index];
-
+    Log.e("Type", item.type)
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { onSelectService("abc") }
+        modifier = Modifier.clickable { onSelectService(item.type) }
     ) {
         Icon(
             painter = painterResource(id = item.icon),
