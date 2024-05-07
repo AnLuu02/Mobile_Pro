@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.AppColor
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
 
 @Composable
 fun smallIconBtn(
@@ -149,6 +150,10 @@ fun RollUpScreen(
   }
   var isTurnOnNotificationSuccess by remember {
     mutableStateOf(false)
+  }
+
+  var isLoading by remember {
+    mutableStateOf(true)
   }
 
 
@@ -436,6 +441,10 @@ fun RollUpScreen(
         }
       }
     }
+  }
+
+  if(isLoading) {
+    LoadingScreen(isLoadingValue = true)
   }
 }
 
