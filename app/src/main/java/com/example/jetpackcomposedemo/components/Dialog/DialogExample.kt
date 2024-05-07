@@ -50,15 +50,13 @@ fun AlertDialogExample(
         confirmButton = {
             Button(
                 onClick = {
-                    onConfirmation()
+                    onDismissRequest()
                 },
-                modifier = Modifier.border(BorderStroke(1.dp,Color.Red), shape = MaterialTheme.shapes.extraLarge),
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = Color.Red,
-                    containerColor = Color.White,
+                    containerColor = Color.Transparent,
 
                 ),
-                shape = MaterialTheme.shapes.extraLarge
             ) {
                 Text(
                     text = "Hủy",
@@ -71,7 +69,7 @@ fun AlertDialogExample(
 
             Button(
                 onClick = {
-                    onDismissRequest()
+                    onConfirmation()
                 },
                 modifier = Modifier.background(Color.Red, shape = MaterialTheme.shapes.extraLarge),
                 colors = ButtonDefaults.buttonColors(
@@ -87,6 +85,6 @@ fun AlertDialogExample(
                     fontWeight = FontWeight.Bold,
                 )
             }
-        }
+        },
     )
 }

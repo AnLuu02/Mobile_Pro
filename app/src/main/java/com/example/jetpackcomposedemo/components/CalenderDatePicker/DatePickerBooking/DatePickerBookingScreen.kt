@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 fun DatePickerBookingScreen(
     bookingViewModel:BookingViewModel,
     searchViewModel: SearchViewModel,
+    typeBooking:String,
     onHandleApplyTimeBooking:(String,String,String,String)->Unit,
     onCloseDatePicker:(Boolean)->Unit
 ) {
@@ -41,14 +42,15 @@ fun DatePickerBookingScreen(
     val dateCheckoutString = remember{ mutableStateOf("") }
     val totalTime = remember{ mutableLongStateOf(0)  }
     val bookingRoom = remember{ mutableStateOf(BookRoom()) }
-    val typeBooking = remember { mutableStateOf<String?>(null) }
+
+    val enabledButtonApply = remember{ mutableStateOf(false) }
+    enabledButtonApply.value = dateCheckoutString.value != "Bất kì"
 
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         sheetState.hide()
-
     }
 
 
@@ -71,12 +73,10 @@ fun DatePickerBookingScreen(
             dragHandle = {
                 DatePickerBookingTopBar(
                     bookingViewModel = bookingViewModel,
-                    typeBooking = {
-                        typeBooking.value = it
-                    },
+                    typeBooking = typeBooking,
                     checkIn = dateCheckinString.value,
                     checkOut = dateCheckoutString.value,
-                    totalHourlyCheckin = totalTime.longValue,
+                    totalTime = totalTime.longValue,
                 )
             },
         ) {
@@ -84,12 +84,13 @@ fun DatePickerBookingScreen(
                 bottomBar = {
                     DatePickerBookingBottomBar(
                         sheetState = sheetState,
+                        searchViewModel = searchViewModel,
                         bookingViewModel = bookingViewModel,
                         dateCheckinString = dateCheckinString.value,
                         dateCheckoutString = dateCheckoutString.value,
                         totalTime = totalTime.longValue,
-                        typeBooking = typeBooking.value.toString(),
-                        enabledButtonApply = true,
+                        typeBooking = typeBooking,
+                        enabledButtonApply = enabledButtonApply.value,
                         onHandleApplyTimeBooking = onHandleApplyTimeBooking,
                         onCloseDatePicker = onCloseDatePicker
                     )
@@ -100,10 +101,10 @@ fun DatePickerBookingScreen(
 
 
             ) { padding ->
-                when(typeBooking.value){
+                when(typeBooking){
                     "hourly"-> DatePickerCustom(
                         searchViewModel = searchViewModel,
-                        typeBooking = typeBooking.value.toString(),
+                        typeBooking = typeBooking,
                         padding = padding,
                         onDateCheckinString = {
                             dateCheckinString.value = it
@@ -119,7 +120,7 @@ fun DatePickerBookingScreen(
                     }
                     "overnight"-> DateRangePickerCustom(
                         searchViewModel = searchViewModel,
-                        typeBooking = typeBooking.value.toString(),
+                        typeBooking = typeBooking,
                         padding = padding,
                         onDateCheckinString = {
                             dateCheckinString.value = it
@@ -135,7 +136,7 @@ fun DatePickerBookingScreen(
                     }
                     "bydate"-> DateRangePickerCustom(
                         searchViewModel = searchViewModel,
-                        typeBooking = typeBooking.value.toString(),
+                        typeBooking = typeBooking,
                         padding = padding,
                         onDateCheckinString = {
                             dateCheckinString.value = it

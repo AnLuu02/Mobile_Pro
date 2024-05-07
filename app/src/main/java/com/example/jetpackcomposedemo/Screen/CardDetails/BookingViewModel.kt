@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
+import com.example.jetpackcomposedemo.data.models.Room.Room
 
 
 data class BookingResult(
@@ -15,6 +16,7 @@ data class BookingResult(
     var phoneCustomer:String? = null,
     var totalTime:String? = null,
     var status:String? = null,
+    var infoRoom: Room? = null
 )
 
 class BookingViewModel: ViewModel() {
@@ -32,7 +34,7 @@ class BookingViewModel: ViewModel() {
     fun getPhoneCustomer() = _bookingResult.value.phoneCustomer
     fun getTotalTime() = _bookingResult.value.totalTime
     fun getStatus() = _bookingResult.value.status
-
+    fun getInfoRoom() = _bookingResult.value.infoRoom
 
     fun setBookingResult(bookingResult: BookingResult) {
         _bookingResult.value = bookingResult
@@ -46,7 +48,7 @@ class BookingViewModel: ViewModel() {
     fun setPhoneCustomer(phoneCustomer:String) { _bookingResult.value.phoneCustomer = phoneCustomer}
     fun setTotalTime(totalTime:String) { _bookingResult.value.totalTime = totalTime}
     fun setStatus(status:String) { _bookingResult.value.status = status}
-
+    fun setInfoRoom(infoRoom: Room?) { _bookingResult.value.infoRoom = infoRoom}
 
 
 }

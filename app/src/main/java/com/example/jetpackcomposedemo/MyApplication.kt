@@ -6,20 +6,15 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.jetpackcomposedemo.Screen.User.AppContainer
+import com.example.jetpackcomposedemo.Screen.User.DefaultAppContainer
 
 class MyApplication:Application() {
+    lateinit var container: AppContainer
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
+        container = DefaultAppContainer()
 
-        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        val notificationChannel = NotificationChannel(
-            NOTIFICATION_CHANNEL_ID,
-            NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_HIGH
-        )
-
-        notificationManager.createNotificationChannel(notificationChannel)
     }
 }

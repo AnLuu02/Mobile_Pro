@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.User
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,11 +17,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.HeartBroken
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.LockClock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Icon
@@ -37,14 +41,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 
 @Composable
 fun UserScreen(
+    navController: NavHostController,
     onLogoutSuccess: () -> Unit = {},
     loginUiState: LoginUiState,
     padding: PaddingValues,
 ){
+    Log.d("DEBUG","User FULLNAME INIT : ${loginUiState.fullName} " )
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -52,14 +59,26 @@ fun UserScreen(
     ) {
         item {
             Column() {
+
+                if(loginUiState.isLoggedIn){
+                    Text(
+                        text = "Trang của tôi",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(12.dp,20.dp,12.dp,16.dp)
+                    )
+                    SettingElement(Icons.Filled.LockClock,"Đặt phòng của tôi", onClick = {
+                        navController.navigate("user/${loginUiState.uid}/mybooking")
+                    })
+                    SettingElement(Icons.Filled.HeartBroken,"Khách sạn yêu thích")
+                }
+
                 Text(
                     text = "Cài đặt",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(12.dp,16.dp)
+                    modifier = Modifier.padding(12.dp,20.dp,12.dp,16.dp)
                 )
-
-
                 SettingElement(Icons.Filled.Notifications,"Thông báo")
                 SettingElement(Icons.Filled.AddCircle,"Ngôn ngữ","Tiếng Việt")
                 SettingElement(Icons.Filled.LocationOn,"Khu vực","Hồ Chí Minh")
@@ -68,24 +87,14 @@ fun UserScreen(
                     text = "Thông tin",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(12.dp,16.dp)
+                    modifier = Modifier.padding(12.dp,20.dp,12.dp,16.dp)
                 )
                 SettingElement(Icons.Filled.Phone,"Hỏi đáp")
                 SettingElement(Icons.Filled.DateRange,"Điều khoản & Chính sách bảo mật")
                 SettingElement(Icons.Filled.AccountBox,"Phiên bản","15.35.0")
                 SettingElement(Icons.Filled.Info,"Liên hệ")
                 if(loginUiState.isLoggedIn){
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp), horizontalArrangement = Arrangement.Center, ) {
-                        OutlinedButton(
-                            onClick = onLogoutSuccess,
-                            modifier = Modifier.fillMaxWidth(),
-
-                            ) {
-                            Text(text = "Đăng xuất", color = Color.Red)
-                        }
-                    }
+                    SettingElement(Icons.AutoMirrored.Filled.Logout,"Đăng xuất", onClick = onLogoutSuccess)
                 }
             }
         }
@@ -126,15 +135,17 @@ fun SettingElement(
     icon: ImageVector,
     text: String,
     setting: String? = null,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit= {},
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier
         .fillMaxWidth()
-        .clickable(onClick = { /* handle click here */ })
+        .clickable {onClick()}
     ) {
         Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically, modifier = Modifier
             .padding(12.dp)
-            .fillMaxWidth()) {
+            .fillMaxWidth()
+            ) {
             Icon(imageVector = icon, contentDescription = null,tint = Color.Red , modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.width(12.dp))
             Text(text = text, fontSize = 16.sp,color = Color.Black.copy(0.6f))

@@ -27,8 +27,6 @@ data class ServicesUI(
     val icon: Int,
     val title:String
 )
-
-
 val servicesUI = listOf(
     ServicesUI(
         icon = R.drawable.outline_location_on_24,
@@ -61,13 +59,11 @@ val servicesUI = listOf(
     ServicesUI(
         icon = R.drawable.outline_fiber_new_24,
         title = "Đổi gió"
-    ),
-
     )
+)
 
 @Composable
 fun ServiceSection() {
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -91,12 +87,12 @@ fun ServiceSection() {
 
         }
     }
+    Spacer(modifier = Modifier.height(15.dp))
+
 }
 
 @Composable
-fun ServiceItem(
-    index: Int
-) {
+fun ServiceItem(index: Int) {
     val item = servicesUI[index]
 
     Column(
@@ -111,7 +107,7 @@ fun ServiceItem(
             tint = Color.Red,
             modifier = Modifier.size(24.dp)
         )
-        
+
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(

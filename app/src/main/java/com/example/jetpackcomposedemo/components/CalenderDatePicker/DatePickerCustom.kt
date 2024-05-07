@@ -17,10 +17,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -37,7 +39,6 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,17 +74,20 @@ fun DatePickerCustom(
         else timeCheckin.intValue + totalTime.intValue
 
     val initialSelectedDateMillis = if(searchViewModel.getTimeCheckin(typeBooking) != "Bất kì")
-        searchViewModel.getTimeCheckin(typeBooking).let {
-            convertStringToMillis(
-                it
-            )
-        } else currentTime.toMillis()
+        convertStringToMillis(
+            searchViewModel.getTimeCheckin(typeBooking)
+        ) else currentTime.toMillis()
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis  = initialSelectedDateMillis,
         initialDisplayedMonthMillis = null,
         initialDisplayMode = DisplayMode.Picker,
-        yearRange = (currentTime.year..3000)
+        yearRange = (currentTime.year..3000),
+        selectableDates =  object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis >= LocalDateTime.now().toMillis()
+            }
+        }
     )
 
     val currentDay = currentTime.format(DateTimeFormatter.ofPattern("dd"))
@@ -104,20 +108,20 @@ fun DatePickerCustom(
     val currentHourly = if(selectedDate?.format(DateTimeFormatter.ofPattern("dd")) == currentDay) roundUpHour(currentTime,true).toInt() else 0
 
     val dateCheckinString = if(searchViewModel.getDateNotYear(typeBooking).timeCheckin == "Bất kì")
-        "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
-    else if("${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}" != searchViewModel.getDateNotYear(typeBooking).timeCheckin
+        "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(dateFormatter)}"
+    else if("${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(dateFormatter)}" != searchViewModel.getDateNotYear(typeBooking).timeCheckin
     ){
-        "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
+        "${formatHourly(timeCheckin.intValue)}, ${selectedDate?.format(dateFormatter)}"
     }
     else searchViewModel.getDateNotYear(typeBooking).timeCheckin
 
 
     val dateCheckoutString = if(searchViewModel.getDateNotYear(typeBooking).timeCheckOut == "Bất kì")
-        "${formatHourly(timeCheckout)}, ${newDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
+        "${formatHourly(timeCheckout)}, ${newDate?.format(dateFormatter)}"
     else if(
-        "${formatHourly(timeCheckout)}, ${newDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}" != searchViewModel.getDateNotYear(typeBooking).timeCheckOut
+        "${formatHourly(timeCheckout)}, ${newDate?.format(dateFormatter)}" != searchViewModel.getDateNotYear(typeBooking).timeCheckOut
     ){
-        "${formatHourly(timeCheckout)}, ${newDate?.format(DateTimeFormatter.ofPattern("dd/MM"))}"
+        "${formatHourly(timeCheckout)}, ${newDate?.format(dateFormatter)}"
 
     }
     else
@@ -147,22 +151,14 @@ fun DatePickerCustom(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 item{
-                    androidx.compose.material3.DatePicker(
+                    DatePicker(
                         state = datePickerState,
                         title = null,
                         headline = null,
                         showModeToggle = false,
-                        dateValidator = {
-                            val calendarNow = Calendar.getInstance()
-                            with(calendarNow) {
-                                set(Calendar.HOUR_OF_DAY, 0)
-                                set(Calendar.MINUTE, 0)
-                                set(Calendar.SECOND, 0)
-                                set(Calendar.MILLISECOND, 0)
-                            }
-                            return@DatePicker it >= calendarNow.timeInMillis
+                        dateFormatter = DatePickerDefaults.dateFormatter(
 
-                        },
+                        ),
                         colors = DatePickerDefaults.colors(
                             selectedDayContainerColor = Color.Red.copy(alpha = 0.1f),
                             todayDateBorderColor = Color.Transparent,
@@ -194,12 +190,12 @@ fun DatePickerCustom(
                         LazyRow {
                             var lastPadding = 0.dp
 
-                            items(listOf(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)){
-                                if(it == 23){
+                            items(listOf(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)){ item->
+                                if(item == 23){
                                     lastPadding = 12.dp
                                 }
-                                if(it >= currentHourly){
-                                    val selectedHourly = it == timeCheckin.intValue
+                                if(item >= currentHourly){
+                                    val selectedHourly = item == timeCheckin.intValue
                                     Box(
                                         modifier = Modifier
                                             .padding(start = 12.dp, end = lastPadding)
@@ -214,11 +210,11 @@ fun DatePickerCustom(
                                                 interactionSource = remember { MutableInteractionSource() },
                                                 indication = rememberRipple(bounded = true)
                                             ) {
-                                                timeCheckin.intValue = it
+                                                timeCheckin.intValue = item
                                             },
                                     ){
                                         Text(
-                                            text = formatHourly(it),
+                                            text = formatHourly(item),
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.Bold,
                                             color = if(selectedHourly) Color.Red else Color.Black,
@@ -251,7 +247,7 @@ fun DatePickerCustom(
 
                         LazyRow {
                             var lastPadding = 0.dp
-                            items(listOf(1,2,3,4,5,6,7,8,9,10)){
+                            items(listOf(1,2,3,4,5,6,7,8,9,10)){it->
                                 if(it == 10){
                                     lastPadding=12.dp
                                 }

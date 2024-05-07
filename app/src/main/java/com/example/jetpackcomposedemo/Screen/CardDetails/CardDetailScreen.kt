@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.CardDetails
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,12 +29,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -42,54 +46,134 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Scale
 import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.Screen.Search.BookRoom
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
+import com.example.jetpackcomposedemo.Screen.User.LoginUiState
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBooking.DatePickerBookingScreen
+import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
+import com.example.jetpackcomposedemo.data.models.Room.Room
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
+import com.example.jetpackcomposedemo.helpper.Status
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CardDetailScreen(
+    loginUiState: LoginUiState,
     searchViewModel: SearchViewModel,
     bookingViewModel:BookingViewModel,
-    roomId: String?,
-    onOpenListRoom:()->Unit,
+    roomViewModel: RoomViewModel,
+    roomId: String,
+    onOpenPayment:()->Unit,
+    onOpenLoginScreen:()->Unit,
     onBack:()->Unit
 ) {
     val listState = rememberLazyListState()
+    val openAlertDialog = remember { mutableStateOf(false) }
+    val openDialogLoginRequired = remember { mutableStateOf(false) }
+
     val openDatePickerBookingScreen = remember {
         mutableStateOf(false)
     }
 
-    val dateCheckinString = remember{ mutableStateOf(
-        bookingViewModel.getTimeCheckin()
-            ?: LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-    ) }
-    val dateCheckoutString = remember{ mutableStateOf(
-        bookingViewModel.getTimeCheckout()
-            ?: LocalDateTime.now().plusDays(2).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-    ) }
+    var dateCheckinString = ""
+    var dateCheckoutString = ""
+    var typeBooking = "";
+    var totalTime = "1"
 
-    val totalTime = remember{ mutableStateOf(bookingViewModel.getTotalTime() ?: "1")  }
-    val typeBooking = remember { mutableStateOf(bookingViewModel.getTypeBooking() ?: "bydate") }
+    LaunchedEffect(Unit) {
+        roomViewModel.getRoomById(roomId)
+    }
+    val roomResource = roomViewModel.rooms.observeAsState()
+    val data = remember {
+        mutableStateOf(Room())
+    }
+    when (roomResource.value?.status) {
+        Status.SUCCESS -> {
+            roomResource.value?.data?.let { room ->
+                data.value = room[0]
+                typeBooking = room[0].roomTypes?.type ?: "hourly"
+                if(bookingViewModel.getTypeBooking() !=  room[0].roomTypes?.type){
+                    bookingViewModel.setBookingResult(BookingResult())
+                }
+                when(room[0].roomTypes?.type){
+                    "hourly"->{
+                        dateCheckinString = bookingViewModel.getTimeCheckin() ?:  LocalDateTime.now().plusHours(1).format(
+                            DateTimeFormatter.ofPattern("HH:00, dd/MM"))
+                        dateCheckoutString =  bookingViewModel.getTimeCheckout() ?: LocalDateTime.now().plusHours(2).format(
+                            DateTimeFormatter.ofPattern("HH:00, dd/MM"))
+                        totalTime =  bookingViewModel.getTotalTime() ?: "1"
 
+                    }
+                    "overnight"->{
+                        dateCheckinString = bookingViewModel.getTimeCheckin() ?: LocalDateTime.now().plusDays(1).format(
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        dateCheckoutString =  bookingViewModel.getTimeCheckout() ?: LocalDateTime.now().plusDays(2).format(
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        totalTime = bookingViewModel.getTotalTime() ?: "1"
+                    }
+                    "bydate"->{
+                        dateCheckinString = bookingViewModel.getTimeCheckin() ?: LocalDateTime.now().plusDays(1).format(
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        dateCheckoutString =  bookingViewModel.getTimeCheckout() ?: LocalDateTime.now().plusDays(3).format(
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        totalTime = bookingViewModel.getTotalTime() ?: "2"
+                    }
+                }
 
+                bookingViewModel.setTimeCheckin(dateCheckinString)
+                bookingViewModel.setTimeCheckout(dateCheckoutString)
+                bookingViewModel.setTotalTime(totalTime)
+                bookingViewModel.setTypeBooking(typeBooking)
+                val currentHour = LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("HH:00"))
+                val saveDateCheckin = when(typeBooking){
+                    "hourly"->"$dateCheckinString/${LocalDateTime.now().year}"
+                    else->"$currentHour, $dateCheckinString"
+                }
+                val saveDateCheckout = when(typeBooking){
+                    "hourly"-> "$dateCheckoutString/${LocalDateTime.now().year}"
+                    else->"$currentHour, $dateCheckoutString"
+                }
+                searchViewModel.setSelectedCalendar(typeBooking, BookRoom(
+                    timeCheckin = saveDateCheckin,
+                    timeCheckOut = saveDateCheckout,
+                    totalTime = totalTime.toInt()
+                )
+                )
 
+            }
+        }
+
+        Status.ERROR ->Log.e("<Null roi>","-----------------------------------------------")
+        Status.LOADING -> Log.e("<Null roi>","-----------------------------------------------")
+        null -> Log.e("<Null roi>","-----------------------------------------------")
+    }
     Scaffold(
         topBar = {
-            TopCardDetail(listState,roomId.toString(),
+            TopCardDetail(listState,data.value,
                 onBack = onBack
             )
         },
         bottomBar = {
             BottomCardDetail(
+                loginUiState = loginUiState,
                 bookingViewModel = bookingViewModel,
-                onOpenListRoom = onOpenListRoom,
-                dateCheckinString =dateCheckinString.value,
-                dateCheckoutString = dateCheckoutString.value,
-                totalTime = totalTime.value,
-                typeBooking = typeBooking.value,
+                data = data.value,
+                onOpenPayment = {
+                    openAlertDialog.value = true
+                },
+                dateCheckinString =dateCheckinString,
+                dateCheckoutString = dateCheckoutString,
+                totalTime = totalTime,
+                typeBooking = typeBooking,
+                openDialogLoginRequired = {
+                    openDialogLoginRequired.value = it
+                },
                 openDatePickerBookingScreen ={
                     openDatePickerBookingScreen.value = it
                 })
@@ -116,8 +200,10 @@ fun CardDetailScreen(
                         verticalAlignment = Alignment.CenterVertically
 
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.hotel_1),
+
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                                .crossfade(true).data(data.value.images?.get(0)).build(),
                             contentDescription = "",
                             modifier = Modifier
                                 .weight(1f)
@@ -127,15 +213,18 @@ fun CardDetailScreen(
 
                             )
 
-                        Image(
-                            painter = painterResource(id = R.drawable.hotel_2),
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                                .crossfade(true).data(data.value.images?.get(1) ?: data.value.images?.get(0)).build(),
                             contentDescription = "",
                             modifier = Modifier
                                 .weight(1f)
                                 .heightIn(min = 180.dp, max = 200.dp)
-                                .padding(start = 1.dp),
+                                .padding(end = 1.dp),
                             contentScale = ContentScale.Crop,
-                        )
+
+                            )
+
                     }
 
                     Spacer(modifier = Modifier.height(2.dp))
@@ -203,7 +292,7 @@ fun CardDetailScreen(
 
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "4.4",
+                                    text = data.value.rating.toString(),
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -243,7 +332,7 @@ fun CardDetailScreen(
                         Spacer(modifier = Modifier.height(20.dp))
 
                         Text(
-                            text = "Corzum Homes - Summer's House",
+                            text = data.value.name.toString(),
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleLarge
                         )
@@ -276,7 +365,7 @@ fun CardDetailScreen(
 
                                 Text(
                                     text = "Xem tất cả",
-                                    fontSize = 14.sp,
+                                    fontSize = 12.sp,
                                     color = Color.Red,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -310,13 +399,13 @@ fun CardDetailScreen(
                         ) {
                             Text(
                                 text = "Phòng tập California Gym & Fitness",
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             Text(
                                 text = "0.16 km",
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -332,13 +421,13 @@ fun CardDetailScreen(
                         ) {
                             Text(
                                 text = "Siêu thị Sài Gòn",
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             Text(
                                 text = "0.18 km",
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -353,13 +442,13 @@ fun CardDetailScreen(
                         ) {
                             Text(
                                 text = "Co.opXtra",
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             Text(
                                 text = "0.18 km",
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -371,7 +460,7 @@ fun CardDetailScreen(
                 Spacer(modifier = Modifier.height(3.dp))
                 DiscountTickets()
                 Spacer(modifier = Modifier.height(3.dp))
-                Evaluate()
+                Evaluate(data=data.value)
                 Spacer(modifier = Modifier.height(3.dp))
                 Introduce()
                 Spacer(modifier = Modifier.height(3.dp))
@@ -387,21 +476,49 @@ fun CardDetailScreen(
 
     }
 
-
-
-
     if(openDatePickerBookingScreen.value){
         DatePickerBookingScreen(
             bookingViewModel = bookingViewModel,
             searchViewModel = searchViewModel,
+            typeBooking = typeBooking,
             {checkin,checkout,total,type->
-                dateCheckinString.value = checkin
-                dateCheckoutString.value = checkout
-                totalTime.value = total
-                typeBooking.value = type
+                dateCheckinString = checkin
+                dateCheckoutString = checkout
+                totalTime = total
+                typeBooking = type
             }, onCloseDatePicker = {
                 openDatePickerBookingScreen.value = it
             })
+    }
+
+    if(openAlertDialog.value){
+        AlertDialogExample(
+            onDismissRequest = {
+                openAlertDialog.value = false
+            },
+            onConfirmation = {
+                openAlertDialog.value = false
+                onOpenPayment()
+                bookingViewModel.setInfoRoom(data.value)
+
+            },
+            dialogTitle = "Yêu cầu thanh toán trả trước",
+            dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
+        )
+    }
+
+    if(openDialogLoginRequired.value){
+        AlertDialogExample(
+            onDismissRequest = {
+                openDialogLoginRequired.value = false
+            },
+            onConfirmation = {
+                openDialogLoginRequired.value = false
+                onOpenLoginScreen()
+            },
+            dialogTitle = "Yêu cầu đăng nhâp",
+            dialogText = "Vui lòng đăng nhập trước khi đặt phòng. Xin cảm ơn",
+        )
     }
 
 }
@@ -438,7 +555,7 @@ fun DiscountTickets(){
 
                 Text(
                     text = "Giảm giá 5% tối đa 20k, đặt tối thiểu 150k",
-                    fontSize = 16.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Light
                 )
 
@@ -452,7 +569,9 @@ fun DiscountTickets(){
 }
 
 @Composable
-fun Evaluate(){
+fun Evaluate(
+    data:Room
+){
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)){
@@ -467,7 +586,7 @@ fun Evaluate(){
             ){
 
                 Text(
-                    text ="4.6",
+                    text = data.rating.toString(),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -516,7 +635,7 @@ fun Evaluate(){
 
                     Text(
                         text = "Xem tất cả",
-                        fontSize = 16.sp,
+                        fontSize = 12.sp,
                         color = Color.Red,
                         fontWeight = FontWeight.Bold
                     )
@@ -710,7 +829,7 @@ fun Introduce(){
                 },
                     fontSize = 16.sp,
 
-                )
+                    )
 
             }
         }
