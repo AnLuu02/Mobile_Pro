@@ -32,6 +32,7 @@ val errorColor = Color(android.graphics.Color.parseColor("#E65B68"))
 fun showError (
   title: String = "Opps, dude.",
   message: String = "Somethings went wrong",
+  titleBtn: String = "Close",
   onClickClose: (() -> Unit)? = null
 ) {
   val appColor = AppColor()
@@ -85,7 +86,7 @@ fun showError (
         Text(
           color = errorColor,
           fontSize = 24.sp,
-          text = "Close",
+          text = titleBtn,
           fontWeight = FontWeight.Bold
         )
       }

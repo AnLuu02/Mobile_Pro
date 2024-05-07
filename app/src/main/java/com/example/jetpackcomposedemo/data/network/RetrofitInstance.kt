@@ -7,7 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
-    private const val ipv4Address = "172.26.80.1";
+    private const val ipv4Address = "172.22.192.1";
     private const val port = "8080";
     private const val BASE_URL = "http://$ipv4Address:$port/";
 

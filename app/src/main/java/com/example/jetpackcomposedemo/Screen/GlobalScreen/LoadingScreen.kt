@@ -32,69 +32,70 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun LoadingScreen(isLoadingValue: Boolean = true) {
-  var isLoading by remember { mutableStateOf(isLoadingValue) }
-  var isLoadingDot1 by remember { mutableStateOf(false) }
-  var isLoadingDot2 by remember { mutableStateOf(false) }
-  var isLoadingDot3 by remember { mutableStateOf(false) }
-  val appColor = AppColor()
+  if(isLoadingValue) {
+    var isLoading by remember { mutableStateOf(isLoadingValue) }
+    var isLoadingDot1 by remember { mutableStateOf(false) }
+    var isLoadingDot2 by remember { mutableStateOf(false) }
+    var isLoadingDot3 by remember { mutableStateOf(false) }
+    val appColor = AppColor()
 
-
-  LaunchedEffect(isLoading) {
-    delay(1000) // Wait for 1 second
-    while (isLoading) {
-      // Toggle dot colors sequentially
-      isLoadingDot1 = true
-      delay(500) // Wait for 0.5 seconds
-      isLoadingDot1 = false
-      isLoadingDot2 = true
-      delay(500) // Wait for 0.5 seconds
-      isLoadingDot2 = false
-      isLoadingDot3 = true
-      delay(500) // Wait for 0.5 seconds
-      isLoadingDot3 = false
-    }
-  }
-
-  // Animate dot colors using AnimatedContent
-  val dotColor1 by animateColorAsState(
-    targetValue = if (isLoadingDot1) appColor.red else appColor.white,
-    animationSpec = tween(durationMillis = 500, easing = LinearEasing)
-  )
-
-  val dotColor2 by animateColorAsState(
-    targetValue = if (isLoadingDot2) appColor.red else appColor.white,
-    animationSpec = tween(durationMillis = 500, easing = LinearEasing)
-  )
-
-  val dotColor3 by animateColorAsState(
-    targetValue = if (isLoadingDot3) appColor.red else appColor.white,
-    animationSpec = tween(durationMillis = 500, easing = LinearEasing)
-  )
-
-  Box(
-    modifier = Modifier.fillMaxSize().background(appColor.gray3),
-    contentAlignment = Alignment.Center
-  ) {
-    val dotText = buildAnnotatedString {
-      withStyle(style = SpanStyle(color = dotColor1)) {
-        append("• ")
-      }
-      withStyle(style = SpanStyle(color = dotColor2)) {
-        append("• ")
-      }
-      withStyle(style = SpanStyle(color = dotColor3)) {
-        append("• ")
+    LaunchedEffect(isLoading) {
+      delay(1000) // Wait for 1 second
+      while (isLoading) {
+        // Toggle dot colors sequentially
+        isLoadingDot1 = true
+        delay(500) // Wait for 0.5 seconds
+        isLoadingDot1 = false
+        isLoadingDot2 = true
+        delay(500) // Wait for 0.5 seconds
+        isLoadingDot2 = false
+        isLoadingDot3 = true
+        delay(500) // Wait for 0.5 seconds
+        isLoadingDot3 = false
       }
     }
 
-    Text(
-      text = dotText,
-      fontSize = 50.sp,
-      fontWeight = FontWeight.Bold,
-      color = appColor.white,
-      modifier = Modifier.padding(16.dp),
-      maxLines = 1
+    // Animate dot colors using AnimatedContent
+    val dotColor1 by animateColorAsState(
+      targetValue = if (isLoadingDot1) appColor.red else appColor.white,
+      animationSpec = tween(durationMillis = 500, easing = LinearEasing)
     )
+
+    val dotColor2 by animateColorAsState(
+      targetValue = if (isLoadingDot2) appColor.red else appColor.white,
+      animationSpec = tween(durationMillis = 500, easing = LinearEasing)
+    )
+
+    val dotColor3 by animateColorAsState(
+      targetValue = if (isLoadingDot3) appColor.red else appColor.white,
+      animationSpec = tween(durationMillis = 500, easing = LinearEasing)
+    )
+
+    Box(
+      modifier = Modifier.fillMaxSize().background(appColor.gray3),
+      contentAlignment = Alignment.Center
+    ) {
+      val dotText = buildAnnotatedString {
+        withStyle(style = SpanStyle(color = dotColor1)) {
+          append("• ")
+        }
+        withStyle(style = SpanStyle(color = dotColor2)) {
+          append("• ")
+        }
+        withStyle(style = SpanStyle(color = dotColor3)) {
+          append("• ")
+        }
+      }
+
+      Text(
+        text = dotText,
+        fontSize = 50.sp,
+        fontWeight = FontWeight.Bold,
+        color = appColor.white,
+        modifier = Modifier.padding(16.dp),
+        maxLines = 1
+      )
+    }
   }
 }
 

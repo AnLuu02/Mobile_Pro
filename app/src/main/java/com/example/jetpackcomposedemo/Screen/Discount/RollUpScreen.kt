@@ -153,7 +153,7 @@ fun RollUpScreen(
   }
 
   var isLoading by remember {
-    mutableStateOf(true)
+    mutableStateOf(false)
   }
 
 
@@ -443,9 +443,7 @@ fun RollUpScreen(
     }
   }
 
-  if(isLoading) {
-    LoadingScreen(isLoadingValue = true)
-  }
+  LoadingScreen(isLoadingValue = isLoading)
 }
 
 

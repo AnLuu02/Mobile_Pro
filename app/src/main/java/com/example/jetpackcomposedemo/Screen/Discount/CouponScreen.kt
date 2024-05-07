@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,6 +36,7 @@ import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInList
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInTopBar
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.AppColor
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.showError
 import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance
@@ -63,8 +65,16 @@ val buttons = listOf(
 fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolean = false) {
   var selectedButtonID by remember { mutableStateOf(buttons.firstOrNull()?.get("ID") as? Int) }
   var listCoupon = listOf<UserCoupon>()
+  var isLoading by remember {
+    mutableStateOf(false)
+  }
+  var numberReload by remember {
+    mutableIntStateOf(0)
+  }
   var isLoadingAPIDone = true
-  var isError = false
+  var isError by remember {
+    mutableStateOf(false)
+  }
   var errorMessage: String = ""
   // call api - begin
   val userCouponViewModel: UserCouponViewModel = viewModel(
@@ -80,6 +90,7 @@ fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolea
 
   // Xử lý UI dựa trên trạng thái của Resource
   if(userID != null && !isDemo) {
+    isLoading = true
     when (couponResource.value?.status) {
       Status.SUCCESS -> {
         // Xử lý dữ liệu khi load thành công
@@ -87,12 +98,14 @@ fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolea
           Log.e("List Coupon", list.toString())
           listCoupon = list
           isLoadingAPIDone = true
+          isLoading = false
         }
       }
 
       Status.ERROR -> {
         // Xử lý khi có lỗi
         errorMessage = couponResource.value?.message.toString()
+        isLoading = false
         isError = true
       }
 
@@ -251,16 +264,25 @@ fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolea
       }
     }
   }
+
   if(isError) {
     showError(
+      title = if (numberReload == 0) "Opps, dude" else "Attemp #$numberReload",
       message = "Error: Connecting to server failed",
+      titleBtn = if (numberReload >= 3) "Close" else "Reload",
       onClickClose = {
         // Xử lý khi click close
         isError = false
-        navController?.navigate("home")
+        numberReload += 1
+        if (numberReload == 4) {
+          numberReload = 0
+          navController?.navigate("home")
+        }
       }
     )
   }
+
+  LoadingScreen(isLoadingValue = isLoading)
 }
 
 fun selectButton(IDValue: String) {
