@@ -81,7 +81,7 @@ fun PriceCard(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true)
-            ) { onOpenDetailCardScreen(index.toString()) }
+            ) { onOpenDetailCardScreen(data.id.toString()) }
     ) {
         Card(
             modifier = Modifier

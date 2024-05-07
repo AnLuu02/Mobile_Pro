@@ -107,8 +107,8 @@ fun MainApp(
                                 onOpenDetailCardScreen = {roomId->
                                     navController.navigate("roomDetails/$roomId")
                                 },
-                                onSelectService = {service ->
-                                    navController.navigate("service/$service")
+                                onSelectService = {filter->
+                                    navController.navigate("service/$filter")
                                 })
                         })
                 }
@@ -123,7 +123,7 @@ fun MainApp(
                     SearchScreen(
                         searchViewModel = searchViewModel,
                         onHandleSearchClickButtonSearch = {filter->
-                            navController.navigate("search/$filter")
+                            navController.navigate("service/$filter")
                         },
                         closeSearchScreen={
                             navController.popBackStack("home",inclusive = false)
@@ -292,17 +292,17 @@ fun MainApp(
                         },
                     )
                 ){ backStackEntry ->
-                    val type = backStackEntry.arguments?.getString("type");
+                    val type = backStackEntry.arguments?.getString("type").toString();
                     ServiceScreen(
-                        type = type,
+                        serviceType = type,
                         onCancelButtonClicked = {
                             navController.popBackStack()
                         },
                         onSearchFieldClicked = {
                             navController.navigate("search")
                         },
-                        onOpenDetailCardScreen = {cardId->
-                            navController.navigate("carddetail/$cardId")
+                        onOpenDetailCardScreen = {roomId->
+                            navController.navigate("roomDetails/$roomId")
                         },
                     )
                 }

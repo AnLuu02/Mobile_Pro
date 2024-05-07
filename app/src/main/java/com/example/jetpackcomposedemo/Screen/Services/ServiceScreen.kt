@@ -1,9 +1,16 @@
 package com.example.jetpackcomposedemo.Screen.Services
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,37 +19,60 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackcomposedemo.data.models.Room
-import com.example.jetpackcomposedemo.Screen.Home.dataTest
 import com.example.jetpackcomposedemo.Screen.Services.widget.CardSection
+import com.example.jetpackcomposedemo.data.models.RoomType
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance
 import com.example.jetpackcomposedemo.data.repository.RoomRepository
+import com.example.jetpackcomposedemo.data.repository.RoomTypeRepository
+import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModelFactory
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelFactory
 import com.example.jetpackcomposedemo.helpper.Status
 
 val sortOptions = arrayOf(
-    "Phù hợp nhất",
-    "Khoảng cách từ gần đến xa",
-    "Điểm đánh giá từ cao đến thấp",
-    "Giá từ thấp đến cao",
-    "Giá từ cao đến thấp"
+    "Tăng dần",
+    "Giảm dần",
 )
-val capacityOptions = arrayOf(
-    1,2,4,5,6,8,10
-)
+
+fun sort(list: MutableList<Room>, ascend: Boolean = true) : MutableList<Room> {
+    list.sortWith(compareByDescending { it.price })
+    if(ascend) {
+        list.reverse()
+    }
+    return list;
+}
+
+fun filterByType(list: MutableList<Room>, typeID: Int) : MutableList<Room> {
+    val rooms = mutableListOf<Room>()
+    for (room in list) {
+        if(room.roomTypeId == typeID){
+            rooms.add(room)
+        }
+    }
+    return rooms
+}
+
 @Composable
 fun ServiceScreen(
-    type:String?,
+    serviceType:String,
     onCancelButtonClicked: () -> Unit,
     onSearchFieldClicked: () -> Unit,
     onOpenDetailCardScreen: (String)->Unit,
 
 ) {
-    var lst_room = listOf<Room>()
-    var isLoadingAPIDone = true
+    //get all room
+    var lst_room = remember { mutableListOf<Room>() }
+    var (isFiltered, setIsFiltered) = remember { mutableStateOf(false) }
+    var (isSorted, setIsSorted) = remember { mutableStateOf(false) }
+    var (roomLoaded, setRoomLoaded) = remember { mutableStateOf(false) }
+    var (roomTypeLoaded, setRoomTypeLoaded) = remember { mutableStateOf(false) }
+    var (currentServiceType, setCurrentServiceType) = remember { mutableStateOf("") }
     var isError = false
     var errorMessage: String = ""
     //call api
@@ -56,9 +86,8 @@ fun ServiceScreen(
     when (roomResource.value?.status) {
         Status.SUCCESS -> {
             roomResource.value?.data?.let { list ->
-                lst_room = list
-                isLoadingAPIDone = true
-                Log.e("List room", lst_room[0].name)
+                lst_room = list.toMutableList()
+                setRoomLoaded(true)
             }
         }
 
@@ -74,6 +103,44 @@ fun ServiceScreen(
         null -> Text(text = errorMessage)
     }
     //end call api
+
+    val (typeOption, onTypeOptionSelected) = remember {///////
+        mutableStateOf("");
+    }
+    //get all roomtype
+    var lst_roomtype = remember { mutableListOf<RoomType>() }
+    isError = false
+    errorMessage = ""
+    //call api
+    val roomTypeViewModel: RoomTypeViewModel = viewModel(
+        factory = RoomTypeViewModelFactory(RoomTypeRepository(apiService = RetrofitInstance.apiService))
+    )
+    LaunchedEffect(Unit) {
+        roomTypeViewModel.getListRoomType()
+    }
+    val roomTypeResource = roomTypeViewModel.list.observeAsState()
+    when (roomTypeResource.value?.status) {
+        Status.SUCCESS -> {
+            roomTypeResource.value?.data?.let { list ->
+                lst_roomtype = list.toMutableList()
+                setRoomTypeLoaded(true)
+            }
+        }
+
+        Status.ERROR -> {
+            errorMessage = roomTypeResource.value?.message.toString()
+            isError = true
+            Log.e("Error", errorMessage);
+        }
+
+        Status.LOADING -> {
+
+        }
+        null -> Text(text = errorMessage)
+    }
+    //end
+
+
     val (sortOption, onSortOptionSelected) = remember {
         mutableStateOf(sortOptions[0]);
     }
@@ -83,20 +150,59 @@ fun ServiceScreen(
     val (maxPrice, setMaxPrice) = remember {
         mutableIntStateOf(1000000);
     }
-    val (capacityOption, onCapacityOptionSelected) = remember {
-        mutableIntStateOf(capacityOptions[0]);
+    if(isFiltered) {
+        val rooms = mutableListOf<Room>();
+        var typeID = 0
+        for (type in lst_roomtype) {
+            if(type.type.contains(typeOption)) {
+                typeID = type.id
+            }
+        }
+        for (room in lst_room) {
+            if(room.price in minPrice..maxPrice && room.roomTypeId == typeID){
+                rooms.add(room)
+            }
+        }
+        lst_room = rooms
+    }
+    if(isSorted) {
+//        lst_room.sortWith(compareByDescending { it.price })
+        if(sortOption.contains("Tăng dần")) {
+            lst_room = sort(lst_room, true);
+        }
+        else {
+            lst_room = sort(lst_room, false);
+        }
+    }
+    if(roomLoaded && roomTypeLoaded && !serviceType.equals("other")) {
+        var typeID = 0
+        for (type in lst_roomtype) {
+            if(type.type.contains(serviceType)) {
+                typeID = type.id
+                setCurrentServiceType(type.name.trim())
+            }
+        }
+        lst_room = filterByType(lst_room, typeID)
     }
     Scaffold (
         topBar = {
             ServiceTopBar (
+                currentType = currentServiceType,
                 onCancelButtonClicked = onCancelButtonClicked,
                 onSearchFieldClicked = onSearchFieldClicked,
                 onSortOptionSelected = onSortOptionSelected,
                 sortOption = sortOption,
-                onCapacityOptionSelected = onCapacityOptionSelected,
-                capacityOption = capacityOption,
+                roomTypes = lst_roomtype,
+                onTypeOptionSelected = onTypeOptionSelected,
+                typeOption = typeOption,
                 setMinPrice = setMinPrice,
                 setMaxPrice = setMaxPrice,
+                onFilterApplied = {
+                    setIsFiltered(true)
+                },
+                onSort = {
+                    setIsSorted(true)
+                }
             )
         }
     ) {padding ->
@@ -105,13 +211,28 @@ fun ServiceScreen(
                 .padding(padding)
                 .fillMaxWidth()
         ) {
-            CardSection(
-                data = lst_room,
-                isDiscount = true,
-                hasPrice = true,
-                isImageFull = true,
-                onOpenDetailCardScreen = onOpenDetailCardScreen,
-            )
+            if(roomLoaded) {
+                CardSection(
+                    data = lst_room,
+                    isDiscount = true,
+                    hasPrice = true,
+                    isImageFull = true,
+                    onOpenDetailCardScreen = onOpenDetailCardScreen,
+                )
+            }
+            else {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.width(64.dp),
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                }
+            }
 //            Text(text = sortOption)
 //            Text(text = minPrice.toString())
 //            Text(text = maxPrice.toString())

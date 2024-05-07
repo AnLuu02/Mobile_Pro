@@ -49,8 +49,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.jetpackcomposedemo.Screen.Services.capacityOptions
 import com.example.jetpackcomposedemo.data.models.PriceRange
+import com.example.jetpackcomposedemo.data.models.RoomType
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
@@ -61,7 +61,7 @@ val priceRange = PriceRange(
 
 val filterOption = arrayOf(
     "Khoảng giá",
-    "Số lượng người"
+    "Loại phòng"
 );
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,9 +70,11 @@ fun FilterBottomSheet(
     onDismissRequest: () -> Unit,
     setMaxPrice: (Int) -> Unit,
     setMinPrice: (Int) -> Unit,
-    onCapacityOptionSelected: (Int) -> Unit = {},
-    capacityOption: Int,
+    roomTypes: MutableList<RoomType>,
+    onTypeOptionSelected: (String) -> Unit = {},
+    typeOption: String,
     sheetState: SheetState,
+    onFilterApplied: () -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -88,8 +90,10 @@ fun FilterBottomSheet(
             onDismissRequest = onDismissRequest,
             setMaxPrice = setMaxPrice,
             setMinPrice = setMinPrice,
-            onCapacityOptionSelected = onCapacityOptionSelected,
-            capacityOption = capacityOption,
+            roomTypes = roomTypes,
+            onTypeOptionSelected = onTypeOptionSelected,
+            typeOption = typeOption,
+            onFilterApplied = onFilterApplied,
         )
     }
 }
@@ -100,10 +104,13 @@ fun SheetContent(
     onDismissRequest: () -> Unit,
     setMaxPrice: (Int) -> Unit,
     setMinPrice: (Int) -> Unit,
-    onCapacityOptionSelected: (Int) -> Unit = {},
-    capacityOption: Int,
+    roomTypes: MutableList<RoomType>,
+    onTypeOptionSelected: (String) -> Unit = {},
+    typeOption: String,
+    onFilterApplied: () -> Unit
 ) {
     val closeButtonInteractionResource = remember { MutableInteractionSource() }
+    val applyButtonInteractionSource = remember { MutableInteractionSource() }
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -166,9 +173,10 @@ fun SheetContent(
                     .padding(top = 4.dp, bottom = 8.dp)
                     .fillMaxWidth()
             ) {
-                CapacitySelector (
-                    onCapacityOptionSelected = onCapacityOptionSelected,
-                    capacityOption = capacityOption,
+                TypeSelector (
+                    roomTypes = roomTypes,
+                    onTypeOptionSelected = onTypeOptionSelected,
+                    typeOption = typeOption,
                 )
             }
             Row (
@@ -182,6 +190,14 @@ fun SheetContent(
                     modifier = Modifier
                         .fillMaxWidth(0.6f)
                         .background(color = Color.Red, shape = CircleShape)
+                        .clickable(
+                            onClick = {
+                                onFilterApplied()
+                                onDismissRequest()
+                            },
+                            interactionSource = applyButtonInteractionSource,
+                            indication = rememberRipple(bounded = true)
+                        )
                 ) {
                     Text (
                         text = "Áp dụng",
@@ -198,12 +214,13 @@ fun SheetContent(
 }
 
 @Composable
-fun CapacitySelector(
-    onCapacityOptionSelected: (Int) -> Unit = {},
-    capacityOption: Int,
+fun TypeSelector(
+    roomTypes: MutableList<RoomType>,
+    onTypeOptionSelected: (String) -> Unit = {},
+    typeOption: String,
 ) {
     var (selectedItem, setSelectedItem) = remember {
-        mutableIntStateOf(capacityOption)
+        mutableStateOf(typeOption)
     }
     Column (
         modifier = Modifier
@@ -213,7 +230,7 @@ fun CapacitySelector(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Số lượng người",
+                text = "Loại phòng",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp, bottom = 8.dp),
@@ -225,27 +242,28 @@ fun CapacitySelector(
             columns = GridCells.Fixed(3),
             modifier = Modifier.padding(bottom = 8.dp)
         ) {
-            items(capacityOptions.size) {
-                val cardColor = if(capacityOptions[it] == selectedItem) Color(230,230,230) else Color(240,240, 240)
-                val border = if(capacityOptions[it] == selectedItem) BorderStroke(width = 1.dp, color = Color(200,200,200)) else null
+            items(roomTypes.size) {
+                val cardColor = if(roomTypes[it].type == selectedItem) Color(230,230,230) else Color(240,240, 240)
+                val border = if(roomTypes[it].type == selectedItem) BorderStroke(width = 1.dp, color = Color(200,200,200)) else null
                 Card (
                     modifier = Modifier.run {
                         padding(vertical = 4.dp, horizontal = 8.dp)
                             .selectable(
                                 interactionSource = null,
                                 indication = null,
-                                selected = (capacityOptions[it] == capacityOption),
+                                selected = (roomTypes[it].type == typeOption),
                                 onClick = {
-                                    onCapacityOptionSelected(capacityOptions[it])
-                                    setSelectedItem(capacityOptions[it])
+                                    onTypeOptionSelected(roomTypes[it].type)
+                                    setSelectedItem(roomTypes[it].type)
                                 },
                             )
                     },
                     colors = CardDefaults.cardColors(containerColor = cardColor),
                     border = border
                 ) {
+                    var type = if(roomTypes[it].type.contains("hourly")) "Theo giờ" else if (roomTypes[it].type.contains("overnight")) "Qua đêm" else "Theo ngày"
                     Text(
-                        text = capacityOptions[it].toString() +" người",
+                        text = type,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .padding(vertical = 6.dp)

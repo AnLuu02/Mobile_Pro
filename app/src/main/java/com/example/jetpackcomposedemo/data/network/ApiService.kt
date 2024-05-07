@@ -39,7 +39,7 @@ interface ApiService {
 
 
     // RoomType
-    @GET("api/roomtype")
+    @GET("api/roomtype/get_all")
     suspend fun getAllRoomType() : Response<List<RoomType>>
     suspend fun getRoomTypeById(@Query("id") id: Int) : Response<RoomType>
 
