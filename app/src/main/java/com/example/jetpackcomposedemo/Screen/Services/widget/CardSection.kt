@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.jetpackcomposedemo.components.Card.CardSimple
 import com.example.jetpackcomposedemo.components.Card.PriceCard
-import com.example.jetpackcomposedemo.data.models.Room
+import com.example.jetpackcomposedemo.data.models.Room.Room
 
 @Composable
 fun CardSection(

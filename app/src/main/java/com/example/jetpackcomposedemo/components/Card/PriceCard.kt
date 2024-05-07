@@ -1,8 +1,6 @@
 package com.example.jetpackcomposedemo.components.Card
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,17 +34,22 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.data.models.Room
+import com.example.jetpackcomposedemo.data.models.Room.Room
 import java.text.DecimalFormat
+import coil.request.ImageRequest
+import coil.size.Scale
+import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
 
 
 @Composable
@@ -61,7 +63,7 @@ fun PriceCard(
     isColumn:Boolean = false,
     onOpenDetailCardScreen: (String)->Unit
 ) {
-    val image = data.images.split(",")[0].trim();
+//    val image = data.images.split(",")[0].trim();
 
     val screenWidth = with(LocalDensity.current) {
         LocalConfiguration.current.screenWidthDp.dp
@@ -76,7 +78,9 @@ fun PriceCard(
 
     Box(
         modifier = Modifier
-            .then(if(isColumn) Modifier.padding(start = 16.dp,end=16.dp, top=16.dp, bottom = 8.dp) else Modifier.padding(start = 16.dp, end = lastPaddingEnd))
+            .then(
+                if(isColumn) Modifier.padding(start = 16.dp,end=16.dp, top=16.dp, bottom = 8.dp) else Modifier.padding(start = 16.dp, end = lastPaddingEnd))
+
             .clip(shape = MaterialTheme.shapes.small)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -85,13 +89,9 @@ fun PriceCard(
     ) {
         Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, color = Color.LightGray.copy(0.5f), MaterialTheme.shapes.small),
-            shape = MaterialTheme.shapes.small,
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
-            ) {
+                .fillMaxWidth(),
+            shape = MaterialTheme.shapes.small
+        ) {
             Box(
                 modifier = Modifier
                     .then(if (isColumn) Modifier.fillMaxWidth() else Modifier.width(sizeCard))
@@ -100,13 +100,14 @@ fun PriceCard(
             ) {
                 if (isImageFull) {
                     AsyncImage(
-                        model = image,
+//                        model = image,
 //                        painter = painterResource(id = R.drawable.hotel_2),
+                        model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                            .crossfade(true).data(data.images?.get(0)).build(),
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize()
                     )
-
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -131,19 +132,20 @@ fun PriceCard(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-
                         ) {
                             if (!isImageFull) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.hotel_2),
+
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                                        .crossfade(true).data(data.images?.get(0)).build(),
                                     contentScale = ContentScale.Crop,
                                     contentDescription = null,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(sizeCard * 10 / 18)
+                                        .height(sizeCard / 2)
                                 )
-                            }
 
+                            }
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.BottomStart)
@@ -161,48 +163,41 @@ fun PriceCard(
                                         bottom = 2.dp,
                                         end = 4.dp
                                     )
-
                                 )
                             }
-
                         }
-
                         Column(
                             modifier = Modifier
-                                .padding(16.dp),
+                                .padding(16.dp)
+                            ,
                         ) {
-
                             Text(
-                                text = data.name.trim(),
+                                text = data.name.toString(),
 //                                text = "LỒNG ĐÈN ĐỎ HOTEL",
                                 style = MaterialTheme.typography.titleLarge,
+//                                text = data.name.toString(),
+                                fontSize = 20.sp,
                                 color = if (isImageFull) Color.White else Color.Black,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.fillMaxWidth()
                             )
-
                             Spacer(modifier = Modifier.height(12.dp))
-
                             Row(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(18.dp),
+                                    .fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-
                                 if (isSale) {
                                     Text(
                                         text = "FLASH SALE",
                                         fontSize = 14.sp,
                                         fontStyle = FontStyle.Italic,
-                                        style = MaterialTheme.typography.titleLarge,
                                         fontWeight = FontWeight.SemiBold,
                                         color = Color.Red
 
                                     )
-
-
-
                                     Spacer(modifier = Modifier.width(8.dp))
 
                                     Divider(
@@ -211,27 +206,24 @@ fun PriceCard(
                                             .width(1.dp),      // Set the thickness of the divider
                                         color = Color.Gray     // Set the color of the divider
                                     )
-
                                     Spacer(modifier = Modifier.width(8.dp))
-
                                 }
-                                Text(
-                                    text = "Còn 2 phòng dêm nay",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color.Blue,
-                                    fontWeight = FontWeight.SemiBold,
+                                data.roomTypes?.let {
+                                    Text(
+                                        text = it.name,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.Blue,
+                                        fontWeight = FontWeight.SemiBold,
 
-                                    )
+                                        )
+                                }
                             }
-
                             Spacer(modifier = Modifier.height(4.dp))
-
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Absolute.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -239,10 +231,8 @@ fun PriceCard(
                                         text = "Chỉ từ",
                                         color = Color.Gray,
                                         style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier.padding(end = 4.dp),
-
-                                        )
-
+                                        modifier = Modifier.padding(end = 4.dp)
+                                    )
                                     if (isSale) {
                                         Text(
                                             text = "900.000đ",
@@ -251,81 +241,52 @@ fun PriceCard(
                                             textDecoration = TextDecoration.LineThrough
                                         )
                                     }
-
                                 }
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "Phú Nhuận",
-                                        color = if (isImageFull) Color.White else Color.Gray,
-                                        style = MaterialTheme.typography.bodySmall
-
-                                    )
-
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.outline_location_on_24),
-                                        contentDescription = "",
-                                        tint = if (isImageFull) Color.White else Color.Black,
-                                        modifier = Modifier.size(14.dp)
-                                    )
-
-                                }
-
-
                             }
-
                             Spacer(modifier = Modifier.height(2.dp))
-
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                val price = DecimalFormat("#,###đ").format(data.price)
+//                                val price = DecimalFormat("#,###đ").format(data.price)
                                 Text(
-                                    text = price,
-//                                    text = "420.000đ",
+                                    text = "${data.roomTypes?.prices?.let {
+                                        formatCurrencyVND(
+                                            it
+                                        )
+                                    }}",
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.Bold,
                                     color = if (isImageFull) Color.White else Color.Black,
                                 )
-
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-
                                     Text(
                                         text = data.rating.toString(),
-//                                        text = "4.0",
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = if (isImageFull) Color.White else Color.Black
                                     )
-
                                     Text(
                                         text = "(2097)",
                                         color = if (isImageFull) Color.White else Color.Gray,
                                         fontSize = 16.sp,
                                     )
-
                                     Icon(
                                         imageVector = Icons.Rounded.Star,
                                         contentDescription = "",
-                                        tint = Color(255,215,0),
-                                        modifier = Modifier.size(16.dp)
-
+                                        tint = Color(255, 215, 0),
+                                        modifier = Modifier.size(24.dp)
                                     )
                                 }
-
                             }
                             if (isDiscount) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-
                                     Icon(
                                         painter = painterResource(id = R.drawable.outline_local_offer_24),
                                         contentDescription = "discount",

@@ -19,12 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +35,8 @@ import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInList
 import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInTopBar
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.AppColor
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.showError
 import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance
@@ -42,6 +44,8 @@ import com.example.jetpackcomposedemo.data.repository.UserCouponRepository
 import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModelFactory
 import com.example.jetpackcomposedemo.helpper.Status
+
+val AppColor = AppColor()
 
 val buttons = listOf(
   mapOf<String, Any>(
@@ -55,49 +59,53 @@ val buttons = listOf(
 )
 
 // Xử lý UI
-// Color
-val grayColor = Color(android.graphics.Color.parseColor("#E7E7E7"))
-val grayColor1 = Color(android.graphics.Color.parseColor("#F3F3F3"))
-val orangeColor = Color(android.graphics.Color.parseColor("#FF893C"))
-val redColor = Color(android.graphics.Color.parseColor("#FF0000"))
-val lightRedColor = Color(android.graphics.Color.parseColor("#FFE1E4"))
-val whiteColor = Color(android.graphics.Color.parseColor("#FFFFFF"))
 
 // Màn hình
 @Composable
-fun CouponScreen(navController: NavHostController?, UserID: Int?) {
+fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolean = false) {
   var selectedButtonID by remember { mutableStateOf(buttons.firstOrNull()?.get("ID") as? Int) }
-  var lst_coupon = listOf<UserCoupon>()
+  var listCoupon = listOf<UserCoupon>()
+  var isLoading by remember {
+    mutableStateOf(false)
+  }
+  var numberReload by remember {
+    mutableIntStateOf(0)
+  }
   var isLoadingAPIDone = true
-  var isError = false
+  var isError by remember {
+    mutableStateOf(false)
+  }
   var errorMessage: String = ""
   // call api - begin
   val userCouponViewModel: UserCouponViewModel = viewModel(
     factory = UserCouponViewModelFactory(UserCouponRepository(apiService = RetrofitInstance.apiService))
   )
   LaunchedEffect(Unit) {
-    if(UserID != null) {
-      userCouponViewModel.getListCouponOfUser(UserID.toString())
-      Log.e("<UserID>", UserID.toString())
+    if(userID != null) {
+      userCouponViewModel.getListCouponOfUser(userID.toString())
+      Log.e("<UserID>", userID.toString())
     }
   }
   val couponResource = userCouponViewModel.list.observeAsState()
 
   // Xử lý UI dựa trên trạng thái của Resource
-  if(UserID != null) {
-    when (couponResource.value?.status) { // dou co dou ô
+  if(userID != null && !isDemo) {
+    isLoading = true
+    when (couponResource.value?.status) {
       Status.SUCCESS -> {
         // Xử lý dữ liệu khi load thành công
         couponResource.value?.data?.let { list ->
           Log.e("List Coupon", list.toString())
-          lst_coupon = list
+          listCoupon = list
           isLoadingAPIDone = true
+          isLoading = false
         }
       }
 
       Status.ERROR -> {
         // Xử lý khi có lỗi
         errorMessage = couponResource.value?.message.toString()
+        isLoading = false
         isError = true
       }
 
@@ -118,7 +126,7 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
     Row(
       modifier = Modifier
         .fillMaxWidth()
-        .background(redColor)
+        .background(AppColor.red)
         .height(48.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -154,7 +162,7 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
         horizontalArrangement = Arrangement.Center
       ) {
         Text(
-          color = whiteColor,
+          color = AppColor.white,
           fontSize = 24.sp,
           fontWeight = FontWeight.Bold,
           text = "Các ưu đãi của bạn"
@@ -163,7 +171,7 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
     }
     Row(
       modifier = Modifier
-        .background(grayColor)
+        .background(AppColor.gray)
         .fillMaxWidth()
         .height(3.dp)
     ) {}
@@ -173,7 +181,7 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
         .height(40.dp),
       horizontalArrangement = Arrangement.SpaceAround
     ) {
-      if(UserID == null) {
+      if(userID == null && !isDemo) {
         Text("Hãy đăng nhập để sử dụng tính năng này!")
       } else {
         buttons.forEach { button ->
@@ -195,7 +203,7 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
     }
     Row(
       modifier = Modifier
-        .background(grayColor1)
+        .background(AppColor.gray1)
         .fillMaxWidth()
         .fillMaxHeight()
     ) {
@@ -205,12 +213,12 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
           .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
-        if(UserID == null) {
+        if(userID == null) {
 
         } else {
           if (isLoadingAPIDone) {
             if (selectedButtonID == 0) {
-              for ((index, coupon) in lst_coupon.withIndex()) {
+              for ((index, coupon) in listCoupon.withIndex()) {
                 var showDiscount = ""
                 var showExpDate = ""
                 if (coupon.amountDiscount == 0F || coupon.amountDiscount == null) {
@@ -229,7 +237,7 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
                 }
 
                 val handleClickCoupon: () -> Unit = {
-                  navController?.navigate("listroom")
+//                  navController?.navigate("listroom")
                 }
 
                 ItemInList(
@@ -239,7 +247,7 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
                   doLeft = showDetailCoupon,
                   doRight = handleClickCoupon
                 )
-                if (index != lst_coupon.size - 1) {
+                if (index != listCoupon.size - 1) {
                   Spacer(modifier = Modifier.height(10.dp))
                 }
               }
@@ -256,19 +264,25 @@ fun CouponScreen(navController: NavHostController?, UserID: Int?) {
       }
     }
   }
+
   if(isError) {
     showError(
-      message = errorMessage,
+      title = if (numberReload == 0) "Opps, dude" else "Attemp #$numberReload",
+      message = "Error: Connecting to server failed",
+      titleBtn = if (numberReload >= 3) "Close" else "Reload",
       onClickClose = {
         // Xử lý khi click close
-        Log.e("Close button", "Clicked")
         isError = false
-        Log.e("Close button", isError.toString())
-        navController?.navigate("home")
+        numberReload += 1
+        if (numberReload == 4) {
+          numberReload = 0
+          navController?.navigate("home")
+        }
       }
     )
   }
-  Log.e("Outside button", isError.toString())
+
+  LoadingScreen(isLoadingValue = isLoading)
 }
 
 fun selectButton(IDValue: String) {
@@ -278,5 +292,9 @@ fun selectButton(IDValue: String) {
 @Preview(showBackground = true)
 @Composable
 fun CouponScreenDemo() {
-  CouponScreen(null, null)
+  CouponScreen(
+    navController = null,
+    userID = null,
+    isDemo = true
+  )
 }

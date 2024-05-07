@@ -34,14 +34,9 @@ val items = listOf(
         route = "bookquickly"
     ),
     BottomNavigation(
-        title = "Ưu đãi",
-        icon = R.drawable.outline_card_giftcard_24,
-        route = "discount"
-    ),
-    BottomNavigation(
-        title = "Tài khoản",
+        title = "Tôi",
         icon = R.drawable.outline_manage_accounts_24,
-        route = "user"
+        route = "discount"
     )
 )
 

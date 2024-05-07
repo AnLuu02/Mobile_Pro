@@ -2,7 +2,6 @@ package com.example.jetpackcomposedemo.Screen.Discount.UI_components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,13 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Color as ComposeColor
-
-// Constant color
-val textColor = ComposeColor(android.graphics.Color.parseColor("#535353"))
-val whiteColor = ComposeColor(android.graphics.Color.parseColor("#FFFFFF"))
-val orangeColor = ComposeColor(android.graphics.Color.parseColor("#FF893C"))
-val orangeColor1 = ComposeColor(android.graphics.Color.parseColor("#FD6400"))
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.AppColor
 
 // UI
 @Composable
@@ -30,6 +23,8 @@ fun ItemInTopBar (
   isActive: Boolean,
   textShow: String
 ) {
+  val appColor = AppColor()
+
   if (isActive) {
     Column(
       modifier = Modifier
@@ -46,13 +41,13 @@ fun ItemInTopBar (
         Text(
           fontWeight = FontWeight.Bold,
           fontSize = 18.sp,
-          color = orangeColor,
+          color = appColor.orange,
           text = textShow
         )
       }
       Row(
         modifier = Modifier
-          .background(orangeColor1)
+          .background(appColor.orange1)
           .fillMaxWidth()
           .height(2.dp)
       ) {}
@@ -73,13 +68,13 @@ fun ItemInTopBar (
         Text(
           fontWeight = FontWeight.Bold,
           fontSize = 16.sp,
-          color = textColor,
+          color = appColor.gray2,
           text = textShow
         )
       }
       Row(
         modifier = Modifier
-          .background(whiteColor)
+          .background(appColor.white)
           .fillMaxWidth()
           .height(2.dp)
       ) {}

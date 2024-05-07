@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,7 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.jetpackcomposedemo.data.models.Room
+import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.Screen.Services.widget.CardSection
 import com.example.jetpackcomposedemo.data.models.RoomType
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance
@@ -35,8 +34,8 @@ import com.example.jetpackcomposedemo.data.repository.RoomRepository
 import com.example.jetpackcomposedemo.data.repository.RoomTypeRepository
 import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModelFactory
-import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel
-import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelFactory
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModelFactory
 import com.example.jetpackcomposedemo.helpper.Status
 
 val sortOptions = arrayOf(
@@ -45,17 +44,17 @@ val sortOptions = arrayOf(
 )
 
 fun sort(list: MutableList<Room>, ascend: Boolean = true) : MutableList<Room> {
-    list.sortWith(compareByDescending { it.price })
+    list.sortWith(compareByDescending { it.roomTypes?.prices })
     if(ascend) {
         list.reverse()
     }
     return list;
 }
 
-fun filterByType(list: MutableList<Room>, typeID: Int) : MutableList<Room> {
+fun filterByType(list: MutableList<Room>, type: String) : MutableList<Room> {
     val rooms = mutableListOf<Room>()
     for (room in list) {
-        if(room.roomTypeId == typeID){
+        if(room.roomTypes?.type == type){
             rooms.add(room)
         }
     }
@@ -84,9 +83,9 @@ fun ServiceScreen(
         factory = RoomViewModelFactory(RoomRepository(apiService = RetrofitInstance.apiService))
     )
     LaunchedEffect(Unit) {
-        roomViewModel.getListRoom()
+        roomViewModel.getRoomList()
     }
-    val roomResource = roomViewModel.list.observeAsState()
+    val roomResource = roomViewModel.roomList.observeAsState()
     when (roomResource.value?.status) {
         Status.SUCCESS -> {
             roomResource.value?.data?.let { list ->
@@ -156,14 +155,14 @@ fun ServiceScreen(
     }
     if(isFiltered) {
         val rooms = mutableListOf<Room>();
-        var typeID = 0
-        for (type in lst_roomtype) {
-            if(type.type.contains(typeOption)) {
-                typeID = type.id
-            }
-        }
+//        var typeID = 0
+//        for (type in lst_roomtype) {
+//            if(type.type.contains(typeOption)) {
+//                typeID = type.id
+//            }
+//        }
         for (room in lst_room) {
-            if(room.price in minPrice..maxPrice && room.roomTypeId == typeID){
+            if(room.roomTypes?.prices in minPrice..maxPrice && room.roomTypes?.type == serviceType){
                 rooms.add(room)
             }
         }
@@ -179,20 +178,20 @@ fun ServiceScreen(
         }
     }
     if(roomLoaded && roomTypeLoaded && !serviceType.equals("other")) {
-        var typeID = 0
-        for (type in lst_roomtype) {
-            if(type.type.contains(serviceType)) {
-                typeID = type.id
-                setCurrentServiceType(type.name.trim())
-            }
-        }
-        lst_room = filterByType(lst_room, typeID)
+//        var typeID = 0
+//        for (type in lst_roomtype) {
+//            if(type.type.contains(serviceType)) {
+//                typeID = type.id
+//                setCurrentServiceType(type.name.trim())
+//            }
+//        }
+        lst_room = filterByType(lst_room, serviceType)
     }
 
     if(isFiltered) {
         val tempRooms = mutableListOf<Room>();
         for (room in lst_room) {
-            if(room.price in minPrice..maxPrice) {
+            if(room.roomTypes?.prices in minPrice..maxPrice) {
                 tempRooms.add(room);
             }
         }

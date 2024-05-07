@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.data.viewmodel
+package com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -34,7 +34,6 @@ data class ServicesUI(
     val title:String,
     val type: String,
 )
-
 val servicesUI = listOf(
     ServicesUI(
         icon = R.drawable.outline_location_on_24,
@@ -78,7 +77,6 @@ val servicesUI = listOf(
 fun ServiceSection(
     onSelectService: (String) -> Unit
 ) {
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -102,6 +100,8 @@ fun ServiceSection(
 
         }
     }
+    Spacer(modifier = Modifier.height(15.dp))
+
 }
 
 @Composable
@@ -110,7 +110,7 @@ fun ServiceItem(
     onSelectService: (String) -> Unit
 ) {
     val item = servicesUI[index];
-    Log.e("Type", item.type)
+//    Log.e("Type", item.type)
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -122,7 +122,7 @@ fun ServiceItem(
             tint = Color.Red,
             modifier = Modifier.size(24.dp)
         )
-        
+
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(

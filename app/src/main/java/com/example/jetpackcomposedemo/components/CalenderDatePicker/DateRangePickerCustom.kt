@@ -11,6 +11,7 @@ import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SelectableDates
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,12 +67,18 @@ fun DateRangePickerCustom(
 
     val dateRangePickerState = remember {
         DateRangePickerState(
+            locale = Locale.CHINA,
             initialSelectedStartDateMillis = initialSelectedStartDateMillis,
             initialDisplayedMonthMillis = null,
             initialSelectedEndDateMillis = initialSelectedEndDateMillis,
             initialDisplayMode = DisplayMode.Picker,
-            yearRange = (currentTime.year..3000),
-            locale = Locale.KOREAN
+            selectableDates = object : SelectableDates {
+
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                    return utcTimeMillis >= LocalDateTime.now().toMillis()
+                }
+            },
+            yearRange = DatePickerDefaults.YearRange
         )
     }
 
@@ -121,18 +128,6 @@ fun DateRangePickerCustom(
             state = dateRangePickerState,
             title = null,
             headline = null,
-//            dateValidator = {
-//                val calendarNow =
-//                    Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"))
-//                with(calendarNow) {
-//                    set(Calendar.HOUR_OF_DAY, 0)
-//                    set(Calendar.MINUTE, 0)
-//                    set(Calendar.SECOND, 0)
-//                    set(Calendar.MILLISECOND, 0)
-//                }
-//                it >= calendarNow.timeInMillis
-//
-//            },
             showModeToggle = false,
             colors = DatePickerDefaults.colors(
                 dayInSelectionRangeContainerColor = Color.Red,
@@ -142,7 +137,6 @@ fun DateRangePickerCustom(
                 selectedYearContainerColor = Color.Gray,
                 disabledDayContentColor = Color.Gray,
                 todayContentColor = Color.Red
-
             )
         )
     }
