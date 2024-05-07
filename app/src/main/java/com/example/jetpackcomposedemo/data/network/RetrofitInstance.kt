@@ -13,6 +13,10 @@ object RetrofitInstance {
     private const val port = "8080";
     private const val BASE_URL = "http://$ipv4Address:$port/";
 
+    public fun getServerUrl(): String {
+        return BASE_URL
+    }
+
     private val intercepted: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
         Log.e("Retrofit",level.toString())
