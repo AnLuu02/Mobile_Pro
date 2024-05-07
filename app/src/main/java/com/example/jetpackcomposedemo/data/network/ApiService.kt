@@ -52,6 +52,8 @@ interface ApiService {
     suspend fun  getRoomByMaximumcapacity(@Query("maximumcapacity") maximumcapacity: Int) : Response<Room>
     @GET("api/room")
     suspend fun  getRoomByRoomRate(@Query("roomrate") roomrate: Int) : Response<Room>
+//    @GET("api/room/price_range")
+//    suspend fun getRoomByPriceRange(@Query("minPrice") minPrice: Int)
 //
 //    @GET("products/{type}")
 //    suspend fun getProductsList(

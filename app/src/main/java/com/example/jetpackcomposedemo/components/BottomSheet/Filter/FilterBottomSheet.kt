@@ -73,6 +73,7 @@ fun FilterBottomSheet(
     onCapacityOptionSelected: (Int) -> Unit = {},
     capacityOption: Int,
     sheetState: SheetState,
+    onFilterApplied: () -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -90,6 +91,7 @@ fun FilterBottomSheet(
             setMinPrice = setMinPrice,
             onCapacityOptionSelected = onCapacityOptionSelected,
             capacityOption = capacityOption,
+            onFilterApplied = onFilterApplied,
         )
     }
 }
@@ -102,8 +104,10 @@ fun SheetContent(
     setMinPrice: (Int) -> Unit,
     onCapacityOptionSelected: (Int) -> Unit = {},
     capacityOption: Int,
+    onFilterApplied: () -> Unit,
 ) {
     val closeButtonInteractionResource = remember { MutableInteractionSource() }
+    val applyFilterButtonInteractionSource = remember { MutableInteractionSource() }
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -182,6 +186,14 @@ fun SheetContent(
                     modifier = Modifier
                         .fillMaxWidth(0.6f)
                         .background(color = Color.Red, shape = CircleShape)
+                        .clickable(
+                            onClick = {
+                                onFilterApplied()
+                                onDismissRequest()
+                            },
+                            interactionSource = applyFilterButtonInteractionSource,
+                            indication = rememberRipple(bounded = true),
+                        )
                 ) {
                     Text (
                         text = "Áp dụng",

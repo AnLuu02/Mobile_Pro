@@ -39,12 +39,14 @@ fun ServiceScreen(
     onCancelButtonClicked: () -> Unit,
     onSearchFieldClicked: () -> Unit,
     onOpenDetailCardScreen: (String)->Unit,
-
 ) {
-    var lst_room = listOf<Room>()
+    var lst_room = remember { mutableListOf<Room>() }
     var isLoadingAPIDone = true
     var isError = false
     var errorMessage: String = ""
+    val (isFiltered, setIsFiltered) = remember {
+        mutableStateOf(false)
+    }
     //call api
     val roomViewModel: RoomViewModel = viewModel(
         factory = RoomViewModelFactory(RoomRepository(apiService = RetrofitInstance.apiService))
@@ -56,9 +58,8 @@ fun ServiceScreen(
     when (roomResource.value?.status) {
         Status.SUCCESS -> {
             roomResource.value?.data?.let { list ->
-                lst_room = list
+                lst_room = list.toMutableList()
                 isLoadingAPIDone = true
-                Log.e("List room", lst_room[0].name)
             }
         }
 
@@ -86,6 +87,16 @@ fun ServiceScreen(
     val (capacityOption, onCapacityOptionSelected) = remember {
         mutableIntStateOf(capacityOptions[0]);
     }
+
+    if(isFiltered) {
+        val tempRooms = mutableListOf<Room>();
+        for (room in lst_room) {
+            if(room.price in minPrice..maxPrice) {
+                tempRooms.add(room);
+            }
+        }
+        lst_room = tempRooms
+    }
     Scaffold (
         topBar = {
             ServiceTopBar (
@@ -97,6 +108,9 @@ fun ServiceScreen(
                 capacityOption = capacityOption,
                 setMinPrice = setMinPrice,
                 setMaxPrice = setMaxPrice,
+                onFilterApplied = {
+                    setIsFiltered(true);
+                }
             )
         }
     ) {padding ->

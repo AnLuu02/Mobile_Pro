@@ -58,6 +58,7 @@ fun ServiceTopBar (
     capacityOption: Int,
     setMinPrice: (Int) -> Unit = {},
     setMaxPrice: (Int) -> Unit = {},
+    onFilterApplied: () -> Unit
 ) {
     val closeButtonInteractionSource = remember { MutableInteractionSource() }
     val searchInteractionSource = remember { MutableInteractionSource() }
@@ -229,6 +230,7 @@ fun ServiceTopBar (
                 setMinPrice = setMinPrice,
                 onCapacityOptionSelected = onCapacityOptionSelected,
                 capacityOption = capacityOption,
+                onFilterApplied = onFilterApplied,
             )
         }
     }
