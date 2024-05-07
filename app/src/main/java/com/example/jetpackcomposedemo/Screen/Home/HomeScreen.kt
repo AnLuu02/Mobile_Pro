@@ -1,24 +1,30 @@
 package com.example.jetpackcomposedemo.Screen.Home
 
+import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.Screen.Home.widget.AdvCard
 import com.example.jetpackcomposedemo.Screen.Home.widget.CardSection
-import com.example.jetpackcomposedemo.components.Card.ImageRightCard
+import com.example.jetpackcomposedemo.Screen.Home.widget.CardSectionShimmer
 import com.example.jetpackcomposedemo.Screen.Home.widget.LocationSection
 import com.example.jetpackcomposedemo.Screen.Home.widget.ServiceSection
+import com.example.jetpackcomposedemo.components.Card.ImageRightCard
 import com.example.jetpackcomposedemo.components.TitleMain
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
+import com.example.jetpackcomposedemo.helpper.Status
 
 
 val dataTest = listOf(1, 2, 3, 4, 5)
@@ -26,21 +32,15 @@ val dataTest = listOf(1, 2, 3, 4, 5)
 
 @Composable
 fun HomeScreen(
+    roomViewModel:RoomViewModel,
+    navController:NavHostController,
     padding:PaddingValues,
     listState:LazyListState,
     onOpenScreenSearch: ()->Unit,
-    onOpenDetailCardScreen: (String)->Unit
+    onOpenDetailCardScreen: (String)->Unit,
+    onSelectService: (String) -> Unit,
 ) {
-    //test slide adv
-    val sliderList = remember {
-        mutableListOf(
-            "https://www.gstatic.com/webp/gallery/1.webp",
-            "https://www.gstatic.com/webp/gallery/2.webp",
-            "https://www.gstatic.com/webp/gallery/3.webp",
-            "https://www.gstatic.com/webp/gallery/4.webp",
-            "https://www.gstatic.com/webp/gallery/5.webp",
-        )
-    }
+    val roomResource = roomViewModel.roomList.observeAsState()
     LazyColumn(
         state = listState,
         modifier = Modifier
@@ -49,56 +49,142 @@ fun HomeScreen(
     ) {
         item {
             LocationSection(onOpenScreenSearch)
-            ServiceSection()
-
-            Spacer(modifier = Modifier.height(15.dp))
-
-            AdvCard(
-                sliderList = sliderList
-            )
+            ServiceSection(onSelectService = onSelectService)
 
             Spacer(modifier = Modifier.height(10.dp))
+            AdvCard()
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    when (roomResource.value?.status) {
+                        Status.SUCCESS -> {
+                            roomResource.value?.data?.let { rooms ->
+                                CardSection(
+                                    navController = navController,
+                                    titleListCard = "GIÁ SỐC ĐÊM NAY",
+                                    typeBooking = "overnigh",
+                                    data = rooms,
+                                    hasPrice = true,
+                                    isSale = true,
+                                    onOpenDetailCardScreen = onOpenDetailCardScreen
+                                )
 
-            CardSection(
-                data = dataTest,
-                titleHeader = "GIÁ SỐC ĐÊM NAY",
-                hasPrice = true,
-                isSale = true,
-                onOpenDetailCardScreen = onOpenDetailCardScreen
-            )
+                                CardSection(
+                                    navController = navController,
+                                    typeBooking = "hourly",
+                                    data = rooms,
+                                    titleListCard = "GIỜ VÀNG",
+                                    isDiscount = true,
+                                    hasPrice = true,
+                                    onOpenDetailCardScreen = onOpenDetailCardScreen
+                                )
 
-            Spacer(modifier = Modifier.height(10.dp))
+                                CardSection(
+                                    navController = navController,
+                                    typeBooking = "bydate",
+                                    data = rooms,
+                                    titleListCard = "PHÒNG THEO NGAÀY",
+                                    hasPrice = true,
+                                    isImageFull = true,
+                                    isDiscount = true,
+                                    onOpenDetailCardScreen = onOpenDetailCardScreen
+                                )
+                                CardSection(
+                                    navController = navController,
+                                    typeBooking = "hourly",
+                                    data = rooms,
+                                    titleListCard = "PHÒNG NỔI BẬT",
+                                    onOpenDetailCardScreen = onOpenDetailCardScreen
+                                )
 
-            CardSection(
-                data = dataTest,
-                titleHeader = "ƯU ĐÃI ĐẶC BIỆT",
-                isDiscount = true,
-                hasPrice = true,
-                onOpenDetailCardScreen = onOpenDetailCardScreen
-            )
+                            }
+                        }
+                        Status.ERROR -> {
+                            Log.e("<Error>", "${roomResource.value?.message}")
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "overnight",
+                                titleListCard = "GIÁ SỐC ĐÊM NAY",
+                                hasPrice = true,
+                            )
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "hourly",
+                                titleListCard = "GIỜ VÀNG",
+                                hasPrice = true,
+                            )
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "bydate",
+                                titleListCard = "PHÒNG THEO NGÀY",
+                                hasPrice = true,
+                                isImageFull = true,
+                            )
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "hourly",
+                                titleListCard = "PHÒNG NỔI BẬT",
+                            )
+                        }
+                        Status.LOADING -> {
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "overnight",
+                                titleListCard = "GIÁ SỐC ĐÊM NAY",
+                                hasPrice = true,
+                            )
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "hourly",
+                                titleListCard = "GIỜ VÀNG",
+                                hasPrice = true,
+                            )
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "bydate",
+                                titleListCard = "PHÒNG THEO NGÀY",
+                                hasPrice = true,
+                                isImageFull = true,
+                            )
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "hourly",
+                                titleListCard = "PHÒNG NỔI BẬT",
+                            )
+                        }
+                        null -> {
+                            Log.e("<Error>", "Roi vao null")
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "overnight",
+                                titleListCard = "GIÁ SỐC ĐÊM NAY",
+                                hasPrice = true,
+                            )
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "hourly",
+                                titleListCard = "GIỜ VÀNG",
+                                hasPrice = true,
+                            )
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "bydate",
+                                titleListCard = "PHÒNG THEO NGÀY",
+                                hasPrice = true,
+                                isImageFull = true,
+                            )
+                            CardSectionShimmer(
+                                navController = navController,
+                                typeBooking = "hourly",
+                                titleListCard = "PHÒNG NỔI BẬT",
+                            )
+                        }
+                    }
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            CardSection(
-                data = dataTest,
-                titleHeader = "VISA GỢI Ý",
-                hasPrice = true,
-                isImageFull = true,
-                isDiscount = true,
-                onOpenDetailCardScreen = onOpenDetailCardScreen
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            CardSection(
-                data = dataTest,
-                titleHeader = "KHÁCH SẠN NỔI BẬT",
-                onOpenDetailCardScreen = onOpenDetailCardScreen
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            TitleMain(title = "KHÁM PHÁ THÊM")
+                }
+            }
+            TitleMain(title = "KHÁM PHÁ THÊM", onHandleClickShowAll = { navController.navigate("search/discount") })
             ImageRightCard(index = 0, dataTest, onOpenDetailCardScreen = onOpenDetailCardScreen)
             ImageRightCard(index = 1, dataTest, isDiscount = true, onOpenDetailCardScreen = onOpenDetailCardScreen)
             ImageRightCard(index = 2, dataTest, onOpenDetailCardScreen =onOpenDetailCardScreen)

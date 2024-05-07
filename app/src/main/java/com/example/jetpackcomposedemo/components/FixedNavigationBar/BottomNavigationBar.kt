@@ -6,6 +6,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,7 +16,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.data.BottomNavigation
 
 val items = listOf(
     BottomNavigation(
@@ -29,19 +29,14 @@ val items = listOf(
         route = "proposed"
     ),
     BottomNavigation(
-        title = "Đặt nhanh",
+        title = "Đánh giá",
         icon = R.drawable.outline_electric_bolt_24,
         route = "bookquickly"
     ),
     BottomNavigation(
-        title = "Ưu đãi",
-        icon = R.drawable.outline_card_giftcard_24,
-        route = "discount"
-    ),
-    BottomNavigation(
-        title = "Tài khoản",
+        title = "Tôi",
         icon = R.drawable.outline_manage_accounts_24,
-        route = "user"
+        route = "discount"
     )
 )
 
@@ -75,16 +70,19 @@ fun BottomNavigationBar(
                         Icon(
                             painter = painterResource(id = item.icon),
                             contentDescription = item.title,
-                            tint = if (selected) Color.Red else MaterialTheme.colorScheme.onBackground,
                         )
 
                     },
                     label = {
                         Text(
                             text = item.title,
-                            color = if (selected) Color.Red else MaterialTheme.colorScheme.onBackground
                         )
-                    }
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color.Red,
+                        selectedTextColor = Color.Red,
+                        indicatorColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    )
                 )
             }
         }

@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.Search
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -22,14 +23,13 @@ import androidx.compose.material.icons.filled.ArrowOutward
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,24 +41,122 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerScreen
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DateRangePickerScreen
 
+
+@SuppressLint("StateFlowValueCalledInComposition")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SearchScreen(
-    onOpenDatePickerScreen:(String)->Unit,
+    searchViewModel: SearchViewModel,
+    onHandleSearchClickButtonSearch:(String)->Unit,
     closeSearchScreen:()->Unit
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val interactionSource1 = remember { MutableInteractionSource() }
-    val searchCategory = remember {
+
+    val showDatePicker = remember{ mutableStateOf("") }
+    val visibleDataPicker = remember{ mutableStateOf(false) }
+
+
+
+
+    //////////////////////////demooooooooooo////////////////////////////////////////////
+//    val couponViewModel: CouponViewModel = viewModel(
+//        factory = CouponViewModelFactory(CouponRepository(apiService = apiService))
+//    )
+//    LaunchedEffect(Unit) {
+//        couponViewModel.getCouponList()
+//        }
+//    val couponResource = couponViewModel.couponList.observeAsState()
+//    // Xử lý UI dựa trên trạng thái của Resource
+//    when (couponResource.value?.status) {
+//        Status.SUCCESS -> {
+//            // Xử lý dữ liệu khi load thành công
+//            couponResource.value?.data?.let { coupons ->
+//                Log.e("List Coupon", coupons.toString())
+//            }
+//        }
+//        Status.ERROR -> {
+//            // Xử lý khi có lỗi
+//            Text(text = "Lỗi: ${couponResource.value?.message}")
+//        }
+//        Status.LOADING -> {
+//            // Xử lý trạng thái đang tải
+//
+//        }
+//
+//        null -> Text(text = "Lỗi: nuklklklklklklklklklklklklklklklklklklkl")
+//    }
+
+
+    //get by id
+//    LaunchedEffect(Unit) {
+//        couponViewModel.getCouponsById("1")
+//    }
+//    val couponResourceById = couponViewModel.coupons.observeAsState()
+//    Log.e("couponResourceById",couponResourceById.toString())
+//    when (couponResourceById.value?.status) {
+//        Status.SUCCESS -> {
+//            // Xử lý dữ liệu khi load thành công
+//            couponResourceById.value?.data?.let { coupon ->
+//                Log.e("ResourceByID", coupon.toString())
+//            }
+//        }
+//        Status.ERROR -> {
+//            // Xử lý khi có lỗi
+//            Log.e( "Lỗi: ", "${couponResourceById.value?.message}")
+//        }
+//        Status.LOADING -> {
+//        }
+//        null ->Log.e( "NULLLL: ", "NHULLLLLLL")
+//
+//    }
+
+
+    //post coupon
+//    LaunchedEffect(Unit) {
+//        couponViewModel.postCoupon(Coupon(
+//            id = null,
+//            name = "Quà An tặng",
+//            amountDiscount = null,
+//            percentDiscount = 50,
+//            effectiveDate =  "2024-05-01T00:00:00.000Z",
+//            expirationDate = null
+//        ))
+//    }
+//    val newCouponResource = couponViewModel.coupons.observeAsState()
+//    when (newCouponResource.value?.status) {
+//        Status.SUCCESS -> {
+//            // Xử lý dữ liệu khi load thành công
+//            newCouponResource.value?.data?.let { coupon ->
+//                Log.e("New Coupon", coupon.toString())
+//            }
+//        }
+//        Status.ERROR -> {
+//            // Xử lý khi có lỗi
+//            Log.e( "Lỗi: ", "${newCouponResource.value?.message}")
+//        }
+//        Status.LOADING -> {
+//        }
+//        null ->Log.e( "NULLLL: ", "NHULLLLLLL")
+//
+//    }
+
+    //////////////////////////demooooooooooo////////////////////////////////////////////
+
+    val typeBooking = remember {
         mutableStateOf("")
     }
+
+    val timeCheckin = searchViewModel.getDateSearch(typeBooking.value).timeCheckin
+    val timeCheckOut = searchViewModel.getDateSearch(typeBooking.value).timeCheckOut
 
     Scaffold(
         topBar = {
             SearchTopBar(
-                searchCategory = {i->
-                    searchCategory.value = i
+                typeBooking = {i->
+                    typeBooking.value = i
                 },
                 closeSearchScreen)
         }
@@ -94,10 +192,11 @@ fun SearchScreen(
                             .clip(MaterialTheme.shapes.medium)
 
                             .clickable(
-                                interactionSource = interactionSource1,
+                                interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = true)
                             ) {
-                                onOpenDatePickerScreen(searchCategory.value)
+                                showDatePicker.value = typeBooking.value
+                                visibleDataPicker.value = true
                             }
                     ) {
                         Row(
@@ -117,7 +216,11 @@ fun SearchScreen(
                                 ) {
                                     Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
                                     Spacer(modifier = Modifier.height(6.dp))
-                                    Text(text = "Bất kì", color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        text = timeCheckin,
+                                        color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold,
+                                    )
+
 
                                 }
 
@@ -143,7 +246,9 @@ fun SearchScreen(
                                 ) {
                                     Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                                     Spacer(modifier = Modifier.height(6.dp))
-                                    Text(text = "Bất kì", color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        text = timeCheckOut,
+                                        color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
 
                                 }
 
@@ -166,19 +271,20 @@ fun SearchScreen(
                             .clip(shape = MaterialTheme.shapes.large)
                             .background(Color.Red)
                             .clickable(
-                                interactionSource = interactionSource,
+                                interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = true)
-                            ) {}
+                            ) {
+                                onHandleSearchClickButtonSearch(typeBooking.value)
+                            }
                         ,
                         Alignment.Center
                     ) {
                         Text(
                             text = "Tìm kiếm",
-                            style = MaterialTheme.typography.bodyMedium,
+                            fontSize = 16.sp,
                             color = Color.White,
                             modifier = Modifier
                                 .padding(10.dp)
-
                         )
                     }
                 }
@@ -188,9 +294,57 @@ fun SearchScreen(
 
 
     }
+    when(showDatePicker.value){
+        "hourly"-> DatePickerScreen(
+            searchViewModel = searchViewModel,
+            typeBooking = typeBooking.value,
+            visible = visibleDataPicker.value,
+            onCloseCalenderScreen = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            },
+            onHandleClickButtonDelete = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            }
+        )
+        "overnight"-> DateRangePickerScreen(
+            searchViewModel = searchViewModel,
+            typeBooking = typeBooking.value,
+            visible = visibleDataPicker.value,
+            onCloseCalenderScreen = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            },
+            onHandleClickButtonDelete = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            }
+        )
+        "bydate"-> DateRangePickerScreen(
+            searchViewModel = searchViewModel,
+            typeBooking = typeBooking.value,
+            visible = visibleDataPicker.value,
+            onCloseCalenderScreen = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            },
+            onHandleClickButtonDelete = {
+                showDatePicker.value = ""
+                visibleDataPicker.value = false
+            }
+        )
+        else ->{
+            showDatePicker.value = ""
+            visibleDataPicker.value = false
+        }
+
+
+    }
+
+
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextFieldSearch(
     onOpenScreenSearch:()->Unit
@@ -198,7 +352,6 @@ fun TextFieldSearch(
     var text by remember {
         mutableStateOf("")
     }
-    val interactionSource = remember { MutableInteractionSource() }
 
     Surface(
         shadowElevation = 4.dp, // Độ nâng của đổ bóng
@@ -206,7 +359,7 @@ fun TextFieldSearch(
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .clickable(
-                interactionSource = interactionSource,
+                interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true),
                 onClick = onOpenScreenSearch
             )
@@ -238,9 +391,9 @@ fun TextFieldSearch(
                 .fillMaxWidth(),
 
             shape = MaterialTheme.shapes.medium, // Border radius
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.onSecondary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSecondary // Màu viền khi TextField không được focus
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSecondary, // Màu viền khi TextField không được focus
             )
         )
     }

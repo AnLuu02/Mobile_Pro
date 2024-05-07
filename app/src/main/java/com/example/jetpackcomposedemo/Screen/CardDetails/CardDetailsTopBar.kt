@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,14 +28,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.data.models.Room.Room
 
 @Composable
 fun  TopCardDetail(
-    navController: NavHostController,
     listState:LazyListState,
-    cardId:String
+    data:Room,
+    onBack:()->Unit
 ){
 
     val showBackgroundTopBar = remember { mutableStateOf(false) }
@@ -54,21 +54,22 @@ fun  TopCardDetail(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp,end=16.dp,top=46.dp, bottom = 16.dp)
+                .padding(start = 16.dp,end=16.dp,top=48.dp, bottom = 16.dp)
 
             ,
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1.5f)
             ) {
                 Box(
                     modifier = Modifier
                         .size(36.dp)
                         .background(color = Color.White, shape = CircleShape)
                         .clickable {
-                            navController.popBackStack()
+                            onBack()
                         }
                     ,
                     contentAlignment = Alignment.Center
@@ -76,7 +77,7 @@ fun  TopCardDetail(
                     imageVector = Icons.Rounded.ArrowBackIosNew,
                     contentDescription = "Back",
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(24.dp)
 
                 )
                 }
@@ -84,15 +85,17 @@ fun  TopCardDetail(
                 Spacer(modifier = Modifier.width(6.dp))
 
                 Text(
-                    text = "LÒNG ĐỀN ĐỎ HOTEL $cardId",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = data.name.toString(),
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (showBackgroundTopBar.value) Color.Black else Color.White
                 )
             }
 
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.weight(0.5f)
             ) {
                 Box(
                     modifier = Modifier
@@ -104,11 +107,10 @@ fun  TopCardDetail(
                         painter = painterResource(id = R.drawable.outline_location_on_24),
                         contentDescription = "Back",
                         modifier = Modifier
-                            .size(20.dp)
+                            .size(24.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
 
                 Box(
                     modifier = Modifier
@@ -119,7 +121,7 @@ fun  TopCardDetail(
                     imageVector = Icons.Rounded.Share,
                     contentDescription = "Back",
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(24.dp)
                 )
                 }
             }

@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.components.CalenderDatePicker
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -22,15 +24,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.Screen.Search.BookRoom
+import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 
 @Composable
 fun DatePickerBottomBar(
-    onHandleClick:()->Unit
+    searchViewModel: SearchViewModel,
+    typeBooking:String,
+    enabledButtonApply:Boolean = false,
+    onHandleClickButton:()->Unit,
+    onHandleClickButtonDelete: () -> Unit
 ) {
-    val interactionSource = remember {
-        MutableInteractionSource()
-    }
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -38,7 +42,7 @@ fun DatePickerBottomBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start=12.dp,end=12.dp, top = 16.dp, bottom = 20.dp)
+                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 20.dp)
             ,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -48,11 +52,27 @@ fun DatePickerBottomBar(
                 text = "Xóa",
                 style = MaterialTheme.typography.titleMedium,
                 textDecoration = TextDecoration.Underline,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable(
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    },
+                    indication = rememberRipple(bounded = false)
+                ) {
+                    searchViewModel.setSelectedCalendar(typeBooking,
+                        BookRoom(
+                            timeCheckin = "Bất kì",
+                            timeCheckOut = "Bất kì",
+                            totalTime = 1
+                        )
+                    )
+                    onHandleClickButtonDelete()
+                }
             )
 
             Button(
-                onClick = { onHandleClick() },
+                onClick = { onHandleClickButton() },
+                enabled = enabledButtonApply,
                 modifier = Modifier.clip(MaterialTheme.shapes.small),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Red,

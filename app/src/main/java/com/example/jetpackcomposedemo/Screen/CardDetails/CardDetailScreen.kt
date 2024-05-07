@@ -1,5 +1,8 @@
 package com.example.jetpackcomposedemo.Screen.CardDetails
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,8 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForwardIos
-import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -27,10 +29,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -38,33 +45,149 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Scale
 import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.Screen.Search.BookRoom
+import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
+import com.example.jetpackcomposedemo.Screen.User.LoginUiState
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBooking.DatePickerBookingScreen
+import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
+import com.example.jetpackcomposedemo.data.models.Room.Room
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
+import com.example.jetpackcomposedemo.helpper.Status
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CardDetailScreen(
-    cardId: String?,
-    navController:NavHostController
+    loginUiState: LoginUiState,
+    searchViewModel: SearchViewModel,
+    bookingViewModel:BookingViewModel,
+    roomViewModel: RoomViewModel,
+    roomId: String,
+    onOpenPayment:()->Unit,
+    onOpenLoginScreen:()->Unit,
+    onBack:()->Unit
 ) {
     val listState = rememberLazyListState()
+    val openAlertDialog = remember { mutableStateOf(false) }
+    val openDialogLoginRequired = remember { mutableStateOf(false) }
 
+    val openDatePickerBookingScreen = remember {
+        mutableStateOf(false)
+    }
+
+    var dateCheckinString = ""
+    var dateCheckoutString = ""
+    var typeBooking = "";
+    var totalTime = "1"
+
+    LaunchedEffect(Unit) {
+        roomViewModel.getRoomById(roomId)
+    }
+    val roomResource = roomViewModel.rooms.observeAsState()
+    val data = remember {
+        mutableStateOf(Room())
+    }
+    when (roomResource.value?.status) {
+        Status.SUCCESS -> {
+            roomResource.value?.data?.let { room ->
+                data.value = room[0]
+                typeBooking = room[0].roomTypes?.type ?: "hourly"
+                if(bookingViewModel.getTypeBooking() !=  room[0].roomTypes?.type){
+                    bookingViewModel.setBookingResult(BookingResult())
+                }
+                when(room[0].roomTypes?.type){
+                    "hourly"->{
+                        dateCheckinString = bookingViewModel.getTimeCheckin() ?:  LocalDateTime.now().plusHours(1).format(
+                            DateTimeFormatter.ofPattern("HH:00, dd/MM"))
+                        dateCheckoutString =  bookingViewModel.getTimeCheckout() ?: LocalDateTime.now().plusHours(2).format(
+                            DateTimeFormatter.ofPattern("HH:00, dd/MM"))
+                        totalTime =  bookingViewModel.getTotalTime() ?: "1"
+
+                    }
+                    "overnight"->{
+                        dateCheckinString = bookingViewModel.getTimeCheckin() ?: LocalDateTime.now().plusDays(1).format(
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        dateCheckoutString =  bookingViewModel.getTimeCheckout() ?: LocalDateTime.now().plusDays(2).format(
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        totalTime = bookingViewModel.getTotalTime() ?: "1"
+                    }
+                    "bydate"->{
+                        dateCheckinString = bookingViewModel.getTimeCheckin() ?: LocalDateTime.now().plusDays(1).format(
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        dateCheckoutString =  bookingViewModel.getTimeCheckout() ?: LocalDateTime.now().plusDays(3).format(
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        totalTime = bookingViewModel.getTotalTime() ?: "2"
+                    }
+                }
+
+                bookingViewModel.setTimeCheckin(dateCheckinString)
+                bookingViewModel.setTimeCheckout(dateCheckoutString)
+                bookingViewModel.setTotalTime(totalTime)
+                bookingViewModel.setTypeBooking(typeBooking)
+                val currentHour = LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("HH:00"))
+                val saveDateCheckin = when(typeBooking){
+                    "hourly"->"$dateCheckinString/${LocalDateTime.now().year}"
+                    else->"$currentHour, $dateCheckinString"
+                }
+                val saveDateCheckout = when(typeBooking){
+                    "hourly"-> "$dateCheckoutString/${LocalDateTime.now().year}"
+                    else->"$currentHour, $dateCheckoutString"
+                }
+                searchViewModel.setSelectedCalendar(typeBooking, BookRoom(
+                    timeCheckin = saveDateCheckin,
+                    timeCheckOut = saveDateCheckout,
+                    totalTime = totalTime.toInt()
+                )
+                )
+
+            }
+        }
+
+        Status.ERROR ->Log.e("<Null roi>","-----------------------------------------------")
+        Status.LOADING -> Log.e("<Null roi>","-----------------------------------------------")
+        null -> Log.e("<Null roi>","-----------------------------------------------")
+    }
     Scaffold(
         topBar = {
-            TopCardDetail(navController,listState,cardId.toString())
+            TopCardDetail(listState,data.value,
+                onBack = onBack
+            )
         },
         bottomBar = {
-            BottomCardDetail()
+            BottomCardDetail(
+                loginUiState = loginUiState,
+                bookingViewModel = bookingViewModel,
+                data = data.value,
+                onOpenPayment = {
+                    openAlertDialog.value = true
+                },
+                dateCheckinString =dateCheckinString,
+                dateCheckoutString = dateCheckoutString,
+                totalTime = totalTime,
+                typeBooking = typeBooking,
+                openDialogLoginRequired = {
+                    openDialogLoginRequired.value = it
+                },
+                openDatePickerBookingScreen ={
+                    openDatePickerBookingScreen.value = it
+                })
         },
 
 
-    ) { padding ->
+        ) { padding ->
 
         LazyColumn(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = padding.calculateBottomPadding())
-                .background(Color.LightGray)
+                .background(Color.LightGray.copy(alpha = 0.3f))
         ) {
             item {
                 Column(modifier = Modifier
@@ -77,8 +200,10 @@ fun CardDetailScreen(
                         verticalAlignment = Alignment.CenterVertically
 
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.hotel_1),
+
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                                .crossfade(true).data(data.value.images?.get(0)).build(),
                             contentDescription = "",
                             modifier = Modifier
                                 .weight(1f)
@@ -88,15 +213,18 @@ fun CardDetailScreen(
 
                             )
 
-                        Image(
-                            painter = painterResource(id = R.drawable.hotel_2),
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                                .crossfade(true).data(data.value.images?.get(1) ?: data.value.images?.get(0)).build(),
                             contentDescription = "",
                             modifier = Modifier
                                 .weight(1f)
                                 .heightIn(min = 180.dp, max = 200.dp)
-                                .padding(start = 1.dp),
+                                .padding(end = 1.dp),
                             contentScale = ContentScale.Crop,
-                        )
+
+                            )
+
                     }
 
                     Spacer(modifier = Modifier.height(2.dp))
@@ -158,43 +286,44 @@ fun CardDetailScreen(
                                 Icon(
                                     imageVector = Icons.Rounded.Star,
                                     contentDescription = "",
-                                    tint = Color.Yellow,
+                                    tint = Color(255,215,0),
                                     modifier = Modifier
                                         .size(24.dp))
 
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "4.4",
-                                    style = MaterialTheme.typography.bodyLarge,
+                                    text = data.value.rating.toString(),
+                                    fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "(17)",
-                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontSize = 20.sp,
                                     color = Color.Gray
                                 )
                             }
 
                             Box(modifier = Modifier
-                                .background(Color.Green, shape = RoundedCornerShape(4.dp)),
+                                .background(Color.Red.copy(0.2f), shape = RoundedCornerShape(4.dp)),
                                 contentAlignment = Alignment.Center
                             ){
                                 Row(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(8.dp)
+                                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Rounded.Home,
+                                        painter = painterResource(id = R.drawable.outline_local_fire_department_24),
                                         contentDescription = "",
-                                        tint = Color.Blue,
+                                        tint = Color.Red,
                                         modifier = Modifier
                                             .size(12.dp))
+                                    Spacer(modifier = Modifier.width(2.dp))
                                     Text(
-                                        text = "Toàn bộ căn hộ",
+                                        text = "Nổi bật",
                                         style = MaterialTheme.typography.bodySmall,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.Blue
+                                        color = Color.Red
                                     )
                                 }
                             }
@@ -203,7 +332,7 @@ fun CardDetailScreen(
                         Spacer(modifier = Modifier.height(20.dp))
 
                         Text(
-                            text = "Corzum Homes - Summer's House",
+                            text = data.value.name.toString(),
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleLarge
                         )
@@ -225,7 +354,7 @@ fun CardDetailScreen(
                         ) {
                             Text(
                                 text = "Địa danh gần khách sạn",
-                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 14.sp,
                                 color = Color.Gray,
                                 fontWeight = FontWeight.Bold
                             )
@@ -236,16 +365,16 @@ fun CardDetailScreen(
 
                                 Text(
                                     text = "Xem tất cả",
-                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 12.sp,
                                     color = Color.Red,
                                     fontWeight = FontWeight.Bold
                                 )
 
                                 Icon(
-                                    imageVector = Icons.Rounded.ArrowForwardIos,
+                                    imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos,
                                     contentDescription = "",
                                     tint = Color.Red,
-                                    modifier = Modifier.size(10.dp)
+                                    modifier = Modifier.size(16.dp)
 
                                 )
                             }
@@ -270,13 +399,13 @@ fun CardDetailScreen(
                         ) {
                             Text(
                                 text = "Phòng tập California Gym & Fitness",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             Text(
                                 text = "0.16 km",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -292,13 +421,13 @@ fun CardDetailScreen(
                         ) {
                             Text(
                                 text = "Siêu thị Sài Gòn",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             Text(
                                 text = "0.18 km",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -313,13 +442,13 @@ fun CardDetailScreen(
                         ) {
                             Text(
                                 text = "Co.opXtra",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             Text(
                                 text = "0.18 km",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -331,7 +460,7 @@ fun CardDetailScreen(
                 Spacer(modifier = Modifier.height(3.dp))
                 DiscountTickets()
                 Spacer(modifier = Modifier.height(3.dp))
-                Evaluate()
+                Evaluate(data=data.value)
                 Spacer(modifier = Modifier.height(3.dp))
                 Introduce()
                 Spacer(modifier = Modifier.height(3.dp))
@@ -340,10 +469,56 @@ fun CardDetailScreen(
                 PolicyHotel()
                 Spacer(modifier = Modifier.height(3.dp))
                 RefundAndCancellationPolicy()
+                Spacer(modifier = Modifier.height(3.dp))
 
             }
         }
 
+    }
+
+    if(openDatePickerBookingScreen.value){
+        DatePickerBookingScreen(
+            bookingViewModel = bookingViewModel,
+            searchViewModel = searchViewModel,
+            typeBooking = typeBooking,
+            {checkin,checkout,total,type->
+                dateCheckinString = checkin
+                dateCheckoutString = checkout
+                totalTime = total
+                typeBooking = type
+            }, onCloseDatePicker = {
+                openDatePickerBookingScreen.value = it
+            })
+    }
+
+    if(openAlertDialog.value){
+        AlertDialogExample(
+            onDismissRequest = {
+                openAlertDialog.value = false
+            },
+            onConfirmation = {
+                openAlertDialog.value = false
+                onOpenPayment()
+                bookingViewModel.setInfoRoom(data.value)
+
+            },
+            dialogTitle = "Yêu cầu thanh toán trả trước",
+            dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
+        )
+    }
+
+    if(openDialogLoginRequired.value){
+        AlertDialogExample(
+            onDismissRequest = {
+                openDialogLoginRequired.value = false
+            },
+            onConfirmation = {
+                openDialogLoginRequired.value = false
+                onOpenLoginScreen()
+            },
+            dialogTitle = "Yêu cầu đăng nhâp",
+            dialogText = "Vui lòng đăng nhập trước khi đặt phòng. Xin cảm ơn",
+        )
     }
 
 }
@@ -380,13 +555,13 @@ fun DiscountTickets(){
 
                 Text(
                     text = "Giảm giá 5% tối đa 20k, đặt tối thiểu 150k",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Light
                 )
 
             }
 
-            Icon(imageVector = Icons.Rounded.ArrowForwardIos, contentDescription = "", tint = Color.Red, modifier = Modifier.size(12.dp))
+            Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos, contentDescription = "", tint = Color.Red, modifier = Modifier.size(12.dp))
 
         }
 
@@ -394,7 +569,9 @@ fun DiscountTickets(){
 }
 
 @Composable
-fun Evaluate(){
+fun Evaluate(
+    data:Room
+){
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)){
@@ -409,7 +586,7 @@ fun Evaluate(){
             ){
 
                 Text(
-                    text ="4.6",
+                    text = data.rating.toString(),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -419,7 +596,7 @@ fun Evaluate(){
                 Column {
                     Text(
                         text ="Tuyệt vời",
-                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
 
@@ -458,13 +635,13 @@ fun Evaluate(){
 
                     Text(
                         text = "Xem tất cả",
-                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 12.sp,
                         color = Color.Red,
                         fontWeight = FontWeight.Bold
                     )
 
                     Icon(
-                        imageVector = Icons.Rounded.ArrowForwardIos,
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos,
                         contentDescription = "",
                         tint = Color.Red,
                         modifier = Modifier.size(16.dp)
@@ -498,7 +675,7 @@ fun Comment(){
                 Icon(
                     imageVector = Icons.Rounded.Star,
                     contentDescription = "",
-                    tint = Color.Yellow,
+                    tint = Color(255,215,0),
                     modifier = Modifier
                         .size(24.dp)
                 )
@@ -509,7 +686,7 @@ fun Comment(){
                 Icon(
                     imageVector = Icons.Rounded.Star,
                     contentDescription = "",
-                    tint = Color.Yellow,
+                    tint = Color(255,215,0),
                     modifier = Modifier
                         .size(24.dp)
                 )
@@ -519,7 +696,7 @@ fun Comment(){
                 Icon(
                     imageVector = Icons.Rounded.Star,
                     contentDescription = "",
-                    tint = Color.Yellow,
+                    tint = Color(255,215,0),
                     modifier = Modifier
                         .size(24.dp)
                 )
@@ -530,7 +707,7 @@ fun Comment(){
                 Icon(
                     imageVector = Icons.Rounded.Star,
                     contentDescription = "",
-                    tint = Color.Yellow,
+                    tint = Color(255,215,0),
                     modifier = Modifier
                         .size(24.dp)
                 )
@@ -541,7 +718,7 @@ fun Comment(){
                 Icon(
                     imageVector = Icons.Rounded.Star,
                     contentDescription = "",
-                    tint = Color.Yellow,
+                    tint = Color(255,215,0),
                     modifier = Modifier
                         .size(24.dp)
                 )
@@ -552,7 +729,7 @@ fun Comment(){
 
             Text(
                 text ="Dâu bé",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
                 color = Color.Gray
             )
 
@@ -563,7 +740,7 @@ fun Comment(){
 
         Text(
             text ="Ks cực kì tốt luôn. 100/100 điểm nha. Sẽ là khách quen của ks luôn hihi",
-            style = MaterialTheme.typography.bodyMedium,
+            fontSize = 16.sp,
             color = Color.Gray
         )
     }
@@ -581,7 +758,7 @@ fun Introduce(){
         ) {
             Text(
                 text ="Giới thiệu",
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -594,7 +771,7 @@ fun Introduce(){
 
                 Text(
                     text ="HOTLINE:",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     textDecoration = TextDecoration.Underline,
                     fontWeight = FontWeight.Bold
                 )
@@ -603,7 +780,7 @@ fun Introduce(){
 
                 Text(
                     text ="0918064618",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                 )
 
 
@@ -627,9 +804,9 @@ fun Introduce(){
 
                     append(" 243/2/30 đường Chu Văn An, phường 12, quận Bình Thạnh")
                 },
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
 
-                )
+                    )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -650,9 +827,9 @@ fun Introduce(){
 
                     append(" Mặt tiền 4 phía, 5 lầu, cách chợ vài trăm mét aaaaaaaaaaaaaaaaaaaaaaaaaa")
                 },
-                    style = MaterialTheme.typography.bodyMedium
+                    fontSize = 16.sp,
 
-                )
+                    )
 
             }
         }
@@ -673,7 +850,7 @@ fun CheckInCheckOut(){
         ) {
             Text(
                 text ="Giờ nhận phòng/trả phòng",
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -686,14 +863,14 @@ fun CheckInCheckOut(){
             ) {
                 Text(
                     text = "Loại đặt phòng",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
                     text = "Thời gian",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
                 )
@@ -718,13 +895,13 @@ fun CheckInCheckOut(){
             ) {
                 Text(
                     text = "Theo giờ",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
                     text = "Từ 07:00 đến 22:00",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -740,13 +917,13 @@ fun CheckInCheckOut(){
             ) {
                 Text(
                     text = "Qua đêm",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
                     text = "Từ 22:00 đến 12:00",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -762,13 +939,13 @@ fun CheckInCheckOut(){
             ) {
                 Text(
                     text = "Theo ngày",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
                     text = "Từ 13:00 đến 12:00",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -792,7 +969,7 @@ fun PolicyHotel(){
         ) {
             Text(
                 text ="Chính sách khách sạn",
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -801,7 +978,7 @@ fun PolicyHotel(){
 
             Text(
                 text ="Chính sách:",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold
             )
@@ -810,13 +987,13 @@ fun PolicyHotel(){
 
             Text(
                 text ="- Đối với khách lưu trú qua đêm: Khách cần cung cấp CMND/CCCD/PASSPORT cho lễ tân.",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
             )
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
                 text ="- Khách phải từ 18 tuổi trở lên mới có thể nhận phòng.",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
             )
 
         }
@@ -837,7 +1014,7 @@ fun RefundAndCancellationPolicy(){
         ) {
             Text(
                 text ="Chính sách hoàn hủy",
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -845,7 +1022,7 @@ fun RefundAndCancellationPolicy(){
 
             Text(
                 text ="Hủy miễn phí trước giờ nhận phòng 1 tiếng",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 16.sp,
             )
 
         }
