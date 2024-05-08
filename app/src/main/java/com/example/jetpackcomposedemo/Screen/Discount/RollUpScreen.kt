@@ -136,7 +136,8 @@ fun checkDayItem(
 @SuppressLint("ResourceType")
 @Composable
 fun RollUpScreen(
-  navController: NavHostController? = null
+  navController: NavHostController? = null,
+  userID: Int? = null
 ) {
   val appColor = AppColor()
   var isTodayRolledUp by remember {
@@ -366,6 +367,27 @@ fun RollUpScreen(
                     if (((index + 1) * 10000) < totalPoint && totalPoint - ((index + 1) * 10000) >= 0 && !isTurnOnNotificationSuccess) {
                       totalPoint -= ((index + 1) * 10000)
                       isTurnOnNotificationSuccess = true
+
+                      // Call API add UserCoupon
+                      if(userID == null) {
+                        navController?.navigate("home")
+                      } else {
+                        val amountDiscount = ((index + 1) * 10000)
+                        val couponID = if (amountDiscount == 50000) 11
+                          else if (amountDiscount == 40) 10
+                          else if (amountDiscount == 30) 9
+                          else if (amountDiscount == 20) 8
+                          else 7
+                        val numberOfUses = 1
+                        val isUsed = 1
+                        val body = "{ " +
+                            "CouponID: $couponID " +
+                            "UserID: $userID " +
+                            "IsUsed: $isUsed " +
+                            "NumberOfUses: $numberOfUses " +
+                            "}"
+
+                      }
                     }
                   },
                   modifier = Modifier
@@ -445,7 +467,6 @@ fun RollUpScreen(
 
   LoadingScreen(isLoadingValue = isLoading)
 }
-
 
 private fun getDayText(index: Int): String {
   return when (index) {

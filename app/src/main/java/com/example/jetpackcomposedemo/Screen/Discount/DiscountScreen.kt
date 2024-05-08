@@ -170,7 +170,8 @@ fun smallIconBtn(
 @Composable
 fun TopInfoView(
     userName: String = "Nguyễn Quốc An",
-    phoneNumber: String = "0123456789"
+    phoneNumber: String = "0123456789",
+    navController: NavHostController? = null
 ) {
     val appColor = AppColor()
 
@@ -192,7 +193,7 @@ fun TopInfoView(
                 size = 32.dp,
                 imageResId = R.raw.setting,
                 onClickBtn = {
-
+                    navController?.navigate("user")
                 }
             )
 
@@ -481,7 +482,9 @@ fun DiscountScreen(
     navController: NavHostController? = null,
     isLoggedIn: Boolean = true,
     isCheckedIn: Boolean = true,
-    timeCheckOut: String = "06/05/2024 18:01:00"
+    timeCheckOut: String = "08/05/2024 18:01:00",
+    userName: String = "Nguyen Quoc An",
+    phoneNumber: String = "0123456789"
 ) {
     // Config screen - begin
     val screenWidth = with(LocalDensity.current) {
@@ -498,7 +501,11 @@ fun DiscountScreen(
             .background(appColor.gray3)
     ) {
         if(isLoggedIn) {
-            TopInfoView()
+            TopInfoView(
+                navController = navController,
+                userName = userName,
+                phoneNumber = phoneNumber
+            )
 
             if(isCheckedIn) {
                 LineCountdown(

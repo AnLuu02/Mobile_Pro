@@ -204,18 +204,46 @@ fun MainApp(){
                     ScreenWithBottomNavigationBar(navController = navController, topBar = {
 
                     }, content = {padding, _->
-                        DiscountScreen(padding = padding, navController)
+                        if(loginUiState.isLoggedIn) {
+                            DiscountScreen(
+                                padding = padding,
+                                navController = navController,
+                                isLoggedIn = true,
+                                isCheckedIn = false,
+                                userName = loginUiState.fullName.toString(),
+                                phoneNumber = loginUiState.phoneNumber.toString()
+                                )
+                        } else {
+                            DiscountScreen(
+                                padding = padding,
+                                navController = navController,
+                                isLoggedIn = false,
+                                isCheckedIn = false,
+
+                            )
+                        }
                     })
                 }
 
                 composable("CouponScreen"){
-                    CouponScreen(navController, 1)
+                    if(loginUiState.isLoggedIn) {
+                        CouponScreen(navController, loginUiState.id)
+                    } else {
+                        CouponScreen(navController, null)
+                    }
                 }
 
                 composable("RollUpScreen"){
-                    RollUpScreen(
-                        navController = navController
-                    )
+                    if(loginUiState.isLoggedIn) {
+                        RollUpScreen(
+                            navController = navController,
+                            userID = loginUiState.id
+                        )
+                    } else {
+                        RollUpScreen(
+                            navController = navController
+                        )
+                    }
                 }
 
                 composable("StartingAppScreen"){
