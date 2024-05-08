@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.Home.widget
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.HourglassTop
+import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.rounded.ShieldMoon
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,53 +22,61 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.data.models.ServicesUI
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
 
 data class ServicesUI(
     val icon: Int,
-    val title:String
+    val title:String,
+    val type: String,
 )
 val servicesUI = listOf(
     ServicesUI(
         icon = R.drawable.outline_location_on_24,
-        title = "Gần bạn"
+        title = "Gần bạn",
+        type = "other"
     ),
     ServicesUI(
         icon = R.drawable.outline_hourglass_top_24,
-        title = "Theo giờ"
+        title = "Theo giờ",
+        type = "hourly"
     ),
     ServicesUI(
         icon = R.drawable.outline_dark_mode_24,
-        title = "Qua đêm"
+        title = "Qua đêm",
+        type = "overnight"
     ),
     ServicesUI(
         icon = R.drawable.outline_calendar_month_24,
-        title = "Theo ngày"
+        title = "Theo ngày",
+        type = "bydate"
     ),
-    ServicesUI(
-        icon = R.drawable.outline_favorite_border_24,
-        title = "Tình yêu"
-    ),
-    ServicesUI(
-        icon = R.drawable.outline_local_airport_24,
-        title = "Du lịch"
-    ),
-    ServicesUI(
-        icon = R.drawable.outline_local_offer_24,
-        title = "Ưu đãi"
-    ),
-    ServicesUI(
-        icon = R.drawable.outline_fiber_new_24,
-        title = "Đổi gió"
-    )
+//    ServicesUI(
+//        icon = R.drawable.outline_favorite_border_24,
+//        title = "Tình yêu"
+//    ),
+//    ServicesUI(
+//        icon = R.drawable.outline_local_airport_24,
+//        title = "Du lịch"
+//    ),
+//    ServicesUI(
+//        icon = R.drawable.outline_local_offer_24,
+//        title = "Ưu đãi"
+//    ),
+//    ServicesUI(
+//        icon = R.drawable.outline_fiber_new_24,
+//        title = "Đổi gió"
+//    ),
 )
 
 @Composable
-fun ServiceSection() {
+fun ServiceSection(
+    onSelectService: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -83,7 +96,7 @@ fun ServiceSection() {
             modifier = Modifier
                 .height(120.dp)
         ) {
-            items(servicesUI.size) { index -> ServiceItem(index = index) }
+            items(servicesUI.size) { ServiceItem(index = it, onSelectService = onSelectService) }
 
         }
     }
@@ -92,14 +105,16 @@ fun ServiceSection() {
 }
 
 @Composable
-fun ServiceItem(index: Int) {
-    val item = servicesUI[index]
-
+fun ServiceItem(
+    index: Int,
+    onSelectService: (String) -> Unit
+) {
+    val item = servicesUI[index];
+//    Log.e("Type", item.type)
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { }
-
+        modifier = Modifier.clickable { onSelectService(item.type) }
     ) {
         Icon(
             painter = painterResource(id = item.icon),

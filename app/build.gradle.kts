@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.material)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.androidx.material3.android)
     implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -85,7 +86,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
     //material 3
-    implementation ("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.material3:material3:1.2.1")
 
     // Video player
     implementation("com.google.android.exoplayer:exoplayer:2.16.1")

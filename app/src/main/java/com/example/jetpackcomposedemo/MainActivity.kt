@@ -22,6 +22,7 @@ import androidx.navigation.navArgument
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
+import com.example.jetpackcomposedemo.Screen.Services.ServiceScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.WaitingPaymentScreen.MethodWaitingPaymentScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
@@ -130,6 +131,9 @@ fun MainApp(){
                                 },
                                 onOpenDetailCardScreen = {roomId->
                                     navController.navigate("roomDetails/$roomId")
+                                },
+                                onSelectService = {filter->
+                                    navController.navigate("service/$filter")
                                 })
                         })
                 }
@@ -144,7 +148,7 @@ fun MainApp(){
                     SearchScreen(
                         searchViewModel = searchViewModel,
                         onHandleSearchClickButtonSearch = {filter->
-                            navController.navigate("search/$filter")
+                            navController.navigate("service/$filter")
                         },
                         closeSearchScreen={
                             navController.popBackStack("home",inclusive = false)
@@ -367,6 +371,32 @@ fun MainApp(){
                     val roomId = backStackEntry.arguments?.getString("roomId")
                     PaymentScreen(bookingViewModel,navController)
                 }
+
+                composable(
+                    "service/{type}",
+                    arguments = listOf(
+                        navArgument("type") {
+                            type = NavType.StringType
+                        },
+                    )
+                ){ backStackEntry ->
+                    val type = backStackEntry.arguments?.getString("type").toString();
+                    ServiceScreen(
+                        serviceType = type,
+                        onCancelButtonClicked = {
+                            navController.popBackStack()
+                        },
+                        onSearchFieldClicked = {
+                            navController.navigate("search")
+                        },
+                        onOpenDetailCardScreen = {roomId->
+                            navController.navigate("roomDetails/$roomId")
+                        },
+                        onMapViewButtonClicked = {
+                            navController.navigate("map")
+                        }
+                    )
+                }
                 composable(
                     "roomDetails/chooseDiscount",
                 ){
@@ -383,8 +413,6 @@ fun MainApp(){
                         closeScreenChooseMethodPayment = {}
                         )
                 }
-
-
             }
         }
     }

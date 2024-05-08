@@ -151,7 +151,6 @@ fun SearchResult(
                             }
 
                         }
-
                     }
                 }
             },

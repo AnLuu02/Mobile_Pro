@@ -44,37 +44,43 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.data.models.Room.Room
+import java.text.DecimalFormat
 import coil.request.ImageRequest
 import coil.size.Scale
-import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
-import com.example.jetpackcomposedemo.data.models.Room.Room
 
 
 @Composable
 fun PriceCard(
     index: Int,
     data: Room,
+    isLastItem: Boolean = false,
     isSale: Boolean = false,
     isDiscount: Boolean = false,
     isImageFull: Boolean = false,
     isColumn:Boolean = false,
     onOpenDetailCardScreen: (String)->Unit
 ) {
+//    val image = data.images.split(",")[0].trim();
 
     val screenWidth = with(LocalDensity.current) {
         LocalConfiguration.current.screenWidthDp.dp
     }
     val sizeCard = screenWidth*10/12
 
+    var lastPaddingEnd = 0.dp
+
+    if (isLastItem) {
+        lastPaddingEnd = 16.dp
+    }
 
     Box(
         modifier = Modifier
             .then(
-                if (isColumn) Modifier.padding(start = 16.dp, end = 16.dp) else Modifier.padding(
-                    start = 16.dp,
-                )
-            )
+                if(isColumn) Modifier.padding(start = 16.dp,end=16.dp, top=16.dp, bottom = 8.dp) else Modifier.padding(start = 16.dp, end = lastPaddingEnd))
+
             .clip(shape = MaterialTheme.shapes.small)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -94,6 +100,8 @@ fun PriceCard(
             ) {
                 if (isImageFull) {
                     AsyncImage(
+//                        model = image,
+//                        painter = painterResource(id = R.drawable.hotel_2),
                         model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
                             .crossfade(true).data(data.images?.get(0)).build(),
                         contentScale = ContentScale.Crop,
@@ -165,6 +173,9 @@ fun PriceCard(
                         ) {
                             Text(
                                 text = data.name.toString(),
+//                                text = "LỒNG ĐÈN ĐỎ HOTEL",
+                                style = MaterialTheme.typography.titleLarge,
+//                                text = data.name.toString(),
                                 fontSize = 20.sp,
                                 color = if (isImageFull) Color.White else Color.Black,
                                 fontWeight = FontWeight.Bold,
@@ -238,6 +249,7 @@ fun PriceCard(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
+//                                val price = DecimalFormat("#,###đ").format(data.price)
                                 Text(
                                     text = "${data.roomTypes?.prices?.let {
                                         formatCurrencyVND(
