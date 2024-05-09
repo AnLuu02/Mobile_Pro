@@ -45,7 +45,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -56,38 +55,83 @@ import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.PaymentBottomBar
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
+import com.example.jetpackcomposedemo.Screen.User.LoginUiState
+import com.example.jetpackcomposedemo.Screen.User.MyUser
+import com.example.jetpackcomposedemo.data.models.BedType.BedType
+import com.example.jetpackcomposedemo.data.models.Bill.Bill
+import com.example.jetpackcomposedemo.data.models.Booking.Booking
 import com.example.jetpackcomposedemo.data.models.Room.Room
+import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
 import java.time.LocalDateTime
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaymentScreen(
+    bookingViewModelApi:BookingViewModelApi,
     bookingViewModel:BookingViewModel,
+    loginUiState:LoginUiState,
     navController:NavHostController
 ) {
     val listState = rememberLazyListState()
 
     val year = LocalDateTime.now().year
     val typeBooking = bookingViewModel.getTypeBooking()
-    val dateCheckinString = if(typeBooking == "hourly") "${bookingViewModel.getTimeCheckin()}/$year" else bookingViewModel.getTimeCheckin()
-    val dateCheckoutString =  if(typeBooking == "hourly") "${bookingViewModel.getTimeCheckout()}/$year" else bookingViewModel.getTimeCheckout()
+    val dateCheckinString = if(!bookingViewModel.getTimeCheckin()?.contains("/$year")!!) "${bookingViewModel.getTimeCheckin()}/$year" else bookingViewModel.getTimeCheckin()
+    val dateCheckoutString =  if(!bookingViewModel.getTimeCheckout()?.contains("/$year")!!) "${bookingViewModel.getTimeCheckout()}/$year" else bookingViewModel.getTimeCheckout()
     val totalTime = bookingViewModel.getTotalTime()
     val infoRoom = bookingViewModel.getInfoRoom()
-
-
+    val bedType = bookingViewModel.getBedType()
+    val discount = bookingViewModel.getDiscount()
     val openChooseMethodPayment = remember{ mutableStateOf(false) }
     val payloadChoose = remember{ mutableStateOf(OptionPayment()) }
+    val totalPrice = bedType?.let { CaculateTotalPriceRoom(it.total, discount?.percent) }
+        ?.let { formatCurrencyVND(it) }
     Scaffold(
         topBar = {
             PaymentTopBar(navController = navController)
         },
         bottomBar = {
-            PaymentBottomBar(bookingViewModel = bookingViewModel,
-                payloadChoose = payloadChoose.value,
-                onChooseMethodPayment = {
-                    openChooseMethodPayment.value = it
-                })
+            if (totalPrice != null) {
+                PaymentBottomBar(bookingViewModel = bookingViewModel,
+                    payloadChoose = payloadChoose.value,
+                    totalPrice = totalPrice,
+                    onChooseMethodPayment = {
+                        openChooseMethodPayment.value = it
+                    },
+                    ///////////////////////// post data booking //////////////////////////
+                    onApplyBooking = {
+                        if (infoRoom != null) {
+                            if (totalTime != null) {
+                                bookingViewModelApi.bookingRoom(
+                                    Booking(
+                                        null,
+                                        MyUser(
+                                            fullName = "Lưu Trường An",
+                                            email = "anluu099@gmail.com",
+                                            cccd = "123456789",
+                                            birthday = "24-04-2002",
+                                            gender = "Nam",
+                                            sdt = "0918064618"
+                                        ),
+                                        null,
+                                        Bill(
+                                            checkInDate = dateCheckinString,
+                                            checkOutDate = dateCheckoutString,
+                                            duration = totalTime.toInt(),
+                                        ),
+                                        bedType = bedType,
+                                        typePayment = payloadChoose.value.title,
+                                        typeBooking = typeBooking,
+                                        status = 1,
+                                        bookingViewModel.getInfoRoom()
+                                    )
+                                )
+                            }
+                        }
+                    }
+                )
+            }
         }
 
     ) { padding ->
@@ -102,19 +146,24 @@ fun PaymentScreen(
             item {
                 if (infoRoom != null) {
                     Spacer(modifier = Modifier.height(10.dp))
-                    InfoRoom(
-                        infoRoom = infoRoom,
-                        dateCheckinString.toString(),
-                        dateCheckoutString.toString(),
-                        totalTime ?: "1",
-                        typeBooking.toString()
-                    )
+                    if (bedType != null) {
+                        InfoRoom(
+                            bedType = bedType,
+                            infoRoom = infoRoom,
+                            dateCheckinString.toString(),
+                            dateCheckoutString.toString(),
+                            totalTime ?: "1",
+                            typeBooking.toString()
+                        )
+                    }
                     Spacer(modifier = Modifier.height(10.dp))
                     UserBooking()
                     Spacer(modifier = Modifier.height(10.dp))
                     DiscountBooking(navController = navController)
                     Spacer(modifier = Modifier.height(10.dp))
-                    PaymentDetails(infoRoom = infoRoom)
+                    if (bedType != null) {
+                        PaymentDetails(bookingViewModel = bookingViewModel)
+                    }
                     Spacer(modifier = Modifier.height(10.dp))
                     CanclePolicy()
                     Spacer(modifier = Modifier.height(10.dp))
@@ -140,6 +189,7 @@ fun PaymentScreen(
 
 @Composable
 fun InfoRoom(
+    bedType:BedType,
     infoRoom:Room,
     dateCheckinString:String,
     dateCheckoutString:String,
@@ -200,7 +250,6 @@ fun InfoRoom(
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize(),
-                                verticalArrangement = Arrangement.SpaceBetween
                             ) {
 
                                 Text(
@@ -212,6 +261,8 @@ fun InfoRoom(
                                     modifier = Modifier
                                 )
 
+                                Spacer(modifier = Modifier.height(6.dp))
+
                                 Text(
                                     text = infoRoom.name.toString(),
                                     fontSize = 20.sp,
@@ -219,11 +270,11 @@ fun InfoRoom(
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
-
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = "273 An Dương Vương, Phường 3, Quận 5, TP Hồ Chí Minh",
+                                    text = bedType.name,
                                     fontSize = 14.sp,
-                                    lineHeight = TextUnit.Unspecified,
+                                    fontWeight = FontWeight.W500,
                                     modifier = Modifier
                                 )
 
@@ -498,7 +549,7 @@ fun DiscountBooking(
                     .fillMaxWidth()
                     .padding(12.dp, 16.dp, 12.dp, 16.dp)
                     .clickable(
-                        interactionSource = remember{ MutableInteractionSource() },
+                        interactionSource = remember { MutableInteractionSource() },
                         indication = null
                     ) {
                         navController.navigate("roomDetails/chooseDiscount")
@@ -606,8 +657,11 @@ fun DiscountBooking(
 
 @Composable
 fun PaymentDetails(
-    infoRoom: Room
+    bookingViewModel: BookingViewModel
 ){
+    val infoRoom = bookingViewModel.getInfoRoom()
+    val bedType = bookingViewModel.getBedType()
+    val discount = bookingViewModel.getDiscount()
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -625,7 +679,9 @@ fun PaymentDetails(
             )
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(12.dp, 16.dp, 12.dp, 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp, 16.dp, 12.dp, 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -671,12 +727,14 @@ fun PaymentDetails(
                 )
 
 
-                Text(
-                    text = infoRoom.roomTypes?.let { formatCurrencyVND(it.prices) }.toString(),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                if (bedType != null) {
+                    Text(
+                        text = formatCurrencyVND(bedType.total),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
 
-                )
+                    )
+                }
             }
 
             Row(
@@ -692,12 +750,12 @@ fun PaymentDetails(
                 )
 
 
-                Text(
-                    text = "-80.000đ",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    Text(
+                        text = if(discount?.percent != null) formatCurrencyVND(discount.percent) else "0",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
 
-                )
+                    )
             }
 
             Divider(
@@ -722,14 +780,23 @@ fun PaymentDetails(
                     fontWeight = FontWeight.Bold
                 )
 
-                Text(
-                    text = "1.220.000đ",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                if (bedType != null) {
+                    Text(
+                        text = formatCurrencyVND(CaculateTotalPriceRoom(bedType.total, discount?.percent)),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }
+}
+
+fun CaculateTotalPriceRoom(rommPrice:Int,discount: Int?): Int {
+    if(discount!= null){
+        return rommPrice+discount
+    }
+    return rommPrice
 }
 
 @Composable

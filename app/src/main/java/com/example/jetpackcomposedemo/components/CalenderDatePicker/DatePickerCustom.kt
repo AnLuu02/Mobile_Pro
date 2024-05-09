@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.components.CalenderDatePicker
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -60,6 +61,8 @@ fun DatePickerCustom(
         else{ roundUpHour(currentTime,true).toInt() }
 
     ) }
+    Log.e("Search view model",searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckin)
+    Log.e("Search view model232",searchViewModel.getSelectedCalendar(typeBooking).value.timeCheckOut)
 
     val totalTime = remember{ mutableIntStateOf(
         if(searchViewModel.getTotalDate(typeBooking) != 0){

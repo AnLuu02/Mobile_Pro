@@ -50,13 +50,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Scale
 import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.Screen.Search.BookRoom
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.Screen.User.LoginUiState
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBooking.DatePickerBookingScreen
 import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
 import com.example.jetpackcomposedemo.data.models.Room.Room
-import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
 import com.example.jetpackcomposedemo.helpper.Status
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -69,12 +68,11 @@ fun CardDetailScreen(
     bookingViewModel:BookingViewModel,
     roomViewModel: RoomViewModel,
     roomId: String,
-    onOpenPayment:()->Unit,
+    onOpenChooseBedType:()->Unit,
     onOpenLoginScreen:()->Unit,
     onBack:()->Unit
 ) {
     val listState = rememberLazyListState()
-    val openAlertDialog = remember { mutableStateOf(false) }
     val openDialogLoginRequired = remember { mutableStateOf(false) }
 
     val openDatePickerBookingScreen = remember {
@@ -90,29 +88,26 @@ fun CardDetailScreen(
         roomViewModel.getRoomById(roomId)
     }
     val roomResource = roomViewModel.rooms.observeAsState()
-    val data = remember {
+    val dataRoom = remember {
         mutableStateOf(Room())
     }
     when (roomResource.value?.status) {
         Status.SUCCESS -> {
             roomResource.value?.data?.let { room ->
-                data.value = room[0]
-                typeBooking = room[0].roomTypes?.type ?: "hourly"
+                bookingViewModel.setInfoRoom(room[0])
+                dataRoom.value = room[0]
+                typeBooking = room[0].roomTypes?.type!!
                 if(bookingViewModel.getTypeBooking() !=  room[0].roomTypes?.type){
                     bookingViewModel.setBookingResult(BookingResult())
                 }
                 when(room[0].roomTypes?.type){
                     "hourly"->{
-                        dateCheckinString = bookingViewModel.getTimeCheckin() ?:  LocalDateTime.now().plusHours(1).format(
-                            DateTimeFormatter.ofPattern("HH:00, dd/MM"))
-                        dateCheckoutString =  bookingViewModel.getTimeCheckout() ?: LocalDateTime.now().plusHours(2).format(
-                            DateTimeFormatter.ofPattern("HH:00, dd/MM"))
-                        totalTime =  bookingViewModel.getTotalTime() ?: "1"
-
+                        dateCheckinString = bookingViewModel.getTimeCheckin() ?: LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("HH:00, dd/MM"))
+                        dateCheckoutString = bookingViewModel.getTimeCheckout() ?: LocalDateTime.now().plusHours(2).format(DateTimeFormatter.ofPattern("HH:00, dd/MM"))
+                        totalTime = bookingViewModel.getTotalTime() ?: "1"
                     }
                     "overnight"->{
-                        dateCheckinString = bookingViewModel.getTimeCheckin() ?: LocalDateTime.now().plusDays(1).format(
-                            DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        dateCheckinString = bookingViewModel.getTimeCheckin() ?: LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                         dateCheckoutString =  bookingViewModel.getTimeCheckout() ?: LocalDateTime.now().plusDays(2).format(
                             DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                         totalTime = bookingViewModel.getTotalTime() ?: "1"
@@ -124,28 +119,12 @@ fun CardDetailScreen(
                             DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                         totalTime = bookingViewModel.getTotalTime() ?: "2"
                     }
+                    else ->{}
                 }
-
                 bookingViewModel.setTimeCheckin(dateCheckinString)
                 bookingViewModel.setTimeCheckout(dateCheckoutString)
                 bookingViewModel.setTotalTime(totalTime)
                 bookingViewModel.setTypeBooking(typeBooking)
-                val currentHour = LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("HH:00"))
-                val saveDateCheckin = when(typeBooking){
-                    "hourly"->"$dateCheckinString/${LocalDateTime.now().year}"
-                    else->"$currentHour, $dateCheckinString"
-                }
-                val saveDateCheckout = when(typeBooking){
-                    "hourly"-> "$dateCheckoutString/${LocalDateTime.now().year}"
-                    else->"$currentHour, $dateCheckoutString"
-                }
-                searchViewModel.setSelectedCalendar(typeBooking, BookRoom(
-                    timeCheckin = saveDateCheckin,
-                    timeCheckOut = saveDateCheckout,
-                    totalTime = totalTime.toInt()
-                )
-                )
-
             }
         }
 
@@ -155,7 +134,7 @@ fun CardDetailScreen(
     }
     Scaffold(
         topBar = {
-            TopCardDetail(listState,data.value,
+            TopCardDetail(listState,dataRoom.value,
                 onBack = onBack
             )
         },
@@ -163,10 +142,8 @@ fun CardDetailScreen(
             BottomCardDetail(
                 loginUiState = loginUiState,
                 bookingViewModel = bookingViewModel,
-                data = data.value,
-                onOpenPayment = {
-                    openAlertDialog.value = true
-                },
+                data = dataRoom.value,
+                onOpenChooseBedType = onOpenChooseBedType,
                 dateCheckinString =dateCheckinString,
                 dateCheckoutString = dateCheckoutString,
                 totalTime = totalTime,
@@ -203,7 +180,7 @@ fun CardDetailScreen(
 
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
-                                .crossfade(true).data(data.value.images?.get(0)).build(),
+                                .crossfade(true).data(dataRoom.value.images?.get(0)).build(),
                             contentDescription = "",
                             modifier = Modifier
                                 .weight(1f)
@@ -215,7 +192,7 @@ fun CardDetailScreen(
 
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
-                                .crossfade(true).data(data.value.images?.get(1) ?: data.value.images?.get(0)).build(),
+                                .crossfade(true).data(dataRoom.value.images?.get(1) ?: dataRoom.value.images?.get(0)).build(),
                             contentDescription = "",
                             modifier = Modifier
                                 .weight(1f)
@@ -292,7 +269,7 @@ fun CardDetailScreen(
 
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = data.value.rating.toString(),
+                                    text = dataRoom.value.rating.toString(),
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -332,7 +309,7 @@ fun CardDetailScreen(
                         Spacer(modifier = Modifier.height(20.dp))
 
                         Text(
-                            text = data.value.name.toString(),
+                            text = dataRoom.value.name.toString(),
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleLarge
                         )
@@ -460,7 +437,7 @@ fun CardDetailScreen(
                 Spacer(modifier = Modifier.height(3.dp))
                 DiscountTickets()
                 Spacer(modifier = Modifier.height(3.dp))
-                Evaluate(data=data.value)
+                Evaluate(data=dataRoom.value)
                 Spacer(modifier = Modifier.height(3.dp))
                 Introduce()
                 Spacer(modifier = Modifier.height(3.dp))
@@ -491,21 +468,6 @@ fun CardDetailScreen(
             })
     }
 
-    if(openAlertDialog.value){
-        AlertDialogExample(
-            onDismissRequest = {
-                openAlertDialog.value = false
-            },
-            onConfirmation = {
-                openAlertDialog.value = false
-                onOpenPayment()
-                bookingViewModel.setInfoRoom(data.value)
-
-            },
-            dialogTitle = "Yêu cầu thanh toán trả trước",
-            dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
-        )
-    }
 
     if(openDialogLoginRequired.value){
         AlertDialogExample(

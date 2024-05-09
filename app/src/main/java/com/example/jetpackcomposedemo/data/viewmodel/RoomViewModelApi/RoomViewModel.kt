@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel
+package com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 
 class RoomViewModel(private val repository: RoomRepository) : ViewModel() {
     private val _roomList = MutableLiveData<Resource<List<Room>>>()
+
     val roomList: LiveData<Resource<List<Room>>> = _roomList
     init {
         getRoomList()

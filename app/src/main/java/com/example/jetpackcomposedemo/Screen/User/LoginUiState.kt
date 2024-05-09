@@ -8,7 +8,7 @@ data class LoginUiState(
     val phoneNumber: String? = "",
     val uid: String? = "",
     val email:String? = "",
-    val isLoggedIn: Boolean = false,
+    val isLoggedIn: Boolean = true,
     val isShowingInfo: Boolean = false
 
 )

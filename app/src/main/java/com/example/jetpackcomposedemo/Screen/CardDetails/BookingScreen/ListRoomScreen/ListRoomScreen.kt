@@ -1,4 +1,5 @@
 package com.example.jetpackcomposedemo.Screen.Search
+
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -23,7 +24,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -133,7 +133,7 @@ fun ListRoomScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp)
+                            .padding(16.dp)
                             .border(
                                 BorderStroke(
                                     1.dp, color = when (typeBooking.value) {
@@ -305,14 +305,11 @@ fun ListRoomScreen(
                         }
                     }
                 }
-            }
-            dataRoom.value?.roomTypes?.bedTypes?.let {
-                items(it){bedTypeItem->
-                    CardListRoom(bookingViewModel,bedTypeItem, dataRoom.value!!,onOpenPayment)
+                dataRoom.value?.roomTypes?.bedTypes?.forEachIndexed { index, bedType ->
+                    CardListRoom(bookingViewModel,bedType, dataRoom.value!!,onOpenPayment)
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
-
         }
     }
 

@@ -1,10 +1,11 @@
 package com.example.jetpackcomposedemo.data.network
 
-import com.example.jetpackcomposedemo.data.models.Coupon
 //import com.example.jetpackcomposedemo.data.models.Room
+import com.example.jetpackcomposedemo.data.models.Booking.Booking
+import com.example.jetpackcomposedemo.data.models.Coupon
+import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.models.RoomType
 import com.example.jetpackcomposedemo.data.models.UserCoupon
-import com.example.jetpackcomposedemo.data.models.Room.Room
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -19,7 +20,8 @@ interface ApiService {
     //// get room by id ////
     @GET("api/room")
     suspend fun getRoomsById(@Query("id") id:String): Response<List<Room>>
-
+    @POST("api/room")
+    suspend fun bookingRoom(@Body booking: Booking): Response<List<Booking>>
 
     //get all
     // Coupon - begin

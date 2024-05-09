@@ -1,4 +1,5 @@
 package com.example.jetpackcomposedemo.Screen.Search
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -188,3 +189,4 @@ fun ListRoomTopBar(
     }
 
 }
+
