@@ -174,6 +174,8 @@ fun PaymentScreen(
         }
     }
 
+    //zpdk-release-v3.1.aar
+
     if(openChooseMethodPayment.value){
         MethodPaymentScreen(
             bookingViewModel = bookingViewModel,

@@ -139,4 +139,8 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
+    //------------------------------------payment--------------------------------
+    //zalopay
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar"))))
 }
