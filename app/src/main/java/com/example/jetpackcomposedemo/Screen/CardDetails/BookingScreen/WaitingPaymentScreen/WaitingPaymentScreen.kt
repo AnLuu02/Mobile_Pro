@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -51,6 +52,7 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun WaitingPaymentScreen(
+    navController: NavHostController,
     closeScreenWaitingPayment:(Boolean)->Unit,
     onContinuePayment:()->Unit
 ) {
@@ -74,19 +76,24 @@ fun WaitingPaymentScreen(
                 coroutineScope.launch {
                     sheetState.hide()
                     closeScreenWaitingPayment(false)
+                    navController.navigate("")
                 }
             },
             dragHandle = {
                 MethodWaitingPaymentTopBar(
                     sheetState = sheetState,
-                    closeScreenWaitingPayment = closeScreenWaitingPayment
-                )
+                    closeScreenWaitingPayment = {
+                        navController.navigate("")
+                        closeScreenWaitingPayment(it)
+                    },
+
+                    )
             },
         ) {
             Scaffold(
                 bottomBar = {
                     MethodWaitingPaymentBottomBar(
-                       onContinuePayment = onContinuePayment
+                        onContinuePayment = onContinuePayment
                     )
                 }
 

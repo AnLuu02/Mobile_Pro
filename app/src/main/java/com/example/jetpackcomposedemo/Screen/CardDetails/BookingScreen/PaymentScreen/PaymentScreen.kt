@@ -87,7 +87,7 @@ fun PaymentScreen(
     bookingViewModelApi:BookingViewModelApi,
     bookingViewModel:BookingViewModel,
     loginUiState:LoginUiState,
-    navController:NavHostController
+    navController:NavHostController,
 ) {
     val listState = rememberLazyListState()
 
@@ -256,6 +256,7 @@ fun PaymentScreen(
 
     if(openWaitingPayment.value){
         WaitingPaymentScreen(
+            navController = navController,
             closeScreenWaitingPayment =  {
                 openWaitingPayment.value = it
             },
