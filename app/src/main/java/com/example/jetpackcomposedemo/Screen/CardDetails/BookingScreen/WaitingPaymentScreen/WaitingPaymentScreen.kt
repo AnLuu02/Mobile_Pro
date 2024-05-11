@@ -43,8 +43,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
-import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -53,9 +51,8 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun WaitingPaymentScreen(
-    bookingViewModel:BookingViewModel,
-    onPayloadChoose:(OptionPayment)->Unit,
-    closeScreenChooseMethodPayment:(Boolean)->Unit
+    closeScreenWaitingPayment:(Boolean)->Unit,
+    onContinuePayment:()->Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
@@ -76,23 +73,20 @@ fun WaitingPaymentScreen(
             onDismissRequest = {
                 coroutineScope.launch {
                     sheetState.hide()
-                    closeScreenChooseMethodPayment(false)
+                    closeScreenWaitingPayment(false)
                 }
             },
             dragHandle = {
                 MethodWaitingPaymentTopBar(
                     sheetState = sheetState,
-                    closeScreenChooseMethodPayment = closeScreenChooseMethodPayment
+                    closeScreenWaitingPayment = closeScreenWaitingPayment
                 )
             },
         ) {
             Scaffold(
                 bottomBar = {
                     MethodWaitingPaymentBottomBar(
-                        bookingViewModel = bookingViewModel,
-                        sheetState = sheetState,
-                        closeScreenChooseMethodPayment = closeScreenChooseMethodPayment,
-                        onPayloadChoose = {  }
+                       onContinuePayment = onContinuePayment
                     )
                 }
 
@@ -108,7 +102,7 @@ fun TimerComponent(
     padding:PaddingValues
 ) {
     // State để theo dõi tổng số giây đã trôi qua
-    var totalSeconds by remember { mutableStateOf(300) }
+    var totalSeconds by remember { mutableStateOf(900) }
 
     LaunchedEffect(key1 = "timer") {
         while (true) {

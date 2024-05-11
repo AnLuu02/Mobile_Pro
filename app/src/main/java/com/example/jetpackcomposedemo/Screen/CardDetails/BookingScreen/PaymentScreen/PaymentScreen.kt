@@ -57,6 +57,7 @@ import com.example.jetpackcomposedemo.MainActivity
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.PaymentBottomBar
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.StatusPayment
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.WaitingPaymentScreen.WaitingPaymentScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
@@ -99,6 +100,8 @@ fun PaymentScreen(
     val bedType = bookingViewModel.getBedType()
     val discount = bookingViewModel.getDiscount()
     val openChooseMethodPayment = remember{ mutableStateOf(false) }
+    val openWaitingPayment = remember{ mutableStateOf(false) }
+
     val payloadChoose = remember{ mutableStateOf(bookingViewModel.getMethodPayment() ?: OptionPayment()) }
     val totalPrice = bedType?.let { CaculateTotalPriceRoom(it.total, discount?.percent) }
         ?.let { formatCurrencyVND(it) }
@@ -174,6 +177,9 @@ fun PaymentScreen(
                                     paymentZalopay(
                                         mainActivity,
                                         (totalTime.toInt()*bedType.total).toString(),
+                                        showScreenWaiting = {
+                                            openWaitingPayment.value = it
+                                        },
                                         setToken = { setTokenPaymentZalopay(it) },
                                         setStatus = {
                                             setStatusPayment(it)
@@ -184,6 +190,7 @@ fun PaymentScreen(
                                         }
                                     )
                                 }
+
                             }
                             "momo"->{}
                             else->{}
@@ -242,6 +249,36 @@ fun PaymentScreen(
             },
             onPayloadChoose = {
                 payloadChoose.value = it
+            }
+        )
+    }
+
+
+    if(openWaitingPayment.value){
+        WaitingPaymentScreen(
+            closeScreenWaitingPayment =  {
+                openWaitingPayment.value = it
+            },
+            onContinuePayment = {
+                if (totalTime != null) {
+                    if (bedType != null) {
+                        paymentZalopay(
+                            mainActivity,
+                            (totalTime.toInt()*bedType.total).toString(),
+                            showScreenWaiting = {
+                                openWaitingPayment.value = it
+                            },
+                            setToken = { setTokenPaymentZalopay(it) },
+                            setStatus = {
+                                setStatusPayment(it)
+                            },
+                            setLoading = {
+                                setLoading(it)
+                                setIsClicked(it)
+                            }
+                        )
+                    }
+                }
             }
         )
     }
@@ -935,12 +972,13 @@ fun CanclePolicy(){
 fun paymentZalopay(
     mainActivity: MainActivity,
     amount: String,
+    showScreenWaiting:(Boolean)->Unit,
     setToken: (String)->Unit,
     setStatus:(Int)->Unit,
     setLoading:(Boolean)->Unit
 ){
     val scope = CoroutineScope(Dispatchers.Main)
-    var token = "";
+    var token =  ""
     scope.launch {
         withContext(Dispatchers.IO) {
             val orderApi = CreateOrder()
@@ -979,6 +1017,7 @@ fun paymentZalopay(
                     ) {
                         Log.e("cancle", "cancle")
                         setStatus(StatusPayment.PENDING.status)
+                        showScreenWaiting(true)
                         setLoading(false)
                     }
 

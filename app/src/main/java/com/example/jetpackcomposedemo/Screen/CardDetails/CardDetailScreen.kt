@@ -137,7 +137,7 @@ fun CardDetailScreen(
 
         Status.ERROR -> setLoading(true)
         Status.LOADING -> setLoading(true)
-        null -> setError(true)
+        null -> setLoading(true)
     }
     Scaffold(
         topBar = {

@@ -21,6 +21,7 @@ data class BookingResult(
     var infoRoom: Room? = null,
     var bedType:BedType? = null,
     var discount: Discount? = null,
+    var tokenPayment:String?=null,
 )
 
 class BookingViewModel: ViewModel() {
@@ -44,6 +45,7 @@ class BookingViewModel: ViewModel() {
     fun setBookingResult(bookingResult: BookingResult) {
         _bookingResult.value = bookingResult
     }
+    fun getTokenPayment() = _bookingResult.value.tokenPayment
 
     fun setTimeCheckin(timeCheckin:String) { _bookingResult.value.timeCheckin = timeCheckin}
     fun setTimeCheckout(timeCheckout:String) { _bookingResult.value.timeCheckout = timeCheckout}
@@ -56,4 +58,5 @@ class BookingViewModel: ViewModel() {
     fun setInfoRoom(infoRoom: Room?) { _bookingResult.value.infoRoom = infoRoom}
     fun setBedType(bedType: BedType?) { _bookingResult.value.bedType = bedType}
     fun setDiscount(discount: Discount?) { _bookingResult.value.discount = discount}
+    fun setTokenPayment(tokenPayment: String?) { _bookingResult.value.tokenPayment = tokenPayment}
 }

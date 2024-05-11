@@ -22,7 +22,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
-import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.WaitingPaymentScreen.WaitingPaymentScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
@@ -421,15 +420,7 @@ fun MainApp(mainActivity: MainActivity) {
                 }
 
 
-                composable(
-                    "roomDetails/waitingpayment",
-                ){
-                    WaitingPaymentScreen(
-                        bookingViewModel = bookingViewModel,
-                        onPayloadChoose = {},
-                        closeScreenChooseMethodPayment = {}
-                    )
-                }
+
             }
         }
     }
