@@ -3,27 +3,18 @@ package com.example.jetpackcomposedemo
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -65,93 +56,19 @@ import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.Booking
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApiFactory
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModelFactory
-import com.example.jetpackcomposedemo.handlePayment.Api.CreateOrder
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import vn.zalopay.sdk.ZaloPayError
 import vn.zalopay.sdk.ZaloPaySDK
-import vn.zalopay.sdk.listeners.PayOrderListener
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val policy = ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
         // ZaloPay SDK Init
         ZaloPaySDK.init(2554, vn.zalopay.sdk.Environment.SANDBOX)
 
         setContent {
-            val lblZpTransToken = remember{ mutableStateOf("") }
-            val txtToken = remember{ mutableStateOf("") }
-            val scope = CoroutineScope(Dispatchers.Main)
-
-            Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
-
-                Spacer(modifier = Modifier.height(20.dp))
-                Button(
-                    onClick = {
-                        scope.launch {
-                            withContext(Dispatchers.IO) {
-                                val orderApi = CreateOrder()
-
-                                try {
-                                    val data: JSONObject =
-                                        orderApi.createOrder("500000")!!
-                                    val code = data.getString("return_code")
-
-                                    if (code == "1") {
-                                        lblZpTransToken.value = "zptranstoken"
-                                        txtToken.value = data.getString("zp_trans_token")
-                                        Log.e("order thanh cong", code.toString())
-                                    }
-                                } catch (e: Exception) {
-                                    Log.e("catchhhhhhhhh", "catchhhhhhhhh")
-                                    e.printStackTrace()
-                                }
-                                Log.e("Đã click", "Đã click ${orderApi.createOrder("200000")}")
-                                ZaloPaySDK.getInstance().payOrder(
-                                    this@MainActivity,
-                                    txtToken.value,
-                                    "demozpdk://app",
-                                    object : PayOrderListener {
-                                        override fun onPaymentSucceeded(
-                                            transactionId: String,
-                                            transToken: String,
-                                            appTransID: String
-                                        ) {
-                                            Log.e("success", "success")
-
-                                        }
-
-                                        override fun onPaymentCanceled(
-                                            zpTransToken: String,
-                                            appTransID: String
-                                        ) {
-                                            Log.e("cancle", "cancle")
-
-                                        }
-
-                                        override fun onPaymentError(
-                                            zaloPayError: ZaloPayError,
-                                            zpTransToken: String,
-                                            appTransID: String
-                                        ) {
-                                            Log.e("error", "error")
-                                        }
-                                    })
-                            }
-                        }
-                    }
-                ) {
-                    Text("Xác nhận")
-                }
-
-            }
-
 //            val context = LocalContext.current
 //            val db = RemindersDB.getInstance(context)
 //            val reminderRepository = ReminderRepository(db)
@@ -171,7 +88,7 @@ class MainActivity : ComponentActivity() {
 //
 //            WorkManager.getInstance(context).enqueue(notificationWorkRequest)
 
-//            MainApp()
+            MainApp(this@MainActivity)
 //            HomeScreenReminder()
         }
     }
@@ -182,7 +99,7 @@ class MainActivity : ComponentActivity() {
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainApp(){
+fun MainApp(mainActivity: MainActivity) {
     val navController = rememberNavController()
     JetpackComposeDemoTheme {
         Surface(
@@ -437,6 +354,7 @@ fun MainApp(){
                     val roomId = backStackEntry.arguments?.getString("roomId")
 
                     CardDetailScreen(
+                        navController = navController,
                         loginUiState = loginUiState,
                         searchViewModel = searchViewModel,
                         bookingViewModel=bookingViewModel,
@@ -486,6 +404,7 @@ fun MainApp(){
 
                     val roomId = backStackEntry.arguments?.getString("roomId")
                     PaymentScreen(
+                        mainActivity = mainActivity,
                         bookingViewModelApi = bookingViewModelApi,
                         bookingViewModel,
                         loginUiState = loginUiState,

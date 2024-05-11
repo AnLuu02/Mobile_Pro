@@ -1,7 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.CardDetails
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,14 +46,17 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Scale
 import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.showError
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.Screen.User.LoginUiState
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBooking.DatePickerBookingScreen
-import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
+import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
 import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
 import com.example.jetpackcomposedemo.helpper.Status
@@ -63,6 +66,7 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CardDetailScreen(
+    navController:NavHostController,
     loginUiState: LoginUiState,
     searchViewModel: SearchViewModel,
     bookingViewModel:BookingViewModel,
@@ -83,7 +87,9 @@ fun CardDetailScreen(
     var dateCheckoutString = ""
     var typeBooking = "";
     var totalTime = "1"
-
+    var (numberReload,setNumberReload) = remember { mutableIntStateOf(0) }
+    val (loading,setLoading) = remember{ mutableStateOf(false) }
+    var (error,setError) = remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         roomViewModel.getRoomById(roomId)
     }
@@ -125,12 +131,13 @@ fun CardDetailScreen(
                 bookingViewModel.setTimeCheckout(dateCheckoutString)
                 bookingViewModel.setTotalTime(totalTime)
                 bookingViewModel.setTypeBooking(typeBooking)
+                setLoading(false)
             }
         }
 
-        Status.ERROR ->Log.e("<Null roi>","-----------------------------------------------")
-        Status.LOADING -> Log.e("<Null roi>","-----------------------------------------------")
-        null -> Log.e("<Null roi>","-----------------------------------------------")
+        Status.ERROR -> setLoading(true)
+        Status.LOADING -> setLoading(true)
+        null -> setError(true)
     }
     Scaffold(
         topBar = {
@@ -470,18 +477,48 @@ fun CardDetailScreen(
 
 
     if(openDialogLoginRequired.value){
-        AlertDialogExample(
-            onDismissRequest = {
-                openDialogLoginRequired.value = false
-            },
+//        AlertDialogExample(
+//            onDismissRequest = {
+//                openDialogLoginRequired.value = false
+//            },
+//            onConfirmation = {
+//                openDialogLoginRequired.value = false
+//                onOpenLoginScreen()
+//            },
+//            dialogTitle = "Yêu cầu đăng nhâp",
+//            dialogText = "Vui lòng đăng nhập trước khi đặt phòng. Xin cảm ơn",
+//        )
+
+        DialogMessage(
+            onDismissRequest = { openDialogLoginRequired.value = false },
             onConfirmation = {
                 openDialogLoginRequired.value = false
                 onOpenLoginScreen()
             },
-            dialogTitle = "Yêu cầu đăng nhâp",
-            dialogText = "Vui lòng đăng nhập trước khi đặt phòng. Xin cảm ơn",
+            dialogTitle =  "Yêu cầu đăng nhâp",
+            dialogText ="Vui lòng đăng nhập trước khi đặt phòng. Xin cảm ơn",
         )
     }
+
+    if(error) {
+        showError(
+            title = if (numberReload == 0) "Opps, dude" else "Attemp #$numberReload",
+            message = "Error: Connecting to server failed",
+            titleBtn = if (numberReload >= 3) "Close" else "Reload",
+            onClickClose = {
+                // Xử lý khi click close
+               setError(false)
+               setNumberReload(numberReload+1)
+                if (numberReload == 4) {
+                    numberReload = 0
+                    navController.navigate("home")
+                }
+            }
+        )
+    }
+
+    LoadingScreen(isLoadingValue = loading)
+
 
 }
 

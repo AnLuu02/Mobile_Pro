@@ -1,15 +1,19 @@
 package com.example.jetpackcomposedemo.data.models.Bill
 
-import com.google.gson.annotations.SerializedName
+import com.example.jetpackcomposedemo.data.models.BedType.BedType
+import com.example.jetpackcomposedemo.data.models.Coupon
+import com.example.jetpackcomposedemo.data.models.Room.Room
 
 data class Bill(
-    @SerializedName("ID")  val id:Int? = null,
-    @SerializedName("Room_ID")  val roomId:Int? = null,
-    @SerializedName("RoomRate")  val roomRate:Int? = null,
-    @SerializedName("CheckInDay")  val checkOutDate:String? = null,
-    @SerializedName("CheckOutDay")  val checkInDate:String? = null,
-    @SerializedName("Duration")  val duration:Int? = null,
-    @SerializedName("LateCharge")  val late:Float? = null,
-    @SerializedName("DamageCharge")  val damage:Float? = null,
-    @SerializedName("FinalCharge")  val finalCharge:Float? = null,
+    val id:Int? = null,
+    val statusPayment:Int? = null,
+    val typePayment:String? = null,
+    val checkOutDate:String? = null,
+    val checkInDate:String? = null,
+    val duration:Int? = null,
+    val coupon: Coupon? = null,
+    val typeBooking:String? = null,
+    val bedType: BedType? = null,
+    val infoRoom: Room? = null,
+    val finalCharge:Int? = null
 )

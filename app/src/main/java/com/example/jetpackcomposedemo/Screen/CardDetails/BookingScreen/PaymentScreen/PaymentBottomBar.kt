@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,7 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
-import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
+import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -48,6 +49,7 @@ fun PaymentBottomBar(
     bookingViewModel: BookingViewModel,
     payloadChoose:OptionPayment,
     totalPrice:String,
+    isClicked:Boolean,
     onChooseMethodPayment:(Boolean)->Unit,
     onApplyBooking:()->Unit
 ){
@@ -155,15 +157,22 @@ fun PaymentBottomBar(
                 }
 
                 Button(
+                    enabled = !isClicked,
                     onClick = {
-//                        openAlertDialog.value = payloadChoose.type == null
-                        onApplyBooking()
-
+                        Log.e("payloadCHoos",payloadChoose.type.toString())
+                        if(payloadChoose.type == null){
+                            openAlertDialog.value = true
+                        }
+                        else{
+                            onApplyBooking()
+                        }
                     },
                     modifier = Modifier.clip(MaterialTheme.shapes.small),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Red,
                         contentColor = Color.White,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.White
                     )
                 ) {
                     Text(
@@ -180,14 +189,23 @@ fun PaymentBottomBar(
 
     }
     if(openAlertDialog.value){
-        AlertDialogExample(
+//        AlertDialogExample(
+//            onDismissRequest = { openAlertDialog.value = false },
+//            onConfirmation = {
+//                openAlertDialog.value = false
+//            },
+//            dialogTitle = "Chọn phương thức thanh toán",
+//            dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
+//        )
+//
+
+        DialogMessage(
             onDismissRequest = { openAlertDialog.value = false },
             onConfirmation = {
                 openAlertDialog.value = false
-                println("Confirmation registered") // Add logic here to handle confirmation.
             },
             dialogTitle = "Chọn phương thức thanh toán",
-            dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
+            dialogText ="Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
         )
     }
 

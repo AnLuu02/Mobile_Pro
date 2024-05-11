@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.Search
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -51,9 +53,12 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Scale
+import com.example.jetpackcomposedemo.MainActivity
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.PaymentBottomBar
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.StatusPayment
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
 import com.example.jetpackcomposedemo.Screen.User.LoginUiState
 import com.example.jetpackcomposedemo.Screen.User.MyUser
@@ -62,12 +67,22 @@ import com.example.jetpackcomposedemo.data.models.Bill.Bill
 import com.example.jetpackcomposedemo.data.models.Booking.Booking
 import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
+import com.example.jetpackcomposedemo.handlePayment.Api.CreateOrder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import vn.zalopay.sdk.ZaloPayError
+import vn.zalopay.sdk.ZaloPaySDK
+import vn.zalopay.sdk.listeners.PayOrderListener
 import java.time.LocalDateTime
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaymentScreen(
+    mainActivity:MainActivity,
     bookingViewModelApi:BookingViewModelApi,
     bookingViewModel:BookingViewModel,
     loginUiState:LoginUiState,
@@ -84,50 +99,94 @@ fun PaymentScreen(
     val bedType = bookingViewModel.getBedType()
     val discount = bookingViewModel.getDiscount()
     val openChooseMethodPayment = remember{ mutableStateOf(false) }
-    val payloadChoose = remember{ mutableStateOf(OptionPayment()) }
+    val payloadChoose = remember{ mutableStateOf(bookingViewModel.getMethodPayment() ?: OptionPayment()) }
     val totalPrice = bedType?.let { CaculateTotalPriceRoom(it.total, discount?.percent) }
         ?.let { formatCurrencyVND(it) }
+
+    val (tokenPaymentZalopay,setTokenPaymentZalopay) = remember {
+        mutableStateOf("")
+    }
+
+    val (statusPayment,setStatusPayment) = remember {
+        mutableIntStateOf(StatusPayment.NON.status)
+    }
+    val (isClicked,setIsClicked) = remember{ mutableStateOf(false) }
+    val (loading,setLoading) = remember{ mutableStateOf(false) }
+
+
+
+
+
+    if(statusPayment != StatusPayment.NON.status){
+        if (totalTime != null) {
+            if (bedType != null) {
+                bookingViewModelApi.bookingRoom(
+                    Booking(
+                        null,
+                        MyUser(
+                            fullName = "Lưu Trường An",
+                            email = "anluu099@gmail.com",
+                            cccd = "123456789",
+                            birthday = "24-04-2002",
+                            gender = "Nam",
+                            sdt = "0918064618"
+                        ),
+                        Bill(
+                            statusPayment = statusPayment,
+                            typePayment = payloadChoose.value.title,
+                            checkInDate = dateCheckinString,
+                            checkOutDate = dateCheckoutString,
+                            duration = totalTime.toInt(),
+                            coupon = null,
+                            typeBooking = typeBooking,
+                            bedType = bedType,
+                            infoRoom = bookingViewModel.getInfoRoom(),
+                            finalCharge = totalTime.toInt()*bedType.total,
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+
+
     Scaffold(
         topBar = {
             PaymentTopBar(navController = navController)
         },
         bottomBar = {
             if (totalPrice != null) {
-                PaymentBottomBar(bookingViewModel = bookingViewModel,
+                PaymentBottomBar(
+                    bookingViewModel = bookingViewModel,
                     payloadChoose = payloadChoose.value,
                     totalPrice = totalPrice,
                     onChooseMethodPayment = {
                         openChooseMethodPayment.value = it
                     },
+                    isClicked = isClicked,
                     ///////////////////////// post data booking //////////////////////////
                     onApplyBooking = {
-                        if (infoRoom != null) {
-                            if (totalTime != null) {
-                                bookingViewModelApi.bookingRoom(
-                                    Booking(
-                                        null,
-                                        MyUser(
-                                            fullName = "Lưu Trường An",
-                                            email = "anluu099@gmail.com",
-                                            cccd = "123456789",
-                                            birthday = "24-04-2002",
-                                            gender = "Nam",
-                                            sdt = "0918064618"
-                                        ),
-                                        null,
-                                        Bill(
-                                            checkInDate = dateCheckinString,
-                                            checkOutDate = dateCheckoutString,
-                                            duration = totalTime.toInt(),
-                                        ),
-                                        bedType = bedType,
-                                        typePayment = payloadChoose.value.title,
-                                        typeBooking = typeBooking,
-                                        status = 1,
-                                        bookingViewModel.getInfoRoom()
+                        setLoading(true)
+                        when(payloadChoose.value.type){
+                            "zalopay"->{
+                                if (totalTime != null) {
+                                    paymentZalopay(
+                                        mainActivity,
+                                        (totalTime.toInt()*bedType.total).toString(),
+                                        setToken = { setTokenPaymentZalopay(it) },
+                                        setStatus = {
+                                            setStatusPayment(it)
+                                        },
+                                        setLoading = {
+                                            setLoading(it)
+                                            setIsClicked(it)
+                                        }
                                     )
-                                )
+                                }
                             }
+                            "momo"->{}
+                            else->{}
                         }
                     }
                 )
@@ -174,7 +233,6 @@ fun PaymentScreen(
         }
     }
 
-    //zpdk-release-v3.1.aar
 
     if(openChooseMethodPayment.value){
         MethodPaymentScreen(
@@ -187,6 +245,9 @@ fun PaymentScreen(
             }
         )
     }
+
+    LoadingScreen(isLoadingValue = loading)
+
 }
 
 @Composable
@@ -752,12 +813,12 @@ fun PaymentDetails(
                 )
 
 
-                    Text(
-                        text = if(discount?.percent != null) formatCurrencyVND(discount.percent) else "0",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                Text(
+                    text = if(discount?.percent != null) formatCurrencyVND(discount.percent) else "0",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
 
-                    )
+                )
             }
 
             Divider(
@@ -866,6 +927,71 @@ fun CanclePolicy(){
 
 
 
+        }
+    }
+}
+
+
+fun paymentZalopay(
+    mainActivity: MainActivity,
+    amount: String,
+    setToken: (String)->Unit,
+    setStatus:(Int)->Unit,
+    setLoading:(Boolean)->Unit
+){
+    val scope = CoroutineScope(Dispatchers.Main)
+    var token = "";
+    scope.launch {
+        withContext(Dispatchers.IO) {
+            val orderApi = CreateOrder()
+
+            try {
+                val data: JSONObject =
+                    orderApi.createOrder(amount)!!
+                val code = data.getString("return_code")
+
+                if (code == "1") {
+                    token = data.getString("zp_trans_token")
+                    setToken(data.getString("zp_trans_token"))
+                    setLoading(true)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            ZaloPaySDK.getInstance().payOrder(
+                mainActivity,
+                token,
+                "demozpdk://app",
+                object : PayOrderListener {
+                    override fun onPaymentSucceeded(
+                        transactionId: String,
+                        transToken: String,
+                        appTransID: String
+                    ) {
+                        Log.e("success", "success")
+                        setStatus(StatusPayment.PAID.status)
+                        setLoading(false)
+                    }
+
+                    override fun onPaymentCanceled(
+                        zpTransToken: String,
+                        appTransID: String
+                    ) {
+                        Log.e("cancle", "cancle")
+                        setStatus(StatusPayment.PENDING.status)
+                        setLoading(false)
+                    }
+
+                    override fun onPaymentError(
+                        zaloPayError: ZaloPayError,
+                        zpTransToken: String,
+                        appTransID: String
+                    ) {
+                        Log.e("error", "error")
+                        setStatus(StatusPayment.NON.status)
+                        setLoading(true)
+                    }
+                })
         }
     }
 }

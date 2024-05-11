@@ -11,7 +11,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitInstance {
     private const val ipv4Address = "192.168.1.116";
     private const val port = "8080";
-    private const val BASE_URL = "http://$ipv4Address:$port/";
+    //    private const val BASE_URL = "http://$ipv4Address:$port/";
+    private const val BASE_URL = "https://90bc-1-53-27-26.ngrok-free.app/";
+
 
     fun getServerUrl(): String {
         return BASE_URL

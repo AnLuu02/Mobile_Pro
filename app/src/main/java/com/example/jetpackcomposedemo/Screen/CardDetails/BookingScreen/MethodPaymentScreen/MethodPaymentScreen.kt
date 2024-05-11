@@ -55,17 +55,13 @@ fun MethodPaymentScreen(
     closeScreenChooseMethodPayment:(Boolean)->Unit
 ) {
     val listState = rememberLazyListState()
-    val selectedMethodPayment = remember {
-        mutableStateOf(OptionPayment())
-    }
-
+    val selectedMethodPayment = remember { mutableStateOf(OptionPayment()) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         sheetState.hide()
 
     }
-
     Box(modifier = Modifier
         .fillMaxSize()
         .then(if(sheetState.isVisible) Modifier.background(Color.Black.copy(alpha = 0.3f)) else Modifier)
@@ -96,7 +92,7 @@ fun MethodPaymentScreen(
                         sheetState = sheetState,
                         selectedMethodPayment = selectedMethodPayment.value,
                         closeScreenChooseMethodPayment = closeScreenChooseMethodPayment,
-                        onPayloadChoose = onPayloadChoose
+                        onPayloadChoose = { onPayloadChoose(selectedMethodPayment.value) }
                     )
                 }
 
