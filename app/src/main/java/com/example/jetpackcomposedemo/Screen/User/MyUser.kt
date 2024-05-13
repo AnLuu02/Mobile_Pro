@@ -8,7 +8,8 @@ import java.time.LocalDate
 
 @Serializable
 data class MyUser(
-    val ID: Int = 0,
+    @SerialName(value = "ID")
+    val ID: Int? = null,
     @SerialName(value = "FullName")
     val fullName:String? = null,
     @SerialName(value = "Email")

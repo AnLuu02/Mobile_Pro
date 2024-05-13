@@ -169,7 +169,6 @@ fun OTPTextField(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
                 ),
-                visualTransformation = PasswordVisualTransformation()
             )
             Spacer(modifier = Modifier.width(15.dp))
         }

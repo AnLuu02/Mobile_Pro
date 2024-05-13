@@ -1,5 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.User
 
+import com.google.common.base.Verify
+
 data class LoginUiState(
     val id : Int = 0,
     val fullName: String? = "",
@@ -8,7 +10,7 @@ data class LoginUiState(
     val phoneNumber: String? = "",
     val uid: String? = "",
     val email:String? = "",
-    val isLoggedIn: Boolean = true,
-    val isShowingInfo: Boolean = false
+    val isLoggedIn: Boolean = false,
+    val isShowingInfo: Boolean = false,
 
 )
