@@ -3,6 +3,8 @@ package com.example.jetpackcomposedemo.data.network
 import com.example.jetpackcomposedemo.data.models.Coupon
 import com.example.jetpackcomposedemo.data.models.Identity
 import com.example.jetpackcomposedemo.data.models.POST_Body_UserCoupon
+//import com.example.jetpackcomposedemo.data.models.Room
+import com.example.jetpackcomposedemo.data.models.RoomType
 import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.models.User
@@ -61,7 +63,22 @@ interface ApiService {
         @Query("id") userId:Int
     ): Response<List<User>>
     // User - end
+    // RoomType
+    @GET("api/roomtype/get_all")
+    suspend fun getAllRoomType() : Response<List<RoomType>>
+    suspend fun getRoomTypeById(@Query("id") id: Int) : Response<RoomType>
 
+    // Room
+    @GET("api/room/get_all")
+    suspend fun getAllRoom(): Response<List<Room>>
+    @GET("api/room")
+    suspend fun getRoomById(@Query("id") id: Int) : Response<Room>
+    @GET("api/room")
+    suspend fun  getRoomByMaximumcapacity(@Query("maximumcapacity") maximumcapacity: Int) : Response<Room>
+    @GET("api/room")
+    suspend fun  getRoomByRoomRate(@Query("roomrate") roomrate: Int) : Response<Room>
+//    @GET("api/room/price_range")
+//    suspend fun getRoomByPriceRange(@Query("minPrice") minPrice: Int)
 //
 //    @GET("products/{type}")
 //    suspend fun getProductsList(

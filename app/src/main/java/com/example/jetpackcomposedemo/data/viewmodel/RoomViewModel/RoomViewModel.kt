@@ -12,13 +12,12 @@ import kotlinx.coroutines.launch
 
 class RoomViewModel(private val repository: RoomRepository) : ViewModel() {
     private val _roomList = MutableLiveData<Resource<List<Room>>>()
-
     val roomList: LiveData<Resource<List<Room>>> = _roomList
-    init {
-        getRoomList()
-    }
+//    init {
+//        getRoomList()
+//    }
 
-    private fun getRoomList() {
+    fun getRoomList() {
         viewModelScope.launch {
             _roomList.postValue(Resource.loading(null))
             try {

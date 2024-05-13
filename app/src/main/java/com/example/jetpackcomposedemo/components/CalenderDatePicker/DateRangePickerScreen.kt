@@ -44,13 +44,10 @@ fun DateRangePickerScreen(
     val enabledButtonApply = remember{ mutableStateOf(false) }
     enabledButtonApply.value = dateCheckoutString.value != "Bất kì"
 
-
-
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         sheetState.hide()
-
     }
 
     Box(modifier = Modifier
