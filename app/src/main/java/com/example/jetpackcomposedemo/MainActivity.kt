@@ -34,6 +34,7 @@ import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
 import com.example.jetpackcomposedemo.Screen.Discount.RollUpScreen
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.VideoScreen
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.showError
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
@@ -47,6 +48,7 @@ import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScr
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.Screen.Services.ServiceScreen
+import com.example.jetpackcomposedemo.Screen.User.EmailLoginScreen
 import com.example.jetpackcomposedemo.Screen.User.InfoUser
 import com.example.jetpackcomposedemo.Screen.User.LoginScreen
 import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
@@ -336,34 +338,50 @@ fun MainApp(checkCameraPermission: () -> Unit){
                 }
                 //----------------------------------- USER ------------------------------
                 composable("user"){
-                    ScreenWithBottomNavigationBar(
-                        isBotNav = !loginUiState.isShowingInfo,
-                        navController = navController,
-                        topBar = { UserTopBar( loginUiState = loginUiState,
-                            onLoginButtonClicked = { navController.navigate("login") },
-                            onToogleSettingInfo = {
-                                loginViewModel1.toogleSetting(loginUiState.isShowingInfo)
-                                loginViewModel1.reset()
-                            }) },
-                        content = { padding, _ ->
-                            if(loginUiState.isShowingInfo){
-                                InfoUser(padding = padding,loginUiState = loginUiState, loginViewModel = loginViewModel1)
-                            }else{
-                                UserScreen(navController = navController,padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
-                            }
-                        })
+
+                        ScreenWithBottomNavigationBar(
+                            isBotNav = !loginUiState.isShowingInfo,
+                            navController = navController,
+                            topBar = { UserTopBar( loginUiState = loginUiState,
+                                onLoginButtonClicked = { navController.navigate("login") },
+                                onToogleSettingInfo = {
+                                    loginViewModel1.toogleSetting(loginUiState.isShowingInfo)
+                                    loginViewModel1.reset()
+                                }) },
+                            content = { padding, _ ->
+                                if(loginUiState.isShowingInfo){
+                                    InfoUser(padding = padding,loginUiState = loginUiState, loginViewModel = loginViewModel1)
+                                }else{
+                                    UserScreen(navController = navController,padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
+                                }
+                            })
+
                 }
 
                 composable("login") {
-                    LoginScreen(
-                        loginViewModel1,
-                        onCancelButtonClicked = {
-                            navController.popBackStack()
-                        },
-                        onClickedRegisterText = {
-                            navController.navigate("register")
-                        }
-                    )
+                    if(loginViewModel1.isEmailLogin){
+                        EmailLoginScreen(
+                            loginViewModel1,
+                            loginUiState,
+                            onCancelButtonClicked = {
+                                loginViewModel1.toogleShowingEmailLogin()
+                            },
+                            onSuccess = {
+                                navController.navigate("user")
+                            }
+                        )
+                    }else{
+                        LoginScreen(
+                            loginViewModel1,
+                            loginUiState,
+                            onCancelButtonClicked = {
+                                navController.popBackStack()
+                            },
+                            onClickedRegisterText = {
+                                navController.navigate("register")
+                            }
+                        )
+                    }
 
                 }
 

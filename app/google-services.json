@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "35121327066",
+    "firebase_url": "https://hotelmanagement-90d49-default-rtdb.firebaseio.com",
     "project_id": "hotelmanagement-90d49",
     "storage_bucket": "hotelmanagement-90d49.appspot.com"
   },
@@ -12,7 +13,36 @@
           "package_name": "com.example.jetpackcomposedemo"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "35121327066-8s97o13qvduts0n3u1b690mgb5ammr63.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jetpackcomposedemo",
+            "certificate_hash": "3867698e8229acda7fedbfcb4d6e746bf2d87448"
+          }
+        },
+        {
+          "client_id": "35121327066-gijh8ufvntelv4ci5ei868k0rdgmahub.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jetpackcomposedemo",
+            "certificate_hash": "de972b202e751077be4c2f192208776bc4fac153"
+          }
+        },
+        {
+          "client_id": "35121327066-jpmeajjk7l23r9si0hb55ft8sou1mk1h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jetpackcomposedemo",
+            "certificate_hash": "3447558986662618400309286c18ed5dcd8f1412"
+          }
+        },
+        {
+          "client_id": "35121327066-kalmah12tosl7ak7i91uv7ug79nesrcj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBro9O-D072_0t10ygWV0ENZ_laleZfKVk"
@@ -20,7 +50,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "35121327066-kalmah12tosl7ak7i91uv7ug79nesrcj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
