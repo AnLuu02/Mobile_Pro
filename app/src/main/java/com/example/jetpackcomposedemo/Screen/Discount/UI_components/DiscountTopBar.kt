@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.Screen.Discount
+package com.example.jetpackcomposedemo.Screen.Discount.UI_components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth

@@ -1,9 +1,13 @@
 package com.example.jetpackcomposedemo
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -11,8 +15,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -57,9 +63,55 @@ import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.Booking
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModelFactory
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import java.util.concurrent.TimeUnit
 
+var textResult = mutableStateOf("")
+
 class MainActivity : ComponentActivity() {
+
+    private val barCodeLauncher = registerForActivityResult(ScanContract()) {
+        result ->
+        if(result.contents == null) {
+            Toast.makeText(this@MainActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+        } else {
+            textResult.value = result.contents
+        }
+    }
+
+    private fun showCamera () {
+        val options = ScanOptions()
+        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+        options.setPrompt("Scan a QR code")
+        options.setCameraId(0)
+        options.setBeepEnabled(false)
+        options.setOrientationLocked(false)
+
+        barCodeLauncher.launch(options)
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        isGranted ->
+        if(isGranted) {
+            showCamera()
+        }
+    }
+
+    private fun checkCameraPermission(context: Context) {
+        if(ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            showCamera()
+        } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)) {
+            Toast.makeText(this@MainActivity, "Camera Required", Toast.LENGTH_SHORT).show()
+
+        } else {
+            requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+        }
+
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,14 +137,17 @@ class MainActivity : ComponentActivity() {
 
             WorkManager.getInstance(context).enqueue(notificationWorkRequest)
 
-            MainApp()
+            MainApp(
+                checkCameraPermission = { checkCameraPermission(this@MainActivity) }
+            )
 //            HomeScreenReminder()
         }
     }
 }
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainApp(){
+fun MainApp(checkCameraPermission: () -> Unit){
     val navController = rememberNavController()
     JetpackComposeDemoTheme {
         Surface(
@@ -235,9 +290,12 @@ fun MainApp(){
                                 padding = padding,
                                 navController = navController,
                                 isLoggedIn = true,
-                                isCheckedIn = false,
+                                isCheckedIn = true,
                                 userName = loginUiState.fullName.toString(),
-                                phoneNumber = loginUiState.phoneNumber.toString()
+                                phoneNumber = loginUiState.phoneNumber.toString(),
+                                userID = loginUiState.id,
+                                checkCameraPermission = checkCameraPermission,
+                                qrCodeText = textResult.value
                             )
                         } else {
                             DiscountScreen(
@@ -245,8 +303,8 @@ fun MainApp(){
                                 navController = navController,
                                 isLoggedIn = false,
                                 isCheckedIn = false,
-
-                                )
+                                checkCameraPermission = checkCameraPermission
+                            )
                         }
                     })
                 }
@@ -263,7 +321,8 @@ fun MainApp(){
                     if(loginUiState.isLoggedIn) {
                         RollUpScreen(
                             navController = navController,
-                            userID = loginUiState.id
+                            userID = loginUiState.id,
+                            phoneNumber = loginUiState.phoneNumber
                         )
                     } else {
                         RollUpScreen(
