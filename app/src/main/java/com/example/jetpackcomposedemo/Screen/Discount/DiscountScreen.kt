@@ -1,5 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.BookQuickly
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -242,7 +244,8 @@ fun TopInfoView(
 fun LineFunctions (
     localPadding: Dp = 10.dp,
     screenWidth: Dp,
-    navController: NavHostController?= null
+    navController: NavHostController?= null,
+    userID: Int? = null
 ) {
     val appColor = AppColor()
 
@@ -274,7 +277,7 @@ fun LineFunctions (
                     titleBtn = "Chờ lấy phòng",
                     description = "",
                     onClickItem = {
-
+                        navController?.navigate("user/${userID}/mybooking")
                     }
                 )
 
@@ -298,7 +301,7 @@ fun LineFunctions (
                     titleBtn = "Yêu thích",
                     description = "",
                     onClickItem = {
-
+//                        navController?.navigate("")
                     }
                 )
 
@@ -322,7 +325,9 @@ fun LineFunctions (
 fun LineFunctions2 (
     localPadding: Dp = 10.dp,
     screenWidth: Dp,
-    navController: NavHostController?= null
+    navController: NavHostController?= null,
+    checkCameraPermission: () -> Unit,
+    qrCodeText: String = ""
 ) {
     val appColor = AppColor()
     Box(
@@ -366,6 +371,19 @@ fun LineFunctions2 (
                     description = "",
                     onClickItem = {
                         navController?.navigate("RollUpScreen")
+                    }
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                ItemA(
+                    sourceIcon = R.raw.scan,
+                    screenWidth = screenWidth,
+                    titleBtn = "Quét mã QR",
+                    description = "",
+                    onClickItem = {
+                        checkCameraPermission()
+                        Log.i("<QRCODE CONTENT>", qrCodeText)
                     }
                 )
             }
@@ -484,7 +502,10 @@ fun DiscountScreen(
     isCheckedIn: Boolean = true,
     timeCheckOut: String = "08/05/2024 18:01:00",
     userName: String = "Nguyen Quoc An",
-    phoneNumber: String = "0123456789"
+    phoneNumber: String = "0123456789",
+    userID: Int? = null,
+    checkCameraPermission: () -> Unit,
+    qrCodeText: String = ""
 ) {
     // Config screen - begin
     val screenWidth = with(LocalDensity.current) {
@@ -504,7 +525,7 @@ fun DiscountScreen(
             TopInfoView(
                 navController = navController,
                 userName = userName,
-                phoneNumber = phoneNumber
+                phoneNumber = phoneNumber,
             )
 
             if(isCheckedIn) {
@@ -519,14 +540,17 @@ fun DiscountScreen(
 
             LineFunctions(
                 screenWidth = screenWidth,
-                navController = navController
+                navController = navController,
+                userID = userID
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
             LineFunctions2(
                 screenWidth = screenWidth,
-                navController = navController
+                navController = navController,
+                checkCameraPermission = checkCameraPermission,
+                qrCodeText = qrCodeText
             )
         } else {
             Box(
@@ -679,5 +703,6 @@ fun DiscountScreen(
 @Preview
 @Composable
 fun demoDiscountScreen() {
-    DiscountScreen()
+    fun doA() {}
+    DiscountScreen(checkCameraPermission = { doA() })
 }

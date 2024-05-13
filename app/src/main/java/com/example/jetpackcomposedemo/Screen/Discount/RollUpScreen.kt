@@ -1,6 +1,8 @@
 package com.example.jetpackcomposedemo.Screen.Discount
 
 import android.annotation.SuppressLint
+import android.os.Build
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,7 +27,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,10 +43,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.AppColor
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
+import com.example.jetpackcomposedemo.data.models.User
+import com.example.jetpackcomposedemo.data.network.RetrofitInstance
+import com.example.jetpackcomposedemo.data.repository.UserCouponRepository
+import com.example.jetpackcomposedemo.data.repository.UserRepository
+import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModelFactory
+import com.example.jetpackcomposedemo.data.viewmodel.UserViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.UserViewModelFactory
+import com.example.jetpackcomposedemo.helpper.Status
+import java.time.LocalDateTime
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
+
+fun isToday(dateString: String): Boolean {
+  // Parse the input date string into a LocalDate object
+  val dateTimeFormatter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    DateTimeFormatter.ISO_DATE_TIME
+  } else {
+    TODO("VERSION.SDK_INT < O")
+  }
+  val dateTime = LocalDateTime.parse(dateString, dateTimeFormatter)
+
+  // Get the current date in the local time zone
+  val currentDate = LocalDate.now()
+
+  // Compare the parsed date with the current date to check if they are the same day
+  return dateTime.toLocalDate() == currentDate
+}
 
 @Composable
 fun smallIconBtn(
@@ -64,6 +99,24 @@ fun smallIconBtn(
     )
   }
 }
+
+fun getDayOfWeekIndex(): Int {
+  val calendar = Calendar.getInstance()
+  val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+
+  // Convert dayOfWeek to index (0 for Sunday, 1 for Monday, ..., 6 for Saturday)
+  return when (dayOfWeek) {
+    Calendar.SUNDAY -> 0
+    Calendar.MONDAY -> 1
+    Calendar.TUESDAY -> 2
+    Calendar.WEDNESDAY -> 3
+    Calendar.THURSDAY -> 4
+    Calendar.FRIDAY -> 5
+    Calendar.SATURDAY -> 6
+    else -> -1 // Default case (should never happen)
+  }
+}
+
 
 @SuppressLint("ResourceType")
 @Composable
@@ -118,14 +171,14 @@ fun checkDayItem(
 
     if(isChecked) {
       Text(
-        text = getDayText(index),
+        text = if (getDayOfWeekIndex() == index) "Hôm nay" else getDayText(index),
         style = MaterialTheme.typography.bodySmall,
         fontWeight = FontWeight.SemiBold,
         color = appColor.red
       )
     } else {
       Text(
-        text = getDayText(index),
+        text = if (getDayOfWeekIndex() == index) "Hôm nay" else getDayText(index),
         style = MaterialTheme.typography.bodySmall,
         color = appColor.darkGray
       )
@@ -137,7 +190,8 @@ fun checkDayItem(
 @Composable
 fun RollUpScreen(
   navController: NavHostController? = null,
-  userID: Int? = null
+  userID: Int? = null,
+  phoneNumber: String? = null
 ) {
   val appColor = AppColor()
   var isTodayRolledUp by remember {
@@ -146,6 +200,20 @@ fun RollUpScreen(
   var dayChecking by remember {
     mutableStateOf(mutableListOf(0, 0, 0, 0, 0, 0, 0))
   }
+
+  fun updateDayCheckingFromString(inputString: String) {
+    if (inputString.length != 7) {
+      return
+    }
+
+    dayChecking.clear()
+
+    for (char in inputString) {
+      val checked = if (char == '1') 1 else 0 // Convert '1' or '0' to integer 1 or 0
+      dayChecking.add(checked)
+    }
+  }
+
   var totalPoint by remember {
     mutableStateOf(35000)
   }
@@ -157,6 +225,55 @@ fun RollUpScreen(
     mutableStateOf(false)
   }
 
+  var pointUser by remember {
+    mutableIntStateOf(0)
+  }
+
+  // Call API Stuff
+  val userCouponViewModel: UserCouponViewModel = viewModel(
+    factory = UserCouponViewModelFactory(UserCouponRepository(apiService = RetrofitInstance.apiService))
+  )
+
+  val userCouponResource = userCouponViewModel.list2.observeAsState()
+
+  val userViewModel: UserViewModel = viewModel(
+    factory = UserViewModelFactory(UserRepository(apiService = RetrofitInstance.apiService))
+  )
+
+  val userResource = userViewModel.list.observeAsState()
+  // Call API Stuff
+
+  LaunchedEffect(Unit) {
+    if (phoneNumber != null) {
+      userViewModel.getUser(phoneNumber)
+    }
+  }
+  if (phoneNumber != null) {
+    isLoading = true
+    when (userResource.value?.status) {
+      Status.SUCCESS -> {
+        userResource.value?.data?.let { list ->
+          val user = list[0]
+          pointUser = user.Point
+          totalPoint = user.Point
+          updateDayCheckingFromString(user.WeekRollUp)
+          if (user.LastDayRollUp != null) {
+            isTodayRolledUp = isToday(user.LastDayRollUp)
+          }
+          isLoading = false
+        }
+      }
+      Status.ERROR -> {
+        isLoading = false
+      }
+      Status.LOADING -> {
+
+      }
+      null -> {
+        isLoading = false
+      }
+    }
+  }
 
   Box(
     modifier = Modifier
@@ -279,8 +396,58 @@ fun RollUpScreen(
             if(!isTodayRolledUp && !isTurnOnNotificationSuccess) {
               // Handle roll up function
               isTodayRolledUp = true
-              dayChecking[0] = 1
+              dayChecking[getDayOfWeekIndex()] = 1
               totalPoint += 100
+              if(userID != null) {
+                isLoading = true
+
+                userViewModel.updateUserPoint(userID, totalPoint)
+
+                when (userResource.value?.status) {
+                  Status.SUCCESS -> {
+                    userResource.value?.data?.let { list ->
+                      val user = list[0]
+                      pointUser = user.Point
+                      totalPoint = user.Point
+                      Log.e("[Điểm danh] -> Total Point", "${totalPoint}")
+                      isLoading = false
+                    }
+                  }
+                  Status.ERROR -> {
+                    isLoading = false
+                  }
+                  Status.LOADING -> {
+
+                  }
+                  null -> {
+                    isLoading = false
+                  }
+                }
+
+                userViewModel.updateUserRollUp(userID)
+
+                when (userResource.value?.status) {
+                  Status.SUCCESS -> {
+                    userResource.value?.data?.let { list ->
+                      val user = list[0]
+                      pointUser = user.Point
+                      totalPoint = user.Point
+                      Log.e("[Điểm danh] -> Total Point", "${totalPoint}")
+                      isLoading = false
+                    }
+                  }
+                  Status.ERROR -> {
+                    isLoading = false
+                  }
+                  Status.LOADING -> {
+
+                  }
+                  null -> {
+                    isLoading = false
+                  }
+                }
+
+              }
             }
           },
           modifier = Modifier
@@ -365,28 +532,72 @@ fun RollUpScreen(
                 Button(
                   onClick = {
                     if (((index + 1) * 10000) < totalPoint && totalPoint - ((index + 1) * 10000) >= 0 && !isTurnOnNotificationSuccess) {
-                      totalPoint -= ((index + 1) * 10000)
-                      isTurnOnNotificationSuccess = true
-
                       // Call API add UserCoupon
                       if(userID == null) {
                         navController?.navigate("home")
                       } else {
-                        val amountDiscount = ((index + 1) * 10000)
-                        val couponID = if (amountDiscount == 50000) 11
-                          else if (amountDiscount == 40) 10
-                          else if (amountDiscount == 30) 9
-                          else if (amountDiscount == 20) 8
-                          else 7
-                        val numberOfUses = 1
-                        val isUsed = 1
-                        val body = "{ " +
-                            "CouponID: $couponID " +
-                            "UserID: $userID " +
-                            "IsUsed: $isUsed " +
-                            "NumberOfUses: $numberOfUses " +
-                            "}"
+                        isLoading = true
 
+                        val amountDiscount = ((index + 1) * 10000)
+                        val couponID = when (amountDiscount) {
+                          50000 -> 11
+                          40000 -> 10
+                          30000 -> 9
+                          20000 -> 8
+                          else -> 7
+                        }
+
+                        userCouponViewModel.AddUserCoupon(
+                          CouponID = couponID.toString(),
+                          UserID = userID.toString()
+                        )
+
+                        when (userCouponResource.value?.status) {
+                          Status.SUCCESS -> {
+                            userCouponResource.value?.data?.let { list ->
+                              Log.e("ID UserCoupon:", list.toString())
+                              totalPoint -= ((index + 1) * 10000)
+                              isLoading = false
+                              isTurnOnNotificationSuccess = true
+                            }
+                          }
+                          Status.ERROR -> {
+                            val textError = userCouponResource.value?.message.toString()
+                            Log.e("UserCoupon -> Error:", textError)
+                            isLoading = false
+                          }
+                          Status.LOADING -> {
+                            Log.e("UserCoupon:", "Loading...")
+                          }
+                          null -> {
+                            isLoading = false
+                          }
+                        }
+
+                        isLoading = true
+
+                        userViewModel.updateUserPoint(userID, (totalPoint- ((index + 1) * 10000)))
+
+                        when (userResource.value?.status) {
+                          Status.SUCCESS -> {
+                            userResource.value?.data?.let { list ->
+                              val user = list[0]
+                              pointUser = user.Point
+                              totalPoint = user.Point
+                              updateDayCheckingFromString(user.WeekRollUp)
+                              isLoading = false
+                            }
+                          }
+                          Status.ERROR -> {
+                            isLoading = false
+                          }
+                          Status.LOADING -> {
+
+                          }
+                          null -> {
+                            isLoading = false
+                          }
+                        }
                       }
                     }
                   },
@@ -470,7 +681,7 @@ fun RollUpScreen(
 
 private fun getDayText(index: Int): String {
   return when (index) {
-    0 -> "Hôm nay"
+    0 -> "Chủ nhật"
     else -> "Ngày ${index + 1}"
   }
 }

@@ -38,6 +38,7 @@ import com.example.jetpackcomposedemo.Screen.Discount.UI_components.ItemInTopBar
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.AppColor
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.showError
+import com.example.jetpackcomposedemo.data.models.Identity
 import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance
 import com.example.jetpackcomposedemo.data.repository.UserCouponRepository
@@ -65,6 +66,7 @@ val buttons = listOf(
 fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolean = false) {
   var selectedButtonID by remember { mutableStateOf(buttons.firstOrNull()?.get("ID") as? Int) }
   var listCoupon = listOf<UserCoupon>()
+  var listIdentity = listOf<Identity>()
   var isLoading by remember {
     mutableStateOf(false)
   }

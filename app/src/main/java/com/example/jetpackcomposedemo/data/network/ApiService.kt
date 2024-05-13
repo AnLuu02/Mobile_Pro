@@ -1,12 +1,16 @@
 package com.example.jetpackcomposedemo.data.network
 
 import com.example.jetpackcomposedemo.data.models.Coupon
+import com.example.jetpackcomposedemo.data.models.Identity
+import com.example.jetpackcomposedemo.data.models.POST_Body_UserCoupon
 import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.models.Room.Room
+import com.example.jetpackcomposedemo.data.models.User
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Query
 
 interface ApiService {
@@ -31,10 +35,32 @@ interface ApiService {
 
     // UserCoupon - begin
     @GET("api/usercoupon/listbyuserid")
-    suspend fun getListCouponOfUser(@Query("userid") id:String): Response<List<UserCoupon>>
+    suspend fun getListCouponOfUser(
+        @Query("userid") id:String
+    ): Response<List<UserCoupon>>
+    @POST("api/UserCoupon/Add")
+    suspend fun postUserCoupon(
+        @Body post_body: POST_Body_UserCoupon
+    ): Response<List<Identity>>
     // UserCoupon - end
 
+    // User - begin
+    @GET("api/user")
+    suspend fun getUserByPhoneNumber(
+        @Query("phone") phone:String
+    ): Response<List<User>>
 
+    @PUT("api/user/updateUserPoint")
+    suspend fun updateUserPoint(
+        @Query("id") userId:Int,
+        @Query("point") point:Int
+    ): Response<List<User>>
+
+    @PUT("api/user/updateUserRollUp")
+    suspend fun updateUserRollUp(
+        @Query("id") userId:Int
+    ): Response<List<User>>
+    // User - end
 
 //
 //    @GET("products/{type}")
