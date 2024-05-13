@@ -27,10 +27,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
-import com.example.jetpackcomposedemo.Screen.Services.ServiceScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
-import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.WaitingPaymentScreen.MethodWaitingPaymentScreen
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.WaitingPaymentScreen.WaitingPaymentScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
@@ -42,11 +40,13 @@ import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
 import com.example.jetpackcomposedemo.Screen.Search.ChooseDiscountScreen
+import com.example.jetpackcomposedemo.Screen.Search.ListRoomScreen
 import com.example.jetpackcomposedemo.Screen.Search.MyBookingScreen
 import com.example.jetpackcomposedemo.Screen.Search.PaymentScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
+import com.example.jetpackcomposedemo.Screen.Services.ServiceScreen
 import com.example.jetpackcomposedemo.Screen.User.InfoUser
 import com.example.jetpackcomposedemo.Screen.User.LoginScreen
 import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
@@ -56,9 +56,12 @@ import com.example.jetpackcomposedemo.Screen.User.UserTopBar
 import com.example.jetpackcomposedemo.components.LoadingSpinner
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
+import com.example.jetpackcomposedemo.data.repository.BookingRepository
 import com.example.jetpackcomposedemo.data.repository.RoomRepository
-import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
-import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModelFactory
+import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
+import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApiFactory
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModelFactory
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
@@ -158,6 +161,10 @@ fun MainApp(checkCameraPermission: () -> Unit){
             val roomViewModel: RoomViewModel = viewModel(
                 factory = RoomViewModelFactory(RoomRepository(apiService = apiService))
             )
+            /////////////// view model call api booking ///////////////
+            val bookingViewModelApi: BookingViewModelApi = viewModel(factory = BookingViewModelApiFactory(
+                BookingRepository(apiService)
+            ))
             NavHost(navController = navController, startDestination = "StartingAppScreen" ){
 
 
@@ -232,6 +239,32 @@ fun MainApp(checkCameraPermission: () -> Unit){
                         }
                     )
                 }
+                //--------------------------------service result -------------------------------------------
+                composable(
+                    "service/{type}",
+                    arguments = listOf(
+                        navArgument("type") {
+                            type = NavType.StringType
+                        },
+                    )
+                ){ backStackEntry ->
+                    val type = backStackEntry.arguments?.getString("type").toString();
+                    ServiceScreen(
+                        serviceType = type,
+                        onCancelButtonClicked = {
+                            navController.popBackStack()
+                        },
+                        onSearchFieldClicked = {
+                            navController.navigate("search")
+                        },
+                        onOpenDetailCardScreen = {roomId->
+                            navController.navigate("roomDetails/$roomId")
+                        },
+                        onMapViewButtonClicked = {
+                            navController.navigate("map")
+                        }
+                    )
+                }
 
                 //----------------------------------- PROPOSED ------------------------------
                 composable("proposed"){
@@ -245,12 +278,6 @@ fun MainApp(checkCameraPermission: () -> Unit){
                         })
                 }
 
-                //----------------------------------- BOOKQUICKLY ------------------------------
-                composable("bookquickly"){
-                    ScreenWithBottomNavigationBar(navController = navController, content = { padding, _ ->
-                        BookQuicklyScreen(padding = padding)
-                    })
-                }
 
                 //----------------------------------- DISCOUNT ------------------------------
 
@@ -269,7 +296,7 @@ fun MainApp(checkCameraPermission: () -> Unit){
                                 userID = loginUiState.id,
                                 checkCameraPermission = checkCameraPermission,
                                 qrCodeText = textResult.value
-                                )
+                            )
                         } else {
                             DiscountScreen(
                                 padding = padding,
@@ -387,8 +414,8 @@ fun MainApp(checkCameraPermission: () -> Unit){
                         onOpenLoginScreen = {
                             navController.navigate("login")
                         },
-                        onOpenPayment = {
-                            navController.navigate("roomDetails/$roomId/payment")
+                        onOpenChooseBedType = {
+                            navController.navigate("roomDetails/$roomId/listroom")
                         },
                         onBack = {
                             navController.popBackStack()
@@ -397,26 +424,26 @@ fun MainApp(checkCameraPermission: () -> Unit){
                 }
 
                 //----------------------------------- Booking ------------------------------
-//                composable(
-//                    "roomDetails/{roomId}/listroom",
-//                    arguments = listOf(
-//                        navArgument("roomId") {
-//                            type = NavType.StringType
-//                        })
-//                ){ backStackEntry ->
-//
-//                    val roomId = backStackEntry.arguments?.getString("roomId")
-//                    ListRoomScreen(
-//                        searchViewModel = searchViewModel,
-//                        bookingViewModel,
-//                        onOpenPayment = {
-//                            navController.navigate("roomDetails/$roomId/payment")
-//                        },
-//                        onBack = {
-//                            navController.popBackStack()
-//                        }
-//                    )
-//                }
+                composable(
+                    "roomDetails/{roomId}/listroom",
+                    arguments = listOf(
+                        navArgument("roomId") {
+                            type = NavType.StringType
+                        })
+                ){ backStackEntry ->
+
+                    val roomId = backStackEntry.arguments?.getString("roomId")
+                    ListRoomScreen(
+                        searchViewModel = searchViewModel,
+                        bookingViewModel,
+                        onOpenPayment = {
+                            navController.navigate("roomDetails/$roomId/payment")
+                        },
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
 
                 composable(
                     "roomDetails/{roomId}/payment",
@@ -427,34 +454,16 @@ fun MainApp(checkCameraPermission: () -> Unit){
                 ){ backStackEntry ->
 
                     val roomId = backStackEntry.arguments?.getString("roomId")
-                    PaymentScreen(bookingViewModel,navController)
+                    PaymentScreen(
+                        bookingViewModelApi = bookingViewModelApi,
+                        bookingViewModel,
+                        loginUiState = loginUiState,
+                        navController
+                    )
                 }
 
-                composable(
-                    "service/{type}",
-                    arguments = listOf(
-                        navArgument("type") {
-                            type = NavType.StringType
-                        },
-                    )
-                ){ backStackEntry ->
-                    val type = backStackEntry.arguments?.getString("type").toString();
-                    ServiceScreen(
-                        serviceType = type,
-                        onCancelButtonClicked = {
-                            navController.popBackStack()
-                        },
-                        onSearchFieldClicked = {
-                            navController.navigate("search")
-                        },
-                        onOpenDetailCardScreen = {roomId->
-                            navController.navigate("roomDetails/$roomId")
-                        },
-                        onMapViewButtonClicked = {
-                            navController.navigate("map")
-                        }
-                    )
-                }
+
+
                 composable(
                     "roomDetails/chooseDiscount",
                 ){
@@ -465,11 +474,11 @@ fun MainApp(checkCameraPermission: () -> Unit){
                 composable(
                     "roomDetails/waitingpayment",
                 ){
-                    MethodWaitingPaymentScreen(
+                    WaitingPaymentScreen(
                         bookingViewModel = bookingViewModel,
                         onPayloadChoose = {},
                         closeScreenChooseMethodPayment = {}
-                        )
+                    )
                 }
             }
         }

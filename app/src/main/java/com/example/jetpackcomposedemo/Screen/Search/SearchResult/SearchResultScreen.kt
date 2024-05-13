@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.components.Card.PriceCard
 import com.example.jetpackcomposedemo.data.models.Room.Room
-import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
 import com.example.jetpackcomposedemo.helpper.Status
 
 @Composable
@@ -151,6 +151,7 @@ fun SearchResult(
                             }
 
                         }
+
                     }
                 }
             },

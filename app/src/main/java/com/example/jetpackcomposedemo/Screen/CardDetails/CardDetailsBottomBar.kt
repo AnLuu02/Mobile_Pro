@@ -49,13 +49,14 @@ fun BottomCardDetail(
     dateCheckoutString:String,
     totalTime:String,
     typeBooking:String,
-    onOpenPayment:()->Unit,
+    onOpenChooseBedType:()->Unit,
     openDialogLoginRequired:(Boolean)->Unit,
     openDatePickerBookingScreen:(Boolean)->Unit
 ){
     val pattern = Regex("/\\d{4}$")
     val dateCheckinStringFormat =  if(typeBooking == "hourly")  dateCheckinString.replace(pattern, "") else dateCheckinString
     val dateCheckoutStringFormat =  if(typeBooking == "hourly")  dateCheckoutString.replace(pattern, "") else dateCheckoutString
+
 
     Surface(modifier = Modifier
         .fillMaxWidth()
@@ -167,7 +168,7 @@ fun BottomCardDetail(
                 Button(
                     onClick = {
                         if(loginUiState.isLoggedIn){
-                            onOpenPayment()
+                            onOpenChooseBedType()
                         }
                         else{
                             openDialogLoginRequired(true)
