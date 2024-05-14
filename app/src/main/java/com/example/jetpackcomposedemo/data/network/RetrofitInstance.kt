@@ -9,11 +9,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 object RetrofitInstance {
-    private const val ipv4Address = "192.168.1.113";
+
+    private const val ipv4Address = "192.168.0.101";
     private const val port = "8080";
     private const val BASE_URL = "http://$ipv4Address:$port/";
 
-    public fun getServerUrl(): String {
+    fun getServerUrl(): String {
         return BASE_URL
     }
 

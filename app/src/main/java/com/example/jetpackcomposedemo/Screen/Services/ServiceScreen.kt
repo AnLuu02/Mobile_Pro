@@ -26,16 +26,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.Screen.Services.widget.CardSection
+import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.models.RoomType
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance
 import com.example.jetpackcomposedemo.data.repository.RoomRepository
 import com.example.jetpackcomposedemo.data.repository.RoomTypeRepository
 import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModelFactory
-import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
-import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModelFactory
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModelFactory
 import com.example.jetpackcomposedemo.helpper.Status
 
 val sortOptions = arrayOf(

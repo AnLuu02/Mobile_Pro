@@ -2,10 +2,8 @@ package com.example.jetpackcomposedemo.Screen.User
 
 import android.app.Activity
 import android.app.Instrumentation.ActivityResult
-import android.content.Context
 import android.content.Intent
 import android.util.Log
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,6 +31,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBackIos
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
@@ -80,15 +79,24 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun LoginScreen(
+fun EmailLoginScreen(
     loginViewModel: LoginViewModel ,
     loginUiState: LoginUiState,
     onCancelButtonClicked: () -> Unit = {},
-    onClickedRegisterText: () -> Unit = {},
+    onSuccess: () -> Unit = {},
     paddingValues: PaddingValues = PaddingValues(16.dp),
 )
 {
     val activity = LocalContext.current as Activity
+//    val launcher = authLauncher(
+//        onAuthComplete = { result ->
+//            loginViewModel.firebaseUser = result.user
+//        },
+//        onAuthError = {
+//            loginViewModel.firebaseUser = null
+//        }
+//    )
+//    val token = "35121327066-kalmah12tosl7ak7i91uv7ug79nesrcj.apps.googleusercontent.com"
     val interactionSource = remember { MutableInteractionSource() }
     val pressed = interactionSource.collectIsPressedAsState().value
 //    val loginUiState by loginViewModel.uiState.collectAsState()
@@ -102,7 +110,7 @@ fun LoginScreen(
            .fillMaxWidth()
            .weight(1f)){
            Icon(
-               imageVector = Icons.Rounded.Close,
+               imageVector = Icons.Rounded.ArrowBackIos,
                contentDescription = null,
                tint = Color.Black,
                modifier = Modifier
@@ -121,11 +129,10 @@ fun LoginScreen(
                 .fillMaxWidth()
                 .weight(6f)
         ) {
-            Text(text = "Go2Joy xin chào!", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
-            Text(text = "Đăng nhập để đặt phòng với những ưu đãi độc quyền dành cho thành viên", textAlign = TextAlign.Start,modifier = Modifier
-                .requiredWidth(300.dp)
-                .fillMaxWidth()
-                .padding(16.dp, 0.dp))
+            if(loginViewModel.firebaseUser != null) {
+                Text("Xin chào ${loginViewModel.firebaseUser!!.email}", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
+            }
+            Text(text = "Số điện thoại của bạn!", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
@@ -157,56 +164,19 @@ fun LoginScreen(
 //                )
 //            }
                 Button(
-                    onClick = {
-                        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-                        imm?.hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)
-                        loginViewModel.send(loginViewModel.phoneNumber, activity)
-                              },
+                    onClick = { loginViewModel.send(loginViewModel.phoneNumber, activity)},
                     colors = ButtonDefaults.buttonColors(containerColor = if (pressed) Color(0xFFCA1212) else Color.Red),
                     modifier = Modifier
                         .fillMaxWidth(),
                     interactionSource = interactionSource
                 ) {
                     Text(
-                        text = "Đăng nhập & đặt phòng ngay",
+                        text = "Tiếp tục",
                         fontSize = 16.sp,
                     )
                 }
                 Spacer(modifier = Modifier.height(32.dp))
-                Text(text = "Hoặc đăng nhập bằng")
-                val launcher = authLauncher(
-                    onAuthComplete = { result ->
-                        loginViewModel.firebaseUser = result.user
-                        loginViewModel.toogleShowingEmailLogin()
-                    },
-                    onAuthError = {
-                        loginViewModel.firebaseUser = null
-                    }
-                )
-                val token = "35121327066-kalmah12tosl7ak7i91uv7ug79nesrcj.apps.googleusercontent.com"
-                Row {
-                    Image(painter = painterResource(id = R.drawable.ic_fb),contentDescription = null,Modifier.padding(paddingValues))
-                    Image(painter = painterResource(id = R.drawable.ic_gg),contentDescription = null,
-                        Modifier
-                            .padding(paddingValues)
-                            .clickable {
-                                val gso =
-                                    GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                        .requestIdToken(token)
-                                        .requestEmail()
-                                        .build()
-                                val googleSignInClient = GoogleSignIn.getClient(activity, gso)
-                                launcher.launch(googleSignInClient.signInIntent)
-                            })
-                }
-
-
-
-
-
-
             }
-            // OTP Diaglog
             if(loginViewModel.isDialogShown) {
                 DialogOTP(
                     onDismiss = { /*TODO*/
@@ -214,26 +184,14 @@ fun LoginScreen(
                     },
                     onConfirm = {otp ->
                         if (otp.isNotEmpty()) {
-                            loginViewModel.otpVerification(otp,activity,onSuccess = onCancelButtonClicked)
+                            loginViewModel.otpVerification(otp,activity,onSuccess = onSuccess,isLoginWithGoogle = true)
                         }
                     }
                 )
             }
         }
 
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-            ,
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Bottom
 
-        ) {
-            Text(text = "Bạn chưa có tài khoản? ")
-            Text(text = "Đăng ký ngay", color = colorResource(id = R.color.primary), textDecoration = TextDecoration.Underline, modifier = Modifier.clickable(onClick = onClickedRegisterText))
-        }
     }
     LoadingScreen(isLoadingValue = loginViewModel.isLoading)
 
@@ -244,36 +202,4 @@ fun LoginScreen(
 
 
 
-@Composable
-fun PrefixOfTextField() {
-    Row() {
-        Image(painter = painterResource(id = R.drawable.ic_vietnam), contentDescription = null, modifier = Modifier.size(24.dp))
-        Text(text = "+84",Modifier.padding(4.dp,0.dp))
-        Spacer(modifier = Modifier.width(8.dp))
-        Spacer(modifier = Modifier
-            .height(24.dp)
-            .width(1.dp)
-            .border(1.dp, color = Color.LightGray))
-        Spacer(modifier = Modifier.width(8.dp))
-    }
-}
-@Composable
-fun authLauncher(
-    onAuthComplete: (AuthResult) -> Unit,
-    onAuthError: (ApiException) -> Unit
-): ManagedActivityResultLauncher<Intent, androidx.activity.result.ActivityResult> {
-    val scope = rememberCoroutineScope()
-    return rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(ApiException::class.java)!!
-            val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
-            scope.launch {
-                val authResult = Firebase.auth.signInWithCredential(credential).await()
-                onAuthComplete(authResult)
-            }
-        } catch (e: ApiException) {
-            onAuthError(e)
-        }
-    }
-}
+

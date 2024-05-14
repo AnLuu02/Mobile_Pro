@@ -1,9 +1,13 @@
 package com.example.jetpackcomposedemo
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -11,8 +15,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,27 +29,28 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.example.jetpackcomposedemo.Screen.BookQuickly.BookQuicklyScreen
-import com.example.jetpackcomposedemo.Screen.Services.ServiceScreen
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
-import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.WaitingPaymentScreen.MethodWaitingPaymentScreen
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.WaitingPaymentScreen.WaitingPaymentScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
-import com.example.jetpackcomposedemo.Screen.Discount.DiscountTopBar
 import com.example.jetpackcomposedemo.Screen.Discount.RollUpScreen
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.VideoScreen
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.showError
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
 import com.example.jetpackcomposedemo.Screen.Search.ChooseDiscountScreen
+import com.example.jetpackcomposedemo.Screen.Search.ListRoomScreen
 import com.example.jetpackcomposedemo.Screen.Search.MyBookingScreen
 import com.example.jetpackcomposedemo.Screen.Search.PaymentScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.SearchResultScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
+import com.example.jetpackcomposedemo.Screen.Services.ServiceScreen
+import com.example.jetpackcomposedemo.Screen.User.EmailLoginScreen
 import com.example.jetpackcomposedemo.Screen.User.InfoUser
 import com.example.jetpackcomposedemo.Screen.User.LoginScreen
 import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
@@ -51,16 +60,105 @@ import com.example.jetpackcomposedemo.Screen.User.UserTopBar
 import com.example.jetpackcomposedemo.components.LoadingSpinner
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
+import com.example.jetpackcomposedemo.data.repository.BookingRepository
 import com.example.jetpackcomposedemo.data.repository.RoomRepository
+<<<<<<< thanhan
 import com.example.jetpackcomposedemo.data.repository.RoomTypeRepository
 import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModelFactory
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModelFactory
+=======
+import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
+import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApiFactory
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModelFactory
+>>>>>>> master
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
+
 class MainActivity : ComponentActivity() {
+    private var textResult = MutableLiveData("")
+    fun saveToSharedPreferences(context: Context, key: String, value: String) {
+        val sharedPreferences = context.getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString(key, value)
+        editor.apply()
+    }
+
+    fun getFromSharedPreferences(context: Context, key: String, defaultValue: String): String? {
+        val sharedPreferences = context.getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        return sharedPreferences.getString(key, defaultValue)
+    }
+
+    private lateinit var deferredResult: CompletableDeferred<String?>
+
+    private val barCodeLauncher = registerForActivityResult(ScanContract()) { result ->
+        if (result.contents == null) {
+            Toast.makeText(this@MainActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+            deferredResult.complete(null)
+        } else {
+            textResult.value = result.contents
+//            Toast.makeText(this@MainActivity, "QR CONTENT: ${result.contents}", Toast.LENGTH_SHORT).show()
+            deferredResult.complete(result.contents)
+        }
+    }
+
+    suspend fun getQrCode(): String? {
+        deferredResult = CompletableDeferred()
+        withContext(Dispatchers.Main) {
+            checkCameraPermission()
+        }
+        return deferredResult.await()
+    }
+
+    private suspend fun showCamera() {
+        val options = ScanOptions()
+        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+        options.setPrompt("Scan a QR code")
+        options.setCameraId(0)
+        options.setBeepEnabled(false)
+        options.setOrientationLocked(false)
+
+        withContext(Dispatchers.Main) {
+            barCodeLauncher.launch(options)
+        }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            lifecycleScope.launch {
+                showCamera()
+            }
+        }
+    }
+
+    private suspend fun checkCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this@MainActivity, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            showCamera()
+        } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)) {
+            Toast.makeText(this@MainActivity, "Camera Required", Toast.LENGTH_SHORT).show()
+        } else {
+            requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+            // Wait for the permission request result
+//            delay(1000) // Adjust the delay as needed
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,14 +184,17 @@ class MainActivity : ComponentActivity() {
 
             WorkManager.getInstance(context).enqueue(notificationWorkRequest)
 
-            MainApp()
+            MainApp(
+                mainActivity = this@MainActivity
+            )
 //            HomeScreenReminder()
         }
     }
 }
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainApp(){
+fun MainApp(mainActivity: MainActivity){
     val navController = rememberNavController()
     JetpackComposeDemoTheme {
         Surface(
@@ -104,12 +205,23 @@ fun MainApp(){
             val searchViewModel: SearchViewModel = viewModel()
             val bookingViewModel: BookingViewModel = viewModel()
             val loginUiState by loginViewModel1.uiState.collectAsState()
+            if(loginUiState.id != 0) {
+                mainActivity.saveToSharedPreferences(mainActivity, "userid", loginUiState.id.toString())
+            }
+
             val roomViewModel: RoomViewModel = viewModel(
                 factory = RoomViewModelFactory(RoomRepository(apiService = apiService))
             )
+<<<<<<< thanhan
             val roomTypeViewModel : RoomTypeViewModel = viewModel (
                 factory = RoomTypeViewModelFactory(RoomTypeRepository(apiService = apiService))
             )
+=======
+            /////////////// view model call api booking ///////////////
+            val bookingViewModelApi: BookingViewModelApi = viewModel(factory = BookingViewModelApiFactory(
+                BookingRepository(apiService)
+            ))
+>>>>>>> master
             NavHost(navController = navController, startDestination = "StartingAppScreen" ){
 
 
@@ -188,6 +300,32 @@ fun MainApp(){
                         },
                     )
                 }
+                //--------------------------------service result -------------------------------------------
+                composable(
+                    "service/{type}",
+                    arguments = listOf(
+                        navArgument("type") {
+                            type = NavType.StringType
+                        },
+                    )
+                ){ backStackEntry ->
+                    val type = backStackEntry.arguments?.getString("type").toString();
+                    ServiceScreen(
+                        serviceType = type,
+                        onCancelButtonClicked = {
+                            navController.popBackStack()
+                        },
+                        onSearchFieldClicked = {
+                            navController.navigate("search")
+                        },
+                        onOpenDetailCardScreen = {roomId->
+                            navController.navigate("roomDetails/$roomId")
+                        },
+                        onMapViewButtonClicked = {
+                            navController.navigate("map")
+                        }
+                    )
+                }
 
                 //----------------------------------- PROPOSED ------------------------------
                 composable("proposed"){
@@ -201,12 +339,6 @@ fun MainApp(){
                         })
                 }
 
-                //----------------------------------- BOOKQUICKLY ------------------------------
-                composable("bookquickly"){
-                    ScreenWithBottomNavigationBar(navController = navController, content = { padding, _ ->
-                        BookQuicklyScreen(padding = padding)
-                    })
-                }
 
                 //----------------------------------- DISCOUNT ------------------------------
 
@@ -214,18 +346,49 @@ fun MainApp(){
                     ScreenWithBottomNavigationBar(navController = navController, topBar = {
 
                     }, content = {padding, _->
-                        DiscountScreen(padding = padding, navController)
+                        if(loginUiState.isLoggedIn) {
+                            DiscountScreen(
+                                padding = padding,
+                                navController = navController,
+                                isLoggedIn = true,
+                                isCheckedIn = true,
+                                userName = loginUiState.fullName.toString(),
+                                phoneNumber = loginUiState.phoneNumber.toString(),
+                                userID = loginUiState.id,
+                                mainActivity = mainActivity
+                            )
+                        } else {
+                            DiscountScreen(
+                                padding = padding,
+                                navController = navController,
+                                isLoggedIn = false,
+                                isCheckedIn = false,
+                                mainActivity = mainActivity
+                            )
+                        }
                     })
                 }
 
                 composable("CouponScreen"){
-                    CouponScreen(navController, 1)
+                    if(loginUiState.isLoggedIn) {
+                        CouponScreen(navController, loginUiState.id)
+                    } else {
+                        CouponScreen(navController, null)
+                    }
                 }
 
                 composable("RollUpScreen"){
-                    RollUpScreen(
-                        navController = navController
-                    )
+                    if(loginUiState.isLoggedIn) {
+                        RollUpScreen(
+                            navController = navController,
+                            userID = loginUiState.id,
+                            phoneNumber = loginUiState.phoneNumber
+                        )
+                    } else {
+                        RollUpScreen(
+                            navController = navController
+                        )
+                    }
                 }
 
                 composable("StartingAppScreen"){
@@ -233,34 +396,50 @@ fun MainApp(){
                 }
                 //----------------------------------- USER ------------------------------
                 composable("user"){
-                    ScreenWithBottomNavigationBar(
-                        isBotNav = !loginUiState.isShowingInfo,
-                        navController = navController,
-                        topBar = { UserTopBar( loginUiState = loginUiState,
-                            onLoginButtonClicked = { navController.navigate("login") },
-                            onToogleSettingInfo = {
-                                loginViewModel1.toogleSetting(loginUiState.isShowingInfo)
-                                loginViewModel1.reset()
-                            }) },
-                        content = { padding, _ ->
-                            if(loginUiState.isShowingInfo){
-                                InfoUser(padding = padding,loginUiState = loginUiState, loginViewModel = loginViewModel1)
-                            }else{
-                                UserScreen(navController = navController,padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
-                            }
-                        })
+
+                        ScreenWithBottomNavigationBar(
+                            isBotNav = !loginUiState.isShowingInfo,
+                            navController = navController,
+                            topBar = { UserTopBar( loginUiState = loginUiState,
+                                onLoginButtonClicked = { navController.navigate("login") },
+                                onToogleSettingInfo = {
+                                    loginViewModel1.toogleSetting(loginUiState.isShowingInfo)
+                                    loginViewModel1.reset()
+                                }) },
+                            content = { padding, _ ->
+                                if(loginUiState.isShowingInfo){
+                                    InfoUser(padding = padding,loginUiState = loginUiState, loginViewModel = loginViewModel1)
+                                }else{
+                                    UserScreen(navController = navController,padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
+                                }
+                            })
+
                 }
 
                 composable("login") {
-                    LoginScreen(
-                        loginViewModel1,
-                        onCancelButtonClicked = {
-                            navController.popBackStack()
-                        },
-                        onClickedRegisterText = {
-                            navController.navigate("register")
-                        }
-                    )
+                    if(loginViewModel1.isEmailLogin){
+                        EmailLoginScreen(
+                            loginViewModel1,
+                            loginUiState,
+                            onCancelButtonClicked = {
+                                loginViewModel1.toogleShowingEmailLogin()
+                            },
+                            onSuccess = {
+                                navController.navigate("user")
+                            }
+                        )
+                    }else{
+                        LoginScreen(
+                            loginViewModel1,
+                            loginUiState,
+                            onCancelButtonClicked = {
+                                navController.popBackStack()
+                            },
+                            onClickedRegisterText = {
+                                navController.navigate("register")
+                            }
+                        )
+                    }
 
                 }
 
@@ -311,6 +490,28 @@ fun MainApp(){
                         onOpenLoginScreen = {
                             navController.navigate("login")
                         },
+                        onOpenChooseBedType = {
+                            navController.navigate("roomDetails/$roomId/listroom")
+                        },
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+
+                //----------------------------------- Booking ------------------------------
+                composable(
+                    "roomDetails/{roomId}/listroom",
+                    arguments = listOf(
+                        navArgument("roomId") {
+                            type = NavType.StringType
+                        })
+                ){ backStackEntry ->
+
+                    val roomId = backStackEntry.arguments?.getString("roomId")
+                    ListRoomScreen(
+                        searchViewModel = searchViewModel,
+                        bookingViewModel,
                         onOpenPayment = {
                             navController.navigate("roomDetails/$roomId/payment")
                         },
@@ -320,28 +521,6 @@ fun MainApp(){
                     )
                 }
 
-                //----------------------------------- Booking ------------------------------
-//                composable(
-//                    "roomDetails/{roomId}/listroom",
-//                    arguments = listOf(
-//                        navArgument("roomId") {
-//                            type = NavType.StringType
-//                        })
-//                ){ backStackEntry ->
-//
-//                    val roomId = backStackEntry.arguments?.getString("roomId")
-//                    ListRoomScreen(
-//                        searchViewModel = searchViewModel,
-//                        bookingViewModel,
-//                        onOpenPayment = {
-//                            navController.navigate("roomDetails/$roomId/payment")
-//                        },
-//                        onBack = {
-//                            navController.popBackStack()
-//                        }
-//                    )
-//                }
-
                 composable(
                     "roomDetails/{roomId}/payment",
                     arguments = listOf(
@@ -349,19 +528,7 @@ fun MainApp(){
                             type = NavType.StringType
                         })
                 ){ backStackEntry ->
-
-                    val roomId = backStackEntry.arguments?.getString("roomId")
-                    PaymentScreen(bookingViewModel,navController)
-                }
-
-                composable(
-                    "service/{type}",
-                    arguments = listOf(
-                        navArgument("type") {
-                            type = NavType.StringType
-                        },
-                    )
-                ){ backStackEntry ->
+<<<<<<< thanhan
                     val type = backStackEntry.arguments?.getString("type").toString();
                     ServiceScreen(
                         serviceType = type,
@@ -374,8 +541,20 @@ fun MainApp(){
                         onOpenDetailCardScreen = {roomId->
                             navController.navigate("roomDetails/$roomId")
                         },
+=======
+
+                    val roomId = backStackEntry.arguments?.getString("roomId")
+                    PaymentScreen(
+                        bookingViewModelApi = bookingViewModelApi,
+                        bookingViewModel,
+                        loginUiState = loginUiState,
+                        navController
+>>>>>>> master
                     )
                 }
+
+
+
                 composable(
                     "roomDetails/chooseDiscount",
                 ){
@@ -386,11 +565,11 @@ fun MainApp(){
                 composable(
                     "roomDetails/waitingpayment",
                 ){
-                    MethodWaitingPaymentScreen(
+                    WaitingPaymentScreen(
                         bookingViewModel = bookingViewModel,
                         onPayloadChoose = {},
                         closeScreenChooseMethodPayment = {}
-                        )
+                    )
                 }
             }
         }

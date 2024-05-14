@@ -1,6 +1,5 @@
 package com.example.jetpackcomposedemo.Screen.Home.widget
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,10 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.HourglassTop
-import androidx.compose.material.icons.rounded.LocationOn
-import androidx.compose.material.icons.rounded.ShieldMoon
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,10 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.jetpackcomposedemo.data.models.ServicesUI
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
 
@@ -58,22 +52,38 @@ val servicesUI = listOf(
     ServicesUI(
         icon = R.drawable.outline_favorite_border_24,
         title = "Tình yêu",
+<<<<<<< thanhan
         type = "other"
+=======
+        type = "bydate"
+>>>>>>> master
     ),
     ServicesUI(
         icon = R.drawable.outline_local_airport_24,
         title = "Du lịch",
+<<<<<<< thanhan
         type = "other"
+=======
+        type = "bydate"
+>>>>>>> master
     ),
     ServicesUI(
         icon = R.drawable.outline_local_offer_24,
         title = "Ưu đãi",
+<<<<<<< thanhan
         type = "other"
+=======
+        type = "bydate"
+>>>>>>> master
     ),
     ServicesUI(
         icon = R.drawable.outline_fiber_new_24,
         title = "Đổi gió",
+<<<<<<< thanhan
         type = "other"
+=======
+        type = "bydate"
+>>>>>>> master
     ),
 )
 

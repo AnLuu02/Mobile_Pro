@@ -104,6 +104,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.android.gms:play-services-auth:19.0.0")
 
 
     // Livedata
@@ -139,4 +140,19 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
+    // Scan QR
+//    implementation("androidx.camera:camera-camera2:1.0.2")
+//    implementation("androidx.camera:camera-lifecycle:1.0.2")
+//    implementation("androidx.camera:camera-view:1.0.0-alpha31")
+//
+//    implementation("com.google.zxing:core:3.3.3")
+    // CameraX dependencies
+    implementation("androidx.camera:camera-camera2:1.1.0-beta01")
+    implementation("androidx.camera:camera-lifecycle:1.1.0-beta01")
+
+    // ZXing (QR code scanning library) dependency
+    implementation("com.google.zxing:core:3.4.1")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+
 }

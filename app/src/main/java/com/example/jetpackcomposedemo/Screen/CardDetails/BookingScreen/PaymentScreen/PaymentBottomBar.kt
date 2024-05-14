@@ -47,7 +47,9 @@ import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
 fun PaymentBottomBar(
     bookingViewModel: BookingViewModel,
     payloadChoose:OptionPayment,
-    onChooseMethodPayment:(Boolean)->Unit
+    totalPrice:String,
+    onChooseMethodPayment:(Boolean)->Unit,
+    onApplyBooking:()->Unit
 ){
 
     val openAlertDialog = remember { mutableStateOf(false) }
@@ -149,12 +151,14 @@ fun PaymentBottomBar(
                     Text(text = "Tổng thanh toán", style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    Text(text = "1.220.000đ", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(text = totalPrice, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 }
 
                 Button(
                     onClick = {
-                        openAlertDialog.value = payloadChoose.type == null
+//                        openAlertDialog.value = payloadChoose.type == null
+                        onApplyBooking()
+
                     },
                     modifier = Modifier.clip(MaterialTheme.shapes.small),
                     colors = ButtonDefaults.buttonColors(

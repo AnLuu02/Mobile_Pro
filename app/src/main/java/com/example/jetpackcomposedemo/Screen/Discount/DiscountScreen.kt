@@ -1,5 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.BookQuickly
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,8 +29,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,11 +48,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.jetpackcomposedemo.MainActivity
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.AppColor
+import com.example.jetpackcomposedemo.data.network.RetrofitInstance
+import com.example.jetpackcomposedemo.data.repository.UserCouponRepository
+import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModelFactory
+import com.example.jetpackcomposedemo.helpper.Status
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import java.util.Timer
 import kotlin.concurrent.scheduleAtFixedRate
@@ -170,7 +184,8 @@ fun smallIconBtn(
 @Composable
 fun TopInfoView(
     userName: String = "Nguyễn Quốc An",
-    phoneNumber: String = "0123456789"
+    phoneNumber: String = "0123456789",
+    navController: NavHostController? = null
 ) {
     val appColor = AppColor()
 
@@ -192,7 +207,7 @@ fun TopInfoView(
                 size = 32.dp,
                 imageResId = R.raw.setting,
                 onClickBtn = {
-
+                    navController?.navigate("user")
                 }
             )
 
@@ -241,7 +256,8 @@ fun TopInfoView(
 fun LineFunctions (
     localPadding: Dp = 10.dp,
     screenWidth: Dp,
-    navController: NavHostController?= null
+    navController: NavHostController?= null,
+    userID: Int? = null
 ) {
     val appColor = AppColor()
 
@@ -273,7 +289,7 @@ fun LineFunctions (
                     titleBtn = "Chờ lấy phòng",
                     description = "",
                     onClickItem = {
-
+                        navController?.navigate("user/${userID}/mybooking")
                     }
                 )
 
@@ -297,7 +313,7 @@ fun LineFunctions (
                     titleBtn = "Yêu thích",
                     description = "",
                     onClickItem = {
-
+//                        navController?.navigate("")
                     }
                 )
 
@@ -321,9 +337,20 @@ fun LineFunctions (
 fun LineFunctions2 (
     localPadding: Dp = 10.dp,
     screenWidth: Dp,
-    navController: NavHostController?= null
+    navController: NavHostController?= null,
+    mainActivity: MainActivity? = null,
+    userID: Int? = null
 ) {
     val appColor = AppColor()
+    val userCouponViewModel: UserCouponViewModel = viewModel(
+        factory = UserCouponViewModelFactory(UserCouponRepository(apiService = RetrofitInstance.apiService))
+    )
+
+    val userCouponResource = userCouponViewModel.list2.observeAsState()
+
+    val coroutineScope = rememberCoroutineScope()
+    var qrCode by remember { mutableStateOf<String?>(null) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -365,6 +392,61 @@ fun LineFunctions2 (
                     description = "",
                     onClickItem = {
                         navController?.navigate("RollUpScreen")
+                    }
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                ItemA(
+                    sourceIcon = R.raw.scan,
+                    screenWidth = screenWidth,
+                    titleBtn = "Quét mã QR",
+                    description = "",
+                    onClickItem = {
+                        // Wait result
+                        // Call API
+
+                        coroutineScope.launch() {
+                            // Call fun1 and wait for the result
+                            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            val currentDate = Date()
+                            val timeNow = dateFormat.format(currentDate)
+                            qrCode = mainActivity?.getQrCode()
+                            // Call fun2 with the result from fun1
+                            if(userID!= null && qrCode != null) {
+                                userCouponViewModel.AddUserCoupon(
+                                    CouponID = qrCode.toString(),
+                                    UserID = userID.toString(),
+                                    DateScan = timeNow
+                                )
+
+                                // timeout api
+                                delay(1000)
+
+                                try {
+                                    when (userCouponResource.value?.status) {
+                                        Status.SUCCESS -> {
+                                            userCouponResource.value?.data?.let { _ ->
+                                                Toast.makeText(mainActivity, "Scan Coupon Successfully", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                        Status.ERROR -> {
+                                            val textError = userCouponResource.value?.message.toString()
+                                            throw Exception(textError)
+                                        }
+                                        Status.LOADING -> {
+
+                                        }
+                                        null -> {
+                                            throw Exception("Null variable")
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    e.localizedMessage?.let { Log.e("DiscountScreen -> Error", it) }
+                                    Toast.makeText(mainActivity, "Scan Coupon Failed", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
                     }
                 )
             }
@@ -481,7 +563,11 @@ fun DiscountScreen(
     navController: NavHostController? = null,
     isLoggedIn: Boolean = true,
     isCheckedIn: Boolean = true,
-    timeCheckOut: String = "06/05/2024 18:01:00"
+    timeCheckOut: String = "08/05/2024 18:01:00",
+    userName: String = "Nguyen Quoc An",
+    phoneNumber: String = "0123456789",
+    userID: Int? = null,
+    mainActivity: MainActivity? = null
 ) {
     // Config screen - begin
     val screenWidth = with(LocalDensity.current) {
@@ -498,7 +584,11 @@ fun DiscountScreen(
             .background(appColor.gray3)
     ) {
         if(isLoggedIn) {
-            TopInfoView()
+            TopInfoView(
+                navController = navController,
+                userName = userName,
+                phoneNumber = phoneNumber,
+            )
 
             if(isCheckedIn) {
                 LineCountdown(
@@ -512,14 +602,17 @@ fun DiscountScreen(
 
             LineFunctions(
                 screenWidth = screenWidth,
-                navController = navController
+                navController = navController,
+                userID = userID
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
             LineFunctions2(
                 screenWidth = screenWidth,
-                navController = navController
+                navController = navController,
+                mainActivity = mainActivity,
+                userID = userID
             )
         } else {
             Box(
@@ -672,5 +765,6 @@ fun DiscountScreen(
 @Preview
 @Composable
 fun demoDiscountScreen() {
+    fun doA() {}
     DiscountScreen()
 }
