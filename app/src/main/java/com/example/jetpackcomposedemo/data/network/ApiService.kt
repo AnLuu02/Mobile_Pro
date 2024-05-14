@@ -3,13 +3,10 @@ package com.example.jetpackcomposedemo.data.network
 import com.example.jetpackcomposedemo.data.models.Coupon
 import com.example.jetpackcomposedemo.data.models.Identity
 import com.example.jetpackcomposedemo.data.models.POST_Body_UserCoupon
-//import com.example.jetpackcomposedemo.data.models.Room
 import com.example.jetpackcomposedemo.data.models.Booking.Booking
-import com.example.jetpackcomposedemo.data.models.Coupon
 import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.models.RoomType
 import com.example.jetpackcomposedemo.data.models.UserCoupon
-import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.models.User
 import retrofit2.Response
 import retrofit2.http.Body

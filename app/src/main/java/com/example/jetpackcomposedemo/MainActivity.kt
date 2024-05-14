@@ -19,6 +19,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -67,22 +69,54 @@ import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewMo
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-var textResult = mutableStateOf("")
 
 class MainActivity : ComponentActivity() {
+    private var textResult = MutableLiveData("")
+    fun saveToSharedPreferences(context: Context, key: String, value: String) {
+        val sharedPreferences = context.getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString(key, value)
+        editor.apply()
+    }
 
-    private val barCodeLauncher = registerForActivityResult(ScanContract()) {
-        result ->
-        if(result.contents == null) {
+    fun getFromSharedPreferences(context: Context, key: String, defaultValue: String): String? {
+        val sharedPreferences = context.getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        return sharedPreferences.getString(key, defaultValue)
+    }
+
+    private lateinit var deferredResult: CompletableDeferred<String?>
+
+    private val barCodeLauncher = registerForActivityResult(ScanContract()) { result ->
+        if (result.contents == null) {
             Toast.makeText(this@MainActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+            deferredResult.complete(null)
         } else {
             textResult.value = result.contents
+//            Toast.makeText(this@MainActivity, "QR CONTENT: ${result.contents}", Toast.LENGTH_SHORT).show()
+            deferredResult.complete(result.contents)
         }
     }
 
-    private fun showCamera () {
+    suspend fun getQrCode(): String? {
+        deferredResult = CompletableDeferred()
+        withContext(Dispatchers.Main) {
+            checkCameraPermission()
+        }
+        return deferredResult.await()
+    }
+
+    private suspend fun showCamera() {
         val options = ScanOptions()
         options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
         options.setPrompt("Scan a QR code")
@@ -90,28 +124,31 @@ class MainActivity : ComponentActivity() {
         options.setBeepEnabled(false)
         options.setOrientationLocked(false)
 
-        barCodeLauncher.launch(options)
+        withContext(Dispatchers.Main) {
+            barCodeLauncher.launch(options)
+        }
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) {
-        isGranted ->
-        if(isGranted) {
-            showCamera()
+    ) { isGranted ->
+        if (isGranted) {
+            lifecycleScope.launch {
+                showCamera()
+            }
         }
     }
 
-    private fun checkCameraPermission(context: Context) {
-        if(ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+    private suspend fun checkCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this@MainActivity, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             showCamera()
         } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)) {
             Toast.makeText(this@MainActivity, "Camera Required", Toast.LENGTH_SHORT).show()
-
         } else {
             requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+            // Wait for the permission request result
+//            delay(1000) // Adjust the delay as needed
         }
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -140,7 +177,7 @@ class MainActivity : ComponentActivity() {
             WorkManager.getInstance(context).enqueue(notificationWorkRequest)
 
             MainApp(
-                checkCameraPermission = { checkCameraPermission(this@MainActivity) }
+                mainActivity = this@MainActivity
             )
 //            HomeScreenReminder()
         }
@@ -149,7 +186,7 @@ class MainActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainApp(checkCameraPermission: () -> Unit){
+fun MainApp(mainActivity: MainActivity){
     val navController = rememberNavController()
     JetpackComposeDemoTheme {
         Surface(
@@ -160,6 +197,10 @@ fun MainApp(checkCameraPermission: () -> Unit){
             val searchViewModel: SearchViewModel = viewModel()
             val bookingViewModel: BookingViewModel = viewModel()
             val loginUiState by loginViewModel1.uiState.collectAsState()
+            if(loginUiState.id != 0) {
+                mainActivity.saveToSharedPreferences(mainActivity, "userid", loginUiState.id.toString())
+            }
+
             val roomViewModel: RoomViewModel = viewModel(
                 factory = RoomViewModelFactory(RoomRepository(apiService = apiService))
             )
@@ -296,8 +337,7 @@ fun MainApp(checkCameraPermission: () -> Unit){
                                 userName = loginUiState.fullName.toString(),
                                 phoneNumber = loginUiState.phoneNumber.toString(),
                                 userID = loginUiState.id,
-                                checkCameraPermission = checkCameraPermission,
-                                qrCodeText = textResult.value
+                                mainActivity = mainActivity
                             )
                         } else {
                             DiscountScreen(
@@ -305,7 +345,7 @@ fun MainApp(checkCameraPermission: () -> Unit){
                                 navController = navController,
                                 isLoggedIn = false,
                                 isCheckedIn = false,
-                                checkCameraPermission = checkCameraPermission
+                                mainActivity = mainActivity
                             )
                         }
                     })

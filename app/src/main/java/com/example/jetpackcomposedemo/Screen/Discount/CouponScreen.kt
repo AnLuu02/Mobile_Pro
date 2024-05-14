@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -123,7 +126,7 @@ fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolea
 
   Column(
     modifier = Modifier
-      .padding(0.dp, 56.dp, 0.dp, 0.dp)
+      .padding(0.dp, 25.dp, 0.dp, 0.dp)
   ) {
     Row(
       modifier = Modifier
@@ -212,6 +215,7 @@ fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolea
       Column(
         modifier = Modifier
           .fillMaxWidth()
+          .verticalScroll(rememberScrollState())
           .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
@@ -249,9 +253,14 @@ fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolea
                   doLeft = showDetailCoupon,
                   doRight = handleClickCoupon
                 )
-                if (index != listCoupon.size - 1) {
-                  Spacer(modifier = Modifier.height(10.dp))
-                }
+
+                Spacer(modifier = Modifier.height(
+                    if (index != (listCoupon.size - 1))
+                      10.dp
+                    else
+                      60.dp
+                  )
+                )
               }
             } else if (selectedButtonID == 1) {
 

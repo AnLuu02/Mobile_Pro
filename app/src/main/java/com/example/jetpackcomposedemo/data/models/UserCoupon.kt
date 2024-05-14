@@ -10,5 +10,6 @@ data class UserCoupon(
   @SerializedName("EffectiveDate") val effectiveDate: String,
   @SerializedName("ExpirationDate") val expirationDate: String?,
   @SerializedName("NumberOfUses") val NumberOfUses: Int,
-  @SerializedName("IsUsed") val IsUsed: Int
+  @SerializedName("IsUsed") val IsUsed: Int,
+  @SerializedName("DateScan") val DateScan: String? = null
 )
