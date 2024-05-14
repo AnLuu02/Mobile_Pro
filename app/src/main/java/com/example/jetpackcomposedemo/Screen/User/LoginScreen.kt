@@ -2,8 +2,10 @@ package com.example.jetpackcomposedemo.Screen.User
 
 import android.app.Activity
 import android.app.Instrumentation.ActivityResult
+import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -155,7 +157,11 @@ fun LoginScreen(
 //                )
 //            }
                 Button(
-                    onClick = { loginViewModel.send(loginViewModel.phoneNumber, activity) },
+                    onClick = {
+                        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                        imm?.hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)
+                        loginViewModel.send(loginViewModel.phoneNumber, activity)
+                              },
                     colors = ButtonDefaults.buttonColors(containerColor = if (pressed) Color(0xFFCA1212) else Color.Red),
                     modifier = Modifier
                         .fillMaxWidth(),

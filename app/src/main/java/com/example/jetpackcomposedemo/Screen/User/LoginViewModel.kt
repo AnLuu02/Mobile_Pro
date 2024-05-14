@@ -186,7 +186,7 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
                        id = info[0].ID!!,
                        gender = info[0].gender,
                        birthday = info[0].birthday,
-                       fullName = info[0].fullName,
+                       fullName = info[0].fullName ?: "User${info[0].ID}",
                        email = email,
                        phoneNumber = info[0].sdt,
                        isLoggedIn = true
@@ -240,7 +240,7 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
         showError = false
     }
     fun updateFullname(inputFullname: String) {
-        if(inputFullname.isEmpty()) {
+        if(inputFullname.equals("null")) {
             fullName = "User${_uiState.value.id}"
         }else {
             fullName = inputFullname
@@ -253,7 +253,7 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
         displaynameEmail = inputDisplayname
     }
     fun updateEmail(inputEmail: String) {
-        if(inputEmail.isEmpty()) {
+        if(inputEmail.equals("null")) {
             email = ""
         }else {
             email = inputEmail
