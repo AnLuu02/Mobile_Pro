@@ -48,7 +48,6 @@ import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.AppColor
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
-import com.example.jetpackcomposedemo.data.models.User
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance
 import com.example.jetpackcomposedemo.data.repository.UserCouponRepository
 import com.example.jetpackcomposedemo.data.repository.UserRepository
@@ -57,6 +56,7 @@ import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModelFactory
 import com.example.jetpackcomposedemo.data.viewmodel.UserViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.UserViewModelFactory
 import com.example.jetpackcomposedemo.helpper.Status
+import java.io.IOException
 import java.time.LocalDateTime
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -401,7 +401,10 @@ fun RollUpScreen(
               if(userID != null) {
                 isLoading = true
 
-                userViewModel.updateUserPoint(userID, totalPoint)
+                userViewModel.updateUserPoint(
+                  UserId = userID,
+                  Point = totalPoint
+                )
 
                 when (userResource.value?.status) {
                   Status.SUCCESS -> {
@@ -552,51 +555,61 @@ fun RollUpScreen(
                           UserID = userID.toString()
                         )
 
-                        when (userCouponResource.value?.status) {
-                          Status.SUCCESS -> {
-                            userCouponResource.value?.data?.let { list ->
-                              Log.e("ID UserCoupon:", list.toString())
-                              totalPoint -= ((index + 1) * 10000)
-                              isLoading = false
-                              isTurnOnNotificationSuccess = true
+
+                        val newPoint = totalPoint - ((index + 1) * 10000)
+                        userViewModel.updateUserPoint(
+                          UserId = userID,
+                          Point = newPoint
+                        )
+
+                        try {
+                          when (userCouponResource.value?.status) {
+                            Status.SUCCESS -> {
+                              userCouponResource.value?.data?.let { list ->
+//                                Log.e("ID UserCoupon:", list.toString())
+//                                totalPoint -= ((index + 1) * 10000)
+                              }
+                            }
+                            Status.ERROR -> {
+                              val textError = userCouponResource.value?.message.toString()
+                              throw Exception(textError)
+                            }
+                            Status.LOADING -> {
+
+                            }
+                            null -> {
+
                             }
                           }
-                          Status.ERROR -> {
-                            val textError = userCouponResource.value?.message.toString()
-                            Log.e("UserCoupon -> Error:", textError)
-                            isLoading = false
-                          }
-                          Status.LOADING -> {
-                            Log.e("UserCoupon:", "Loading...")
-                          }
-                          null -> {
-                            isLoading = false
-                          }
-                        }
 
-                        isLoading = true
+                          when (userResource.value?.status) {
+                            Status.SUCCESS -> {
+                              userResource.value?.data?.let { list ->
+                                val user = list[0]
+                                totalPoint = user.Point
+                                updateDayCheckingFromString(user.WeekRollUp)
+                              }
+                            }
+                            Status.ERROR -> {
+                              val textError = userResource.value?.message.toString()
+                              throw Exception(textError)
+                            }
+                            Status.LOADING -> {
 
-                        userViewModel.updateUserPoint(userID, (totalPoint- ((index + 1) * 10000)))
+                            }
+                            null -> {
 
-                        when (userResource.value?.status) {
-                          Status.SUCCESS -> {
-                            userResource.value?.data?.let { list ->
-                              val user = list[0]
-                              pointUser = user.Point
-                              totalPoint = user.Point
-                              updateDayCheckingFromString(user.WeekRollUp)
-                              isLoading = false
                             }
                           }
-                          Status.ERROR -> {
-                            isLoading = false
-                          }
-                          Status.LOADING -> {
-
-                          }
-                          null -> {
-                            isLoading = false
-                          }
+                        } catch (e: IOException) {
+                          navController?.navigate("home")
+                          e.localizedMessage?.let { Log.e("RollUpScreen -> IOException:", it) }
+                        } catch (e: Exception) {
+                          navController?.navigate("home")
+                          e.localizedMessage?.let { Log.e("RollUpScreen -> Exception:", it) }
+                        } finally {
+                          isLoading = false
+                          isTurnOnNotificationSuccess = true
                         }
                       }
                     }
@@ -682,7 +695,7 @@ fun RollUpScreen(
 private fun getDayText(index: Int): String {
   return when (index) {
     0 -> "Chủ nhật"
-    else -> "Ngày ${index + 1}"
+    else -> "Thứ ${index + 1}"
   }
 }
 

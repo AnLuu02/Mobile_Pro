@@ -43,7 +43,8 @@ class UserCouponViewModel(private val repository: UserCouponRepository) : ViewMo
         CouponID: String,
         UserID: String,
         IsUsed: String = "1",
-        NumberOfUses: String = "1"
+        NumberOfUses: String = "1",
+        DateScan: String? = null
     ) {
         if(!isCallApi_AddUserCoupon) {
             _list2.postValue(Resource.loading(null))
@@ -53,11 +54,13 @@ class UserCouponViewModel(private val repository: UserCouponRepository) : ViewMo
                         CouponID = CouponID,
                         UserID = UserID,
                         IsUsed = IsUsed,
-                        NumberOfUses = NumberOfUses
+                        NumberOfUses = NumberOfUses,
+                        DateScan = DateScan
                     )
                     val response = repository.postUserCoupon(post_body = post_body)
                     if (response.isSuccessful) {
                         _list2.postValue(Resource.success(response.body()))
+                        // handleAfterDone
                     } else {
                         _list2.postValue(
                             Resource.error(

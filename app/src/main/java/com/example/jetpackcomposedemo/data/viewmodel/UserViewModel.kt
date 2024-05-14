@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.jetpackcomposedemo.data.models.Identity
-import com.example.jetpackcomposedemo.data.models.POST_Body_UserCoupon
 import com.example.jetpackcomposedemo.data.models.User
 import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.repository.UserCouponRepository
@@ -40,11 +38,11 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() { // s
         }
     }
 
-    fun updateUserPoint(userId: Int, point: Int) {
+    fun updateUserPoint(UserId: Int, Point: Int) {
         if(!isCallApi_updateUserRollUp) {
             viewModelScope.launch {
                 try {
-                    val response = repository.updateUserPoint(userId, point) // // sửa function
+                    val response = repository.updateUserPoint(UserId, Point) // // sửa function
                     if (response.isSuccessful) {
                         _list.postValue(Resource.success(response.body()))
                     } else {
