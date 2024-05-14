@@ -62,10 +62,18 @@ import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
 import com.example.jetpackcomposedemo.data.repository.BookingRepository
 import com.example.jetpackcomposedemo.data.repository.RoomRepository
+<<<<<<< thanhan
+import com.example.jetpackcomposedemo.data.repository.RoomTypeRepository
+import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModelFactory
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModelFactory
+=======
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApiFactory
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModelFactory
+>>>>>>> master
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
@@ -204,10 +212,16 @@ fun MainApp(mainActivity: MainActivity){
             val roomViewModel: RoomViewModel = viewModel(
                 factory = RoomViewModelFactory(RoomRepository(apiService = apiService))
             )
+<<<<<<< thanhan
+            val roomTypeViewModel : RoomTypeViewModel = viewModel (
+                factory = RoomTypeViewModelFactory(RoomTypeRepository(apiService = apiService))
+            )
+=======
             /////////////// view model call api booking ///////////////
             val bookingViewModelApi: BookingViewModelApi = viewModel(factory = BookingViewModelApiFactory(
                 BookingRepository(apiService)
             ))
+>>>>>>> master
             NavHost(navController = navController, startDestination = "StartingAppScreen" ){
 
 
@@ -237,7 +251,7 @@ fun MainApp(mainActivity: MainActivity){
                                     navController.navigate("roomDetails/$roomId")
                                 },
                                 onSelectService = {filter->
-                                    navController.navigate("service/$filter")
+                                    navController.navigate("search/$filter")
                                 })
                         })
                 }
@@ -252,7 +266,7 @@ fun MainApp(mainActivity: MainActivity){
                     SearchScreen(
                         searchViewModel = searchViewModel,
                         onHandleSearchClickButtonSearch = {filter->
-                            navController.navigate("service/$filter")
+                            navController.navigate("search/$filter")
                         },
                         closeSearchScreen={
                             navController.popBackStack("home",inclusive = false)
@@ -274,12 +288,16 @@ fun MainApp(mainActivity: MainActivity){
                         typeBooking = typeBooking,
                         searchViewModel = searchViewModel,
                         roomViewModel = roomViewModel,
+                        roomTypeViewModel = roomTypeViewModel,
                         onBackSearchScreen = {
                             navController.popBackStack()
                         },
                         onOpenSearchScreen = {
                             navController.navigate("search")
-                        }
+                        },
+                        onOpenDetailCardScreen = {roomId->
+                            navController.navigate("roomDetails/$roomId")
+                        },
                     )
                 }
                 //--------------------------------service result -------------------------------------------
@@ -510,6 +528,20 @@ fun MainApp(mainActivity: MainActivity){
                             type = NavType.StringType
                         })
                 ){ backStackEntry ->
+<<<<<<< thanhan
+                    val type = backStackEntry.arguments?.getString("type").toString();
+                    ServiceScreen(
+                        serviceType = type,
+                        onCancelButtonClicked = {
+                            navController.popBackStack()
+                        },
+                        onSearchFieldClicked = {
+                            navController.navigate("search")
+                        },
+                        onOpenDetailCardScreen = {roomId->
+                            navController.navigate("roomDetails/$roomId")
+                        },
+=======
 
                     val roomId = backStackEntry.arguments?.getString("roomId")
                     PaymentScreen(
@@ -517,6 +549,7 @@ fun MainApp(mainActivity: MainActivity){
                         bookingViewModel,
                         loginUiState = loginUiState,
                         navController
+>>>>>>> master
                     )
                 }
 

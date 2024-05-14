@@ -52,22 +52,38 @@ val servicesUI = listOf(
     ServicesUI(
         icon = R.drawable.outline_favorite_border_24,
         title = "Tình yêu",
+<<<<<<< thanhan
+        type = "other"
+=======
         type = "bydate"
+>>>>>>> master
     ),
     ServicesUI(
         icon = R.drawable.outline_local_airport_24,
         title = "Du lịch",
+<<<<<<< thanhan
+        type = "other"
+=======
         type = "bydate"
+>>>>>>> master
     ),
     ServicesUI(
         icon = R.drawable.outline_local_offer_24,
         title = "Ưu đãi",
+<<<<<<< thanhan
+        type = "other"
+=======
         type = "bydate"
+>>>>>>> master
     ),
     ServicesUI(
         icon = R.drawable.outline_fiber_new_24,
         title = "Đổi gió",
+<<<<<<< thanhan
+        type = "other"
+=======
         type = "bydate"
+>>>>>>> master
     ),
 )
 

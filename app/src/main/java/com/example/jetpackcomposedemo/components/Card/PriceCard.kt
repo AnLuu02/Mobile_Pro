@@ -79,7 +79,7 @@ fun PriceCard(
     Box(
         modifier = Modifier
             .then(
-                if(isColumn) Modifier.padding(start = 16.dp,end=16.dp, top=16.dp, bottom = 8.dp) else Modifier.padding(start = 16.dp, end = lastPaddingEnd))
+                if(isColumn) Modifier.padding(start = 16.dp,end=16.dp, top=8.dp, bottom = 8.dp) else Modifier.padding(start = 16.dp, end = lastPaddingEnd))
 
             .clip(shape = MaterialTheme.shapes.small)
             .clickable(
@@ -251,11 +251,9 @@ fun PriceCard(
                             ) {
 //                                val price = DecimalFormat("#,###đ").format(data.price)
                                 Text(
-                                    text = "${data.roomTypes?.prices?.let {
-                                        formatCurrencyVND(
-                                            it
-                                        )
-                                    }}",
+                                    text = formatCurrencyVND(
+                                        data.roomTypes?.bedTypes!![0].total
+                                    ),
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.Bold,
                                     color = if (isImageFull) Color.White else Color.Black,

@@ -67,7 +67,6 @@ fun ServiceScreen(
     onCancelButtonClicked: () -> Unit,
     onSearchFieldClicked: () -> Unit,
     onOpenDetailCardScreen: (String)->Unit,
-    onMapViewButtonClicked: () -> Unit
 ) {
     //get all room
     var lst_room = remember { mutableListOf<Room>() }
@@ -155,12 +154,6 @@ fun ServiceScreen(
     }
     if(isFiltered) {
         val rooms = mutableListOf<Room>();
-//        var typeID = 0
-//        for (type in lst_roomtype) {
-//            if(type.type.contains(typeOption)) {
-//                typeID = type.id
-//            }
-//        }
         for (room in lst_room) {
             if(room.roomTypes?.prices in minPrice..maxPrice && room.roomTypes?.type == serviceType){
                 rooms.add(room)
@@ -250,12 +243,12 @@ fun ServiceScreen(
 //            Text(text = minPrice.toString())
 //            Text(text = maxPrice.toString())
 //            Text(text = capacityOption.toString())
-            FloatingActionButton(
-                onClick = { onMapViewButtonClicked() },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Icon(Icons.Filled.Add, "Floating action button.")
-            }
+//            FloatingActionButton(
+//                onClick = { onMapViewButtonClicked() },
+//                modifier = Modifier.align(Alignment.CenterHorizontally)
+//            ) {
+//                Icon(Icons.Filled.Add, "Floating action button.")
+//            }
         }
     }
 }

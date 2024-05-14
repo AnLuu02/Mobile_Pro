@@ -52,7 +52,6 @@ fun SearchResultTopBar(
     onOpenFilter:(Boolean)->Unit,
     onBackSearchScreen:()->Unit,
     onOpenSearchScreen:()->Unit
-
 ){
     Column(
         modifier = Modifier
@@ -190,7 +189,7 @@ fun TextFieldSearchResult(
         "hourly"->"Theo giờ"
         "overnight"->"Qua đêm"
         "bydate" -> "Theo ngày"
-        else -> ""
+        else -> "Bất kỳ"
     }
 
     val startTimeBooking:String
@@ -224,33 +223,33 @@ fun TextFieldSearchResult(
             endTimeBooking = searchViewModel.getDayAndMonth(typeBooking).timeCheckOut
             if(startTimeBooking != "Bất kì") "$startTimeBooking - $endTimeBooking" else "Bất kì"
         }
-        else ->  {""}
+        else ->  {"Bất kì"}
     }
 
-    if(
-        typeBooking != "hourly" &&
-        typeBooking != "overnight" &&
-        typeBooking != "bydate"){
-        Column {
-            Text(
-                text = "ĐỨC ĐẶT GROUP T4 ƯU ĐÃI VÀNG 200Kl;llllllllllllllllllllllll",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Giảm 10% tối đã 204k",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.W500,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+//    if(
+//        typeBooking != "hourly" &&
+//        typeBooking != "overnight" &&
+//        typeBooking != "bydate"){
+//        Column {
+//            Text(
+//                text = "ĐỨC ĐẶT GROUP T4 ƯU ĐÃI VÀNG 200Kl;llllllllllllllllllllllll",
+//                style = MaterialTheme.typography.titleMedium,
+//                fontWeight = FontWeight.Bold,
+//                maxLines = 1,
+//                overflow = TextOverflow.Ellipsis
+//            )
+//            Spacer(modifier = Modifier.height(4.dp))
+//            Text(
+//                text = "Giảm 10% tối đã 204k",
+//                style = MaterialTheme.typography.titleSmall,
+//                fontWeight = FontWeight.W500,
+//                overflow = TextOverflow.Ellipsis
+//            )
+//        }
+//
+//    }
 
-    }
-
-    else{
+//    else{
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -343,7 +342,7 @@ fun TextFieldSearchResult(
 
 
         }
-    }
+//    }
 
 
 }
