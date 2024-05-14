@@ -72,13 +72,15 @@ import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResultFilterScreen(
     searchViewModel: SearchViewModel,
-    typeBooking:String,
-    visible:Boolean = true,
+    typeBooking: String,
+    visible: Boolean = true,
+    onFilter: () -> Unit,
     onCloseFilter:(Boolean)->Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -88,17 +90,14 @@ fun SearchResultFilterScreen(
     var maxPriceRoom = 0
     var rateScore = ""
     var cleanScore = ""
+    var bedType = ""
     var typeRoom = ""
     var utilitiesRoom:List<String>? = null
-
-
-
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         sheetState.hide()
-
     }
 
 
@@ -118,7 +117,6 @@ fun SearchResultFilterScreen(
                 .background(Color.Black.copy(alpha = 0.1f))
                 .clickable { }
         )
-
         ModalBottomSheet(
             sheetState = sheetState,
             shape = RoundedCornerShape(topStartPercent = 4, topEndPercent = 4),
@@ -193,7 +191,6 @@ fun SearchResultFilterScreen(
         ) {
             Scaffold(
                 bottomBar = {
-
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -210,7 +207,7 @@ fun SearchResultFilterScreen(
                                         minPriceRoom = minPriceRoom,
                                         maxPriceRoom = maxPriceRoom,
                                         rateScore = rateScore,
-                                        cleanScore = cleanScore,
+//                                        cleanScore = cleanScore,
                                         typeRoom = typeRoom,
                                         utilitiesRoom = utilitiesRoom
                                     ))
@@ -218,6 +215,7 @@ fun SearchResultFilterScreen(
                                         sheetState.hide()
                                         onCloseFilter(false)
                                     }
+                                    onFilter()
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -273,20 +271,20 @@ fun SearchResultFilterScreen(
                                 }
                             )
                         }
-                        item {
-                            StarRating("Điểm sạch sẽ",
-                                starRating = {
-                                    cleanScore = it
-                                }
-                            )
-                        }
-                        item {
-                            TypeHotel(
-                                typeRoom = {
-                                    typeRoom = it
-                                }
-                            )
-                        }
+//                        item {
+//                            BedTypeSelector("Loại giường",
+//                                starRating = {
+//                                    bedType = it
+//                                }
+//                            )
+//                        }
+//                        item {
+//                            TypeHotel(
+//                                typeRoom = {
+//                                    typeRoom = it
+//                                }
+//                            )
+//                        }
                         item {
                             UtilitiesHotel(
                                 utilitiesRoom = {
@@ -309,10 +307,11 @@ fun PriceRangeSlider(
 ) {
 
 
-    val priceRange = remember { mutableStateOf(100000f..20000000f) }
-    val rangeLimit = 100000f..20000000f // Phạm vi giới hạn cho slider
-    val slideStart = remember{ mutableStateOf(priceRange.value.start.toInt().toString()) }
-    val slideEnd = remember{ mutableStateOf(priceRange.value.endInclusive.toInt().toString() ) }
+    val priceRange = remember { mutableStateOf(20000f..1000000f) }
+    val rangeLimit = 20000f..1000000f // Phạm vi giới hạn cho slider
+    val step = 48
+    val slideStart = remember{ mutableStateOf(priceRange.value.start.roundToInt().toString()) }
+    val slideEnd = remember{ mutableStateOf(priceRange.value.endInclusive.roundToInt().toString() ) }
     val editPriceStart = remember{ mutableStateOf(false) }
     val editPriceEnd = remember{ mutableStateOf(false) }
     val focusRequesterPriceStart = FocusRequester()
@@ -320,8 +319,6 @@ fun PriceRangeSlider(
 
     minPriceRoom(slideStart.value.toInt())
     maxPriceRoom(slideEnd.value.toInt())
-
-
 
     Box(modifier = Modifier.fillMaxWidth()){
         Column(modifier = Modifier
@@ -337,14 +334,12 @@ fun PriceRangeSlider(
             RangeSlider(
                 value = priceRange.value,
                 onValueChange = { newRange ->
-                    slideStart.value = newRange.start.toInt().toString()
-                    slideEnd.value = newRange.endInclusive.toInt().toString()
+                    slideStart.value = (newRange.start.roundToInt()).toString()
+                    slideEnd.value = (newRange.endInclusive.roundToInt()).toString()
                     priceRange.value = newRange.start .. newRange.endInclusive
-
-
                 },
                 valueRange = rangeLimit,
-                steps = 0,
+                steps = step,
                 colors = SliderDefaults.colors(
                     thumbColor = Color.Red,
                     activeTickColor = Color.Red,
@@ -379,9 +374,9 @@ fun PriceRangeSlider(
                         value = if(editPriceStart.value) slideStart.value else formatCurrencyVND(slideStart.value.toInt()),
                         onValueChange = { newValue ->
                             newValue.toIntOrNull()?.let {
-                                if (it <= 20000000) {
-                                    if(it<100000){
-                                        slideStart.value = "100000"
+                                if (it <= 1000000) {
+                                    if(it < 20000){
+                                        slideStart.value = "20000"
                                     }
                                     else if(it >= slideEnd.value.toInt()){
                                         slideStart.value = it.toString()
@@ -391,7 +386,7 @@ fun PriceRangeSlider(
                                         slideStart.value = it.toString()
                                     }
                                 } else{
-                                    slideStart.value = "20000000"
+                                    slideStart.value = "1000000"
                                     slideEnd.value =  slideStart.value
                                 }
                                 priceRange.value = slideStart.value.toFloat() .. slideEnd.value.toFloat()
@@ -452,14 +447,13 @@ fun PriceRangeSlider(
                     }
 
                 ){
-
                     OutlinedTextField(
                         value = if(editPriceEnd.value) slideEnd.value else formatCurrencyVND(slideEnd.value.toInt()),
                         onValueChange = { newValue ->
                             newValue.toIntOrNull()?.let {
-                                if (it <= 20000000) {
-                                    if(it<100000){
-                                        slideEnd.value = "100000"
+                                if (it <= 1000000) {
+                                    if(it < 20000){
+                                        slideEnd.value = "20000"
                                         slideStart.value = slideEnd.value
                                     }
                                     else if(it >= slideStart.value.toInt()){
@@ -470,7 +464,7 @@ fun PriceRangeSlider(
                                         slideStart.value = slideEnd.value
                                     }
                                 } else {
-                                    slideEnd.value = "20000000"
+                                    slideEnd.value = "1000000"
                                 }
                                 priceRange.value = slideStart.value.toFloat() .. slideEnd.value.toFloat()
                             }
@@ -622,12 +616,114 @@ fun StarRating(
     }
 }
 
+@Composable
+fun BedTypeSelector(
+    title:String,
+    starRating:(String)->Unit
+) {
+    val selectedRate = remember{ mutableStateOf("") }
+    val dataStarRate = listOf("Đơn","Đôi","Đa")
+    var lastPadding: Dp
+
+    Box(modifier = Modifier.fillMaxWidth()){
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = title,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding( bottom = 16.dp)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                dataStarRate.forEachIndexed{index,item->
+                    lastPadding = if(index < dataStarRate.size-1){
+                        8.dp
+                    } else{
+                        0.dp
+                    }
+                    val selected = item == selectedRate.value
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = lastPadding)
+                            .background(
+                                Color.LightGray.copy(alpha = 0.3f),
+                                shape = MaterialTheme.shapes.extraLarge
+                            )
+                            .then(
+                                if (selected) Modifier.border(
+                                    border = BorderStroke(1.dp, Color.Red),
+                                    shape = MaterialTheme.shapes.extraLarge
+                                ) else Modifier
+                            )
+                            .clip(shape = MaterialTheme.shapes.extraLarge)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = rememberRipple(bounded = true)
+                            ) {
+                                selectedRate.value = item
+                                starRating(item)
+                            }
+
+                    ){
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 8.dp, bottom = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "> $item",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.W500,
+                                color = if(selected) Color.Red else  Color.Black
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+//                            Icon(
+//                                imageVector = Icons.Default.Star,
+//                                contentDescription = "",
+//                                tint = Color(255,215,0),
+//                                modifier = Modifier.size(24.dp)
+//                            )
+                        }
+                    }
+                }
+            }
+        }
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(0.5.dp)
+                .background(Color.LightGray.copy(alpha = 0.1f))
+                .align(Alignment.BottomCenter)
+
+        )
+    }
+}
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TypeHotel(
     typeRoom:(String)->Unit
 ) {
-    val dataTypeHotel = listOf("Flash Sale","EasyBoking","Ưu đãi đặc biệt","Khuyến mãi","Nổi bật","Mới","Tem")
+    val dataTypeHotel = listOf(
+        "Flash Sale",
+        "EasyBoking",
+        "Ưu đãi đặc biệt",
+        "Khuyến mãi",
+        "Nổi bật",
+        "Mới",
+        "Tem"
+    )
     val selectedTypeHotel = remember{ mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxWidth()){
@@ -702,7 +798,14 @@ fun TypeHotel(
 fun UtilitiesHotel(
     utilitiesRoom:(List<String>)->Unit
 ) {
-    val dataUtilitiesHotel = listOf("Wi-Fi miễn phí","Ghế tình yêu","Lễ tân 24/24","Bồn tắm","Smart TV","Điều hòa ","Két sắt","Tủ lạnh")
+    val dataUtilitiesHotel = listOf(
+        "Wi-Fi",
+        "Bồn tắm",
+        "Smart TV",
+        "Tủ lạnh",
+        "Điều hòa",
+        "Tiện nghi là/ủi"
+    )
     val checkBoxStates = remember { mutableStateListOf<Boolean>().apply {
         for (i in 1..dataUtilitiesHotel.size) {
             add(false)

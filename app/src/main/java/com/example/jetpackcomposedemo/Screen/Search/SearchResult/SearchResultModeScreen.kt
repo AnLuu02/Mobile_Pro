@@ -34,12 +34,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
 import com.example.jetpackcomposedemo.Screen.Search.SortMethod
+import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.UnmodifiableListIterator
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResultModeScreen(
     searchViewModel:SearchViewModel,
+    onSort: () -> Unit = {},
     onCloseModeSort:(Boolean)->Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -77,7 +79,11 @@ fun SearchResultModeScreen(
             }
         },
         content = {
-            OptionsSort(searchViewModel = searchViewModel,onCloseModeSort = onCloseModeSort)
+            OptionsSort(
+                searchViewModel = searchViewModel,
+                onSort = onSort,
+                onCloseModeSort = onCloseModeSort
+            )
         }
     )
 }
@@ -93,26 +99,27 @@ data class SortOption(
 @Composable
 fun OptionsSort(
     searchViewModel:SearchViewModel,
+    onSort: () -> Unit,
     onCloseModeSort:(Boolean)->Unit
 ){
     val options =  remember {
         mutableStateOf(
             listOf(
-                SortOption(
-                    type = "phuhopnhat",
-                    title = "Phù hợp nhất"
-                ),
+//                SortOption(
+//                    type = "phuhopnhat",
+//                    title = "Phù hợp nhất"
+//                ),
                 SortOption(
                     type = "danhgiacaothap",
                     title = "Điểm đánh giá từ cao đến thấp",
                 ),
                 SortOption(
-                    type = "giathapcao",
-                    title = "Giá từ thấp đến cao"
+                    type = "tangdan",
+                    title = "Giá tăng dần"
                 ),
                 SortOption(
-                    type = "giacaothap",
-                    title = "Giá từ cao đến thấp"
+                    type = "giamdan",
+                    title = "Giá giảm dần"
                 )
             )
         )
@@ -135,6 +142,7 @@ fun OptionsSort(
                 ) {
                     selectedOption.value = item.type
                     searchViewModel.setSortMethod(SortMethod(sortMethod = item.type))
+                    onSort()
                     onCloseModeSort(false)
                 }
             ) {
@@ -157,6 +165,7 @@ fun OptionsSort(
                             selectedOption.value = item.type
                             searchViewModel.setSortMethod(SortMethod(sortMethod = item.type))
                             onCloseModeSort(false)
+                            onSort()
                         },
                         colors = RadioButtonDefaults.colors(
                             selectedColor = Color.Red,

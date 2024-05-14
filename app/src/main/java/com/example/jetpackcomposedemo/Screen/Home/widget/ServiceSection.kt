@@ -55,22 +55,26 @@ val servicesUI = listOf(
         title = "Theo ngày",
         type = "bydate"
     ),
-//    ServicesUI(
-//        icon = R.drawable.outline_favorite_border_24,
-//        title = "Tình yêu"
-//    ),
-//    ServicesUI(
-//        icon = R.drawable.outline_local_airport_24,
-//        title = "Du lịch"
-//    ),
-//    ServicesUI(
-//        icon = R.drawable.outline_local_offer_24,
-//        title = "Ưu đãi"
-//    ),
-//    ServicesUI(
-//        icon = R.drawable.outline_fiber_new_24,
-//        title = "Đổi gió"
-//    ),
+    ServicesUI(
+        icon = R.drawable.outline_favorite_border_24,
+        title = "Tình yêu",
+        type = "other"
+    ),
+    ServicesUI(
+        icon = R.drawable.outline_local_airport_24,
+        title = "Du lịch",
+        type = "other"
+    ),
+    ServicesUI(
+        icon = R.drawable.outline_local_offer_24,
+        title = "Ưu đãi",
+        type = "other"
+    ),
+    ServicesUI(
+        icon = R.drawable.outline_fiber_new_24,
+        title = "Đổi gió",
+        type = "other"
+    ),
 )
 
 @Composable

@@ -52,6 +52,9 @@ import com.example.jetpackcomposedemo.components.LoadingSpinner
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
 import com.example.jetpackcomposedemo.data.repository.RoomRepository
+import com.example.jetpackcomposedemo.data.repository.RoomTypeRepository
+import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModelFactory
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModelFactory
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
@@ -104,6 +107,9 @@ fun MainApp(){
             val roomViewModel: RoomViewModel = viewModel(
                 factory = RoomViewModelFactory(RoomRepository(apiService = apiService))
             )
+            val roomTypeViewModel : RoomTypeViewModel = viewModel (
+                factory = RoomTypeViewModelFactory(RoomTypeRepository(apiService = apiService))
+            )
             NavHost(navController = navController, startDestination = "StartingAppScreen" ){
 
 
@@ -133,7 +139,7 @@ fun MainApp(){
                                     navController.navigate("roomDetails/$roomId")
                                 },
                                 onSelectService = {filter->
-                                    navController.navigate("service/$filter")
+                                    navController.navigate("search/$filter")
                                 })
                         })
                 }
@@ -148,7 +154,7 @@ fun MainApp(){
                     SearchScreen(
                         searchViewModel = searchViewModel,
                         onHandleSearchClickButtonSearch = {filter->
-                            navController.navigate("service/$filter")
+                            navController.navigate("search/$filter")
                         },
                         closeSearchScreen={
                             navController.popBackStack("home",inclusive = false)
@@ -170,12 +176,16 @@ fun MainApp(){
                         typeBooking = typeBooking,
                         searchViewModel = searchViewModel,
                         roomViewModel = roomViewModel,
+                        roomTypeViewModel = roomTypeViewModel,
                         onBackSearchScreen = {
                             navController.popBackStack()
                         },
                         onOpenSearchScreen = {
                             navController.navigate("search")
-                        }
+                        },
+                        onOpenDetailCardScreen = {roomId->
+                            navController.navigate("roomDetails/$roomId")
+                        },
                     )
                 }
 
@@ -364,9 +374,6 @@ fun MainApp(){
                         onOpenDetailCardScreen = {roomId->
                             navController.navigate("roomDetails/$roomId")
                         },
-                        onMapViewButtonClicked = {
-                            navController.navigate("map")
-                        }
                     )
                 }
                 composable(

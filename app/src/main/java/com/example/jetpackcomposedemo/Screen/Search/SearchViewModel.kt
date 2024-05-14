@@ -56,10 +56,10 @@ class SearchViewModel:ViewModel() {
         }
     }
 
-    fun getFilterRoom():MutableState<FilterRoom>{
+    fun getFilterRoom(): MutableState<FilterRoom>{
         return _filterRoom
     }
-    fun getSortMethod():MutableState<SortMethod>{
+    fun getSortMethod(): MutableState<SortMethod>{
         return _sortRoom
     }
 
