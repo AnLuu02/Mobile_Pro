@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.components.Card.CardSimple
 import com.example.jetpackcomposedemo.components.Card.PriceCard
 import com.example.jetpackcomposedemo.data.models.Room.Room
@@ -17,6 +18,7 @@ fun CardSection(
     isImageFull: Boolean = false,
     isDiscount: Boolean = false,
     hasPrice: Boolean = false,
+    navController: NavHostController,
     onOpenDetailCardScreen:(String)->Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -40,7 +42,11 @@ fun CardSection(
                             onOpenDetailCardScreen = onOpenDetailCardScreen
                         )
                     } else {
-                        CardSimple(index = it, data)
+                        CardSimple(
+                            room = data[it],
+                            isLastItem = it >= data.size - 1,
+                            navController = navController
+                        )
                     }
 
                 }

@@ -63,9 +63,10 @@ import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBooking.DatePickerBookingScreen
-import com.example.jetpackcomposedemo.components.Dialog.AlertDialogExample
+import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
 import com.example.jetpackcomposedemo.data.models.BedType.BedType
 import com.example.jetpackcomposedemo.data.models.Room.Room
+import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -75,6 +76,7 @@ import java.time.format.DateTimeFormatter
 fun ListRoomScreen(
     searchViewModel: SearchViewModel,
     bookingViewModel: BookingViewModel,
+    bookingViewModelApi:BookingViewModelApi,
     onOpenPayment:()->Unit,
     onBack:()->Unit
 ) {
@@ -672,17 +674,28 @@ fun CardListRoom(
         }
     }
     if(openAlertDialog.value){
-        AlertDialogExample(
-            onDismissRequest = {
-                openAlertDialog.value = false
-            },
+//        AlertDialogExample(
+//            onDismissRequest = {
+//                openAlertDialog.value = false
+//            },
+//            onConfirmation = {
+//                openAlertDialog.value = false
+//                onOpenPayment()
+//            },
+//            dialogTitle = "Yêu cầu thanh toán trả trước",
+//            dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
+//        )
+
+        DialogMessage(
+            onDismissRequest = {openAlertDialog.value = false},
             onConfirmation = {
                 openAlertDialog.value = false
                 onOpenPayment()
             },
             dialogTitle = "Yêu cầu thanh toán trả trước",
-            dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
+            dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm."
         )
+
     }
 }
 

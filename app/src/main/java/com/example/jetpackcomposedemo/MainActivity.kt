@@ -5,6 +5,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,10 +32,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
-import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.WaitingPaymentScreen.WaitingPaymentScreen
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.CountDownPaymentViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
@@ -43,6 +46,7 @@ import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedScreen
 import com.example.jetpackcomposedemo.Screen.Proposed.ProposedTopBar
 import com.example.jetpackcomposedemo.Screen.Search.ChooseDiscountScreen
+import com.example.jetpackcomposedemo.Screen.Search.InfoBookingScreen
 import com.example.jetpackcomposedemo.Screen.Search.ListRoomScreen
 import com.example.jetpackcomposedemo.Screen.Search.MyBookingScreen
 import com.example.jetpackcomposedemo.Screen.Search.PaymentScreen
@@ -62,18 +66,15 @@ import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
 import com.example.jetpackcomposedemo.data.repository.BookingRepository
 import com.example.jetpackcomposedemo.data.repository.RoomRepository
-<<<<<<< thanhan
 import com.example.jetpackcomposedemo.data.repository.RoomTypeRepository
 import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModelFactory
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModel.RoomViewModelFactory
-=======
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApiFactory
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModelFactory
->>>>>>> master
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
@@ -87,6 +88,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import vn.zalopay.sdk.ZaloPaySDK
 
 
 class MainActivity : ComponentActivity() {
@@ -162,10 +164,13 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val policy = ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+        // ZaloPay SDK Init
+        ZaloPaySDK.init(2554, vn.zalopay.sdk.Environment.SANDBOX)
 
         setContent {
-            val context = LocalContext.current
+//            val context = LocalContext.current
 //            val db = RemindersDB.getInstance(context)
 //            val reminderRepository = ReminderRepository(db)
 //            val myViewModel = ReminderViewModel(reminderRepository)
@@ -177,24 +182,26 @@ class MainActivity : ComponentActivity() {
 //                   myViewModel.deleteReminder(ReminderEntity(it.id,it.time))
 //               }
 //           }
-            val delayInMillis = TimeUnit.SECONDS.toMillis(30)
-            val notificationWorkRequest = OneTimeWorkRequestBuilder<NotifyWorker>()
-                .setInitialDelay(delayInMillis, TimeUnit.MILLISECONDS) // Đặt độ trễ ban đầu là 30 giây
-                .build()
+//            val delayInMillis = TimeUnit.SECONDS.toMillis(30)
+//            val notificationWorkRequest = OneTimeWorkRequestBuilder<NotifyWorker>()
+//                .setInitialDelay(delayInMillis, TimeUnit.MILLISECONDS) // Đặt độ trễ ban đầu là 30 giây
+//                .build()
+//
+//            WorkManager.getInstance(context).enqueue(notificationWorkRequest)
 
-            WorkManager.getInstance(context).enqueue(notificationWorkRequest)
-
-            MainApp(
-                mainActivity = this@MainActivity
-            )
+            MainApp(this@MainActivity)
 //            HomeScreenReminder()
         }
+    }
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        ZaloPaySDK.getInstance().onResult(intent)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainApp(mainActivity: MainActivity){
+fun MainApp(mainActivity: MainActivity) {
     val navController = rememberNavController()
     JetpackComposeDemoTheme {
         Surface(
@@ -212,18 +219,46 @@ fun MainApp(mainActivity: MainActivity){
             val roomViewModel: RoomViewModel = viewModel(
                 factory = RoomViewModelFactory(RoomRepository(apiService = apiService))
             )
-<<<<<<< thanhan
             val roomTypeViewModel : RoomTypeViewModel = viewModel (
                 factory = RoomTypeViewModelFactory(RoomTypeRepository(apiService = apiService))
             )
-=======
             /////////////// view model call api booking ///////////////
             val bookingViewModelApi: BookingViewModelApi = viewModel(factory = BookingViewModelApiFactory(
                 BookingRepository(apiService)
             ))
->>>>>>> master
+
+            if(loginUiState.isLoggedIn){
+                bookingViewModelApi.getListMyBooking(1.toString())
+//                bookingViewModelApi.getListMyBooking(loginUiState.id.toString())
+
+            }
+
+            /////////  thời gian thanh toán còn lại trước khi tự động hủy  //////////////////////////
+            val countDownPaymentViewModel:CountDownPaymentViewModel = viewModel()
             NavHost(navController = navController, startDestination = "StartingAppScreen" ){
 
+
+                composable("infobooking/{roomId}/{status}",
+                    arguments = listOf(
+                        navArgument("roomId"){
+                            type = NavType.StringType
+                        },
+                        navArgument("status"){
+                            type = NavType.StringType
+                        }
+                    )
+                ){backStackEntry->
+                    val roomId = backStackEntry.arguments?.getString("roomId").toString()
+                    val status = backStackEntry.arguments?.getString("status").toString()
+                    InfoBookingScreen(
+                        countDownPaymentViewModel = countDownPaymentViewModel,
+                        status = status,
+                        roomId = roomId,
+                        bookingViewModel = bookingViewModel,
+                        navController = navController,
+                        loginUiState = loginUiState
+                    )
+                }
 
                 //----------------------------------- HOME ------------------------------
                 composable("home"){
@@ -312,6 +347,7 @@ fun MainApp(mainActivity: MainActivity){
                     val type = backStackEntry.arguments?.getString("type").toString();
                     ServiceScreen(
                         serviceType = type,
+                        navController = navController,
                         onCancelButtonClicked = {
                             navController.popBackStack()
                         },
@@ -321,9 +357,6 @@ fun MainApp(mainActivity: MainActivity){
                         onOpenDetailCardScreen = {roomId->
                             navController.navigate("roomDetails/$roomId")
                         },
-                        onMapViewButtonClicked = {
-                            navController.navigate("map")
-                        }
                     )
                 }
 
@@ -333,9 +366,11 @@ fun MainApp(mainActivity: MainActivity){
                         navController = navController,
                         topBar = { ProposedTopBar() },
                         content = { padding, _ ->
-                            ProposedScreen(padding = padding, onOpenDetailCardScreen = {roomId->
-                                navController.navigate("roomDetails/$roomId")
-                            })
+                            ProposedScreen(
+                                roomViewModel = roomViewModel,
+                                padding = padding,
+                                navController = navController
+                            )
                         })
                 }
 
@@ -464,8 +499,10 @@ fun MainApp(mainActivity: MainActivity){
                 ){backStackEntry->
                     val uid = backStackEntry.arguments?.getString("uid").toString()
                     MyBookingScreen(
+                        countDownPaymentViewModel = countDownPaymentViewModel,
                         uid = uid,
                         bookingViewModel = bookingViewModel,
+                        bookingViewModelApi = bookingViewModelApi,
                         navController = navController
                     )
                 }
@@ -482,6 +519,7 @@ fun MainApp(mainActivity: MainActivity){
                     val roomId = backStackEntry.arguments?.getString("roomId")
 
                     CardDetailScreen(
+                        navController = navController,
                         loginUiState = loginUiState,
                         searchViewModel = searchViewModel,
                         bookingViewModel=bookingViewModel,
@@ -511,7 +549,8 @@ fun MainApp(mainActivity: MainActivity){
                     val roomId = backStackEntry.arguments?.getString("roomId")
                     ListRoomScreen(
                         searchViewModel = searchViewModel,
-                        bookingViewModel,
+                        bookingViewModel = bookingViewModel,
+                        bookingViewModelApi = bookingViewModelApi,
                         onOpenPayment = {
                             navController.navigate("roomDetails/$roomId/payment")
                         },
@@ -528,28 +567,16 @@ fun MainApp(mainActivity: MainActivity){
                             type = NavType.StringType
                         })
                 ){ backStackEntry ->
-<<<<<<< thanhan
-                    val type = backStackEntry.arguments?.getString("type").toString();
-                    ServiceScreen(
-                        serviceType = type,
-                        onCancelButtonClicked = {
-                            navController.popBackStack()
-                        },
-                        onSearchFieldClicked = {
-                            navController.navigate("search")
-                        },
-                        onOpenDetailCardScreen = {roomId->
-                            navController.navigate("roomDetails/$roomId")
-                        },
-=======
+
 
                     val roomId = backStackEntry.arguments?.getString("roomId")
                     PaymentScreen(
+                        mainActivity = mainActivity,
                         bookingViewModelApi = bookingViewModelApi,
-                        bookingViewModel,
+                        bookingViewModel = bookingViewModel,
                         loginUiState = loginUiState,
-                        navController
->>>>>>> master
+                        navController = navController,
+                        countDownPaymentViewModel = countDownPaymentViewModel
                     )
                 }
 
@@ -558,19 +585,9 @@ fun MainApp(mainActivity: MainActivity){
                 composable(
                     "roomDetails/chooseDiscount",
                 ){
-                    ChooseDiscountScreen(bookingViewModel = bookingViewModel, navController = navController)
+                    ChooseDiscountScreen(bookingViewModel = bookingViewModel, navController = navController,loginUiState)
                 }
 
-
-                composable(
-                    "roomDetails/waitingpayment",
-                ){
-                    WaitingPaymentScreen(
-                        bookingViewModel = bookingViewModel,
-                        onPayloadChoose = {},
-                        closeScreenChooseMethodPayment = {}
-                    )
-                }
             }
         }
     }

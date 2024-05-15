@@ -44,12 +44,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.data.models.Room.Room
-import java.text.DecimalFormat
 import coil.request.ImageRequest
 import coil.size.Scale
+import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
+import com.example.jetpackcomposedemo.data.models.Room.Room
 
 
 @Composable

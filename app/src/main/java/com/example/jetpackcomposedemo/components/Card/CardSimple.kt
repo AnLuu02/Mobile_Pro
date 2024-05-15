@@ -1,12 +1,5 @@
 package com.example.jetpackcomposedemo.components.Card
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,66 +21,39 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.jetpackcomposedemo.R
+import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Scale
+import com.example.jetpackcomposedemo.data.models.Room.Room
 
 @Composable
-fun <T> CardSimple(
-    index: Int,
-    data: List<T>
+fun  CardSimple(
+    isLastItem: Boolean = false,
+    room: Room,
+    navController: NavHostController
 ) {
     val screenWidth = with(LocalDensity.current) {
         LocalConfiguration.current.screenWidthDp.dp
     }
     var lastPaddingEnd = 0.dp
-    if (index == data.size - 1) {
+
+    if (isLastItem) {
         lastPaddingEnd = 16.dp
     }
-
-
-    ///////////////////////////////////////////////shimmer////////////////////////////////////////
-    val shimmerColors = listOf(
-        Color.LightGray.copy(alpha = 0.6f),
-        Color.LightGray.copy(alpha = 0.2f),
-        Color.LightGray.copy(alpha = 0.6f),
-    )
-
-    val transition = rememberInfiniteTransition(label = "")
-    val translateAnim = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 1000,
-                easing = FastOutSlowInEasing
-            ),
-            repeatMode = RepeatMode.Reverse
-        ), label = ""
-    )
-
-    val brush = Brush.linearGradient(
-        colors = shimmerColors,
-        start = Offset.Zero,
-        end = Offset(x = translateAnim.value, y = translateAnim.value)
-    )
-////////////////////////////////////////shimmer////////////////////////////////////////
-
-
-    val loading = remember{ mutableStateOf(true) }
 
     Card(
         modifier = Modifier
@@ -97,19 +63,20 @@ fun <T> CardSimple(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true)
-            ) { },
+            ) {
+                navController.navigate("roomDetails/${room.id}")
+            },
     ) {
 
         Box(modifier = Modifier
             .height(180.dp)
             .width(screenWidth * 10 / 25)) {
-
-            Image(
-                painter = painterResource(id = R.drawable.hotel_1),
-                contentDescription = "",
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                    .crossfade(true).data(room.images?.get(0)).build(),
                 contentScale = ContentScale.Crop,
+                contentDescription = null,
                 modifier = Modifier.fillMaxSize()
-
             )
             Box(
                 modifier = Modifier
@@ -125,8 +92,6 @@ fun <T> CardSimple(
                     )
             )
 
-
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -138,8 +103,8 @@ fun <T> CardSimple(
                 ) {
 
                     Text(
-                        text = "MIDAS HOTEL",
-                        fontSize = 16.sp,
+                        text = room.name  ?: "MIDAS HOTEL",
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
@@ -153,16 +118,16 @@ fun <T> CardSimple(
                             imageVector = Icons.Rounded.Star,
                             contentDescription = "",
                             tint = Color(255,215,0),
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(24.dp),
 
                             )
 
                         Spacer(modifier = Modifier.width(2.dp))
 
                         Text(
-                            text = "4.8(1079)",
+                            text = "${room.rating}(1079)",
                             color = Color.White,
-                            style = MaterialTheme.typography.bodySmall
+                            fontSize = 16.sp
                         )
 
                     }

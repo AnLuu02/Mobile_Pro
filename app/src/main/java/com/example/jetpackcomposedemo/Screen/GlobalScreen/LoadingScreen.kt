@@ -1,16 +1,12 @@
 package com.example.jetpackcomposedemo.Screen.GlobalScreen
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -72,7 +68,7 @@ fun LoadingScreen(isLoadingValue: Boolean = true) {
     )
 
     Box(
-      modifier = Modifier.fillMaxSize().background(appColor.gray3),
+      modifier = Modifier.fillMaxSize().background(Color.Black.copy(0.4f)),
       contentAlignment = Alignment.Center
     ) {
       val dotText = buildAnnotatedString {

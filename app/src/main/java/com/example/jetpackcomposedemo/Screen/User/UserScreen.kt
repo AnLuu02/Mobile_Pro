@@ -68,7 +68,9 @@ fun UserScreen(
                         modifier = Modifier.padding(12.dp,20.dp,12.dp,16.dp)
                     )
                     SettingElement(Icons.Filled.LockClock,"Đặt phòng của tôi", onClick = {
-                        navController.navigate("user/${loginUiState.uid}/mybooking")
+//                        navController.navigate("user/${loginUiState.id}/mybooking")
+                        navController.navigate("user/${1}/mybooking")
+
                     })
                     SettingElement(Icons.Filled.HeartBroken,"Khách sạn yêu thích")
                 }

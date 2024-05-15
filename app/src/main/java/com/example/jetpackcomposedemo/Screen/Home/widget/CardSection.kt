@@ -25,6 +25,7 @@ fun CardSection(
     hasPrice: Boolean = false,
     onOpenDetailCardScreen:(String)->Unit,
 ) {
+    val typeRooms = data.filter { (it.roomTypes?.type ?: "hourly") == typeBooking }
     TitleMain(
         typeBooking = typeBooking,
         title = titleListCard,
@@ -32,7 +33,7 @@ fun CardSection(
             navController.navigate("search/${it.toString()}")
         })
     LazyRow {
-        itemsIndexed(data){index,item->
+        itemsIndexed(typeRooms){index,item->
             if (hasPrice) {
                 PriceCard(
                     index = index,
@@ -40,10 +41,15 @@ fun CardSection(
                     isSale = isSale,
                     isDiscount = isDiscount,
                     isImageFull = isImageFull,
+                    isLastItem = index >= typeRooms.size - 1,
                     onOpenDetailCardScreen = onOpenDetailCardScreen
                 )
             } else {
-                CardSimple(index = index, data)
+                CardSimple(
+                    room = item,
+                    isLastItem = index >= data.size - 1,
+                    navController =  navController
+                )
             }
         }
 

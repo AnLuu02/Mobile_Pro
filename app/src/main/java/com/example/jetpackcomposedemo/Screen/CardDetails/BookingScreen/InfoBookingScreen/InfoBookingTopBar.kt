@@ -1,4 +1,4 @@
-package com.example.jetpackcomposedemo.Screen.Search
+package com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.InfoBookingScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,29 +13,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
+import androidx.navigation.NavHostController
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MethodPaymentTopBar(
-    sheetState: SheetState,
-    closeScreenChooseMethodPayment:(Boolean)->Unit
+fun InfoBookingTopBar(
+    navController:NavHostController
 ) {
 
-    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -44,11 +38,12 @@ fun MethodPaymentTopBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(top = 48.dp),
         ){
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp)
+                    .padding(start = 12.dp,end=12.dp, bottom = 16.dp)
             ){
                 Box(
                     modifier = Modifier
@@ -56,14 +51,7 @@ fun MethodPaymentTopBar(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = false, radius = 24.dp),
-                            onClick = {
-                                coroutineScope.launch {
-                                    sheetState.hide()
-                                    closeScreenChooseMethodPayment(false)
-
-                                }
-
-                            }
+                            onClick = {navController.popBackStack()}
                         )
                     ,
                     contentAlignment = Alignment.Center
@@ -76,7 +64,7 @@ fun MethodPaymentTopBar(
                     )
                 }
                 Text(
-                    text = "Phương thức thanh toán",
+                    text = "Thông tin đặt phòng",
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.align(Alignment.Center),
                     fontWeight = FontWeight.Bold

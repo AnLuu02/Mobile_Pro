@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.ripple.rememberRipple
@@ -33,7 +32,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MethodWaitingPaymentTopBar(
     sheetState: SheetState,
-    closeScreenChooseMethodPayment:(Boolean)->Unit
+    closeScreenWaitingPayment:(Boolean)->Unit
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -53,7 +52,6 @@ fun MethodWaitingPaymentTopBar(
             ){
                 Box(
                     modifier = Modifier
-                        .background(color = Color.White, shape = CircleShape)
                         .align(Alignment.CenterStart)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
@@ -61,8 +59,7 @@ fun MethodWaitingPaymentTopBar(
                             onClick = {
                                 coroutineScope.launch {
                                     sheetState.hide()
-                                    closeScreenChooseMethodPayment(false)
-
+                                    closeScreenWaitingPayment(false)
                                 }
 
                             }
@@ -75,6 +72,7 @@ fun MethodWaitingPaymentTopBar(
                         contentDescription = "back",
                         modifier = Modifier
                             .size(20.dp)
+                            .background(Color.Transparent)
                     )
                 }
                 Text(

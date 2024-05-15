@@ -48,7 +48,6 @@ fun ChooseDiscountTopBar(
             ){
                 Box(
                     modifier = Modifier
-                        .background(color = Color.White, shape = CircleShape)
                         .align(Alignment.CenterStart)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },

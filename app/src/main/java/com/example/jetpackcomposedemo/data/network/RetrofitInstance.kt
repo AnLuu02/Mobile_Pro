@@ -12,7 +12,9 @@ object RetrofitInstance {
 
     private const val ipv4Address = "192.168.0.101";
     private const val port = "8080";
-    private const val BASE_URL = "http://$ipv4Address:$port/";
+//        private const val BASE_URL = "http://$ipv4Address:$port/";
+    private const val BASE_URL = "https://f48c-1-53-27-26.ngrok-free.app/";
+
 
     fun getServerUrl(): String {
         return BASE_URL

@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.Screen.Services.widget.CardSection
 import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.models.RoomType
@@ -64,6 +65,7 @@ fun filterByType(list: MutableList<Room>, type: String) : MutableList<Room> {
 @Composable
 fun ServiceScreen(
     serviceType:String,
+    navController:NavHostController,
     onCancelButtonClicked: () -> Unit,
     onSearchFieldClicked: () -> Unit,
     onOpenDetailCardScreen: (String)->Unit,
@@ -223,6 +225,7 @@ fun ServiceScreen(
                     isDiscount = true,
                     hasPrice = true,
                     isImageFull = true,
+                    navController = navController,
                     onOpenDetailCardScreen = onOpenDetailCardScreen,
                 )
             }

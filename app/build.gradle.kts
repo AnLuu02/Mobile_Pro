@@ -140,7 +140,9 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-
+    //------------------------------------payment--------------------------------
+    //zalopay
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar"))))
     // Scan QR
 //    implementation("androidx.camera:camera-camera2:1.0.2")
 //    implementation("androidx.camera:camera-lifecycle:1.0.2")
@@ -156,3 +158,4 @@ dependencies {
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
 }
+

@@ -7,6 +7,7 @@ class UserBookingInfo(
     @SerializedName("User_ID")  val uID:Int? = null,
     @SerializedName("ApplyDiscount_ID")  val discountID:Int? = null,
     @SerializedName("Bill_ID")  val billID:Int? = null,
+    @SerializedName("TimeBooking")  val timeBooking:String? = null,
     @SerializedName("TypePayment")  val typePayment:String? = null,
     @SerializedName("TypeBooking")  val typeBooking:String? = null,
     @SerializedName("Status") val status:Int? = null
