@@ -3,10 +3,10 @@ package com.example.jetpackcomposedemo.Screen.CardDetails
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.jetpackcomposedemo.Screen.Search.Discount
 import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
 import com.example.jetpackcomposedemo.data.models.BedType.BedType
 import com.example.jetpackcomposedemo.data.models.Room.Room
+import com.example.jetpackcomposedemo.data.models.UserCoupon
 
 
 data class BookingResult(
@@ -17,10 +17,10 @@ data class BookingResult(
     var nameCustomer:String? = null,
     var phoneCustomer:String? = null,
     var totalTime:String? = null,
-    var status:String? = null,
+    var status:Int? = null,
     var infoRoom: Room? = null,
     var bedType:BedType? = null,
-    var discount: Discount? = null,
+    var discount: UserCoupon? = null,
     var tokenPayment:String?=null,
 )
 
@@ -54,9 +54,9 @@ class BookingViewModel: ViewModel() {
     fun setNameCustomer(nameCustomer:String) { _bookingResult.value.nameCustomer = nameCustomer}
     fun setPhoneCustomer(phoneCustomer:String) { _bookingResult.value.phoneCustomer = phoneCustomer}
     fun setTotalTime(totalTime:String) { _bookingResult.value.totalTime = totalTime}
-    fun setStatus(status:String) { _bookingResult.value.status = status}
+    fun setStatus(status: Int) { _bookingResult.value.status = status}
     fun setInfoRoom(infoRoom: Room?) { _bookingResult.value.infoRoom = infoRoom}
     fun setBedType(bedType: BedType?) { _bookingResult.value.bedType = bedType}
-    fun setDiscount(discount: Discount?) { _bookingResult.value.discount = discount}
+    fun setDiscount(discount: UserCoupon?) { _bookingResult.value.discount = discount}
     fun setTokenPayment(tokenPayment: String?) { _bookingResult.value.tokenPayment = tokenPayment}
 }

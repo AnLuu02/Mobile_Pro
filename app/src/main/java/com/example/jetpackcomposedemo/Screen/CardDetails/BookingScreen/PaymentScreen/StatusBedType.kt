@@ -1,22 +1,12 @@
 package com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen
 
-enum class StatusPayment(
+enum class StatusBedType(
     val status: Int,
 ) {
-    NON(
+    UNAVAILABLE(
         status = 0
     ),
-    PENDING(
+    AVAILABLE(
         status = 1
-    ),
-
-    PAID(
-        status = 2
-    ),
-    CANCEL(
-        status = 3
-    ),
-    DONE(
-        status = 4
     )
 }

@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
@@ -37,7 +38,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -76,6 +79,11 @@ fun CardDetailScreen(
     onOpenLoginScreen:()->Unit,
     onBack:()->Unit
 ) {
+    val screenWidth = with(LocalDensity.current) {
+        LocalConfiguration.current.screenWidthDp.dp
+    }
+    val size3Image = (screenWidth/3)
+
     val listState = rememberLazyListState()
     val openDialogLoginRequired = remember { mutableStateOf(false) }
 
@@ -89,9 +97,9 @@ fun CardDetailScreen(
     var totalTime = "1"
     var (numberReload,setNumberReload) = remember { mutableIntStateOf(0) }
     val (loading,setLoading) = remember{ mutableStateOf(false) }
-    var (error,setError) = remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        roomViewModel.getRoomById(roomId)
+    val (error,setError) = remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = roomId) {
+            roomViewModel.getRoomById(roomId)
     }
     val roomResource = roomViewModel.rooms.observeAsState()
     val dataRoom = remember {
@@ -218,38 +226,86 @@ fun CardDetailScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.hotel_1),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .weight(1f)
-                                .heightIn(min = 100.dp, max = 120.dp)
-                                .padding(end = 1.dp),
-                            contentScale = ContentScale.Crop,
+                        if((dataRoom.value.images?.size ?: 2) >= 3 && dataRoom.value.images?.get(2)
+                                ?.isNotEmpty() == true
+                        ){
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                                    .crossfade(true).data(dataRoom.value.images?.get(2)).build(),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(size3Image)
+                                    .padding(end = 1.dp),
+                                contentScale = ContentScale.Crop,
 
-                            )
+                                )
+                        }
+                        else{
+                            Image(
+                                painter = painterResource(id = R.drawable.hotel_1),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(size3Image)
+                                    .padding(end = 1.dp),
+                                contentScale = ContentScale.Crop,
 
-                        Image(
-                            painter = painterResource(id = R.drawable.hotel_2),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .weight(1f)
-                                .heightIn(min = 120.dp, max = 120.dp)
-                                .padding(start = 1.dp, end = 1.dp),
-                            contentScale = ContentScale.Crop,
+                                )
+                        }
 
-                            )
 
-                        Image(
-                            painter = painterResource(id = R.drawable.hotel_1),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .weight(1f)
-                                .heightIn(min = 120.dp, max = 120.dp)
-                                .padding(start = 1.dp),
-                            contentScale = ContentScale.Crop,
+                        if((dataRoom.value.images?.size ?: 2) >= 4 && dataRoom.value.images?.get(3)?.isNotEmpty() == true){
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                                    .crossfade(true).data(dataRoom.value.images?.get(3)).build(),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(size3Image)
+                                    .padding(end = 1.dp),
+                                contentScale = ContentScale.Crop,
 
-                            )
+                                )
+                        }
+                        else{
+                            Image(
+                                painter = painterResource(id = R.drawable.hotel_2),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(size3Image)
+                                    .padding(end = 1.dp),
+                                contentScale = ContentScale.Crop,
+
+                                )
+                        }
+
+                        if((dataRoom.value.images?.size ?: 2) >= 5 && dataRoom.value.images?.get(4)?.isNotEmpty() == true){
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                                    .crossfade(true).data(dataRoom.value.images?.get(4)).build(),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(size3Image)
+                                    .padding(end = 1.dp),
+                                contentScale = ContentScale.Crop,
+
+                                )
+                        }
+                        else{
+                            Image(
+                                painter = painterResource(id = R.drawable.hotel_1),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(size3Image)
+                                    .padding(end = 1.dp),
+                                contentScale = ContentScale.Crop,
+
+                                )
+                        }
                     }
 
                     Column(
@@ -324,7 +380,7 @@ fun CardDetailScreen(
                         Spacer(modifier = Modifier.height(4.dp))
 
                         Text(
-                            text = "436A/50/1A Đường 3/2, Phường 12, Quận 10, TP HCM",
+                            text = "273 An Dương Vương, Phường 3, Quận 5, Thành phố Hồ Chí Minh",
                             style = MaterialTheme.typography.bodyMedium
                         )
 
@@ -446,7 +502,7 @@ fun CardDetailScreen(
                 Spacer(modifier = Modifier.height(3.dp))
                 Evaluate(data=dataRoom.value)
                 Spacer(modifier = Modifier.height(3.dp))
-                Introduce()
+                Introduce(data = dataRoom.value)
                 Spacer(modifier = Modifier.height(3.dp))
                 CheckInCheckOut()
                 Spacer(modifier = Modifier.height(3.dp))
@@ -477,18 +533,6 @@ fun CardDetailScreen(
 
 
     if(openDialogLoginRequired.value){
-//        AlertDialogExample(
-//            onDismissRequest = {
-//                openDialogLoginRequired.value = false
-//            },
-//            onConfirmation = {
-//                openDialogLoginRequired.value = false
-//                onOpenLoginScreen()
-//            },
-//            dialogTitle = "Yêu cầu đăng nhâp",
-//            dialogText = "Vui lòng đăng nhập trước khi đặt phòng. Xin cảm ơn",
-//        )
-
         DialogMessage(
             onDismissRequest = { openDialogLoginRequired.value = false },
             onConfirmation = {
@@ -746,7 +790,9 @@ fun Comment(){
 }
 
 @Composable
-fun Introduce(){
+fun Introduce(
+    data: Room
+){
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)){
@@ -801,7 +847,7 @@ fun Introduce(){
                         append("ĐỊA CHỈ:")
                     }
 
-                    append(" 243/2/30 đường Chu Văn An, phường 12, quận Bình Thạnh")
+                    append(" 273 An Dương Vương, Phường 3, Quận 5, Thành phố Hồ Chí Minh")
                 },
                     fontSize = 16.sp,
 
@@ -809,33 +855,44 @@ fun Introduce(){
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-            ){
-                Text(text = buildAnnotatedString{
-                    withStyle(style = SpanStyle(
-                        color = Color.Black,
-                        textDecoration = TextDecoration.Underline,
-                        fontWeight = FontWeight.Bold
-
-                    )){
-                        append("THÔNG TIN:")
-                    }
-
-                    append(" Mặt tiền 4 phía, 5 lầu, cách chợ vài trăm mét aaaaaaaaaaaaaaaaaaaaaaaaaa")
-                },
-                    fontSize = 16.sp,
-
-                    )
-
-            }
+            ExpandableText(data.description.toString())
         }
 
     }
 
 }
+
+@Composable
+fun ExpandableText(text: String, maxLength: Int = 100) {
+    var expanded = remember { mutableStateOf(false) }
+    val shortDescription = remember(text) { if (text.length > maxLength) text.take(maxLength) + "..." else text }
+
+    Column(modifier = Modifier) {
+        Text(text = buildAnnotatedString{
+            withStyle(style = SpanStyle(
+                color = Color.Black,
+                textDecoration = TextDecoration.Underline,
+                fontWeight = FontWeight.Bold
+
+            )){
+                append("THÔNG TIN:")
+            }
+
+            append(if (expanded.value) text else shortDescription)
+        },
+            fontSize = 16.sp,
+
+            )
+        if (text.length > maxLength) {
+            TextButton(
+                onClick = { expanded.value = !expanded.value }
+            ) {
+                Text(if (expanded.value) "Thu gọn" else "Xem thêm")
+            }
+        }
+    }
+}
+
 
 @Composable
 fun CheckInCheckOut(){

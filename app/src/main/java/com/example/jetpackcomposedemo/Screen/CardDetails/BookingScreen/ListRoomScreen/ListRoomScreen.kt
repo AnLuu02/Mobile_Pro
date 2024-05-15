@@ -66,6 +66,7 @@ import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBo
 import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
 import com.example.jetpackcomposedemo.data.models.BedType.BedType
 import com.example.jetpackcomposedemo.data.models.Room.Room
+import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -75,6 +76,7 @@ import java.time.format.DateTimeFormatter
 fun ListRoomScreen(
     searchViewModel: SearchViewModel,
     bookingViewModel: BookingViewModel,
+    bookingViewModelApi:BookingViewModelApi,
     onOpenPayment:()->Unit,
     onBack:()->Unit
 ) {

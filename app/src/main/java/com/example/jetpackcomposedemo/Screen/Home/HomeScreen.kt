@@ -19,9 +19,11 @@ import com.example.jetpackcomposedemo.Screen.Home.widget.CardSectionShimmer
 import com.example.jetpackcomposedemo.Screen.Home.widget.LocationSection
 import com.example.jetpackcomposedemo.Screen.Home.widget.ServiceSection
 import com.example.jetpackcomposedemo.components.Card.ImageRightCard
+import com.example.jetpackcomposedemo.components.Card.ImageRightCardShimmer
 import com.example.jetpackcomposedemo.components.TitleMain
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
 import com.example.jetpackcomposedemo.helpper.Status
+import kotlin.random.Random
 
 
 val dataTest = listOf(1, 2, 3, 4, 5)
@@ -55,10 +57,11 @@ fun HomeScreen(
                     when (roomResource.value?.status) {
                         Status.SUCCESS -> {
                             roomResource.value?.data?.let { rooms ->
+
                                 CardSection(
                                     navController = navController,
                                     titleListCard = "GIÁ SỐC ĐÊM NAY",
-                                    typeBooking = "overnigh",
+                                    typeBooking = "overnight",
                                     data = rooms,
                                     hasPrice = true,
                                     isSale = true,
@@ -79,7 +82,7 @@ fun HomeScreen(
                                     navController = navController,
                                     typeBooking = "bydate",
                                     data = rooms,
-                                    titleListCard = "PHÒNG THEO NGAÀY",
+                                    titleListCard = "PHÒNG THEO NGÀY",
                                     hasPrice = true,
                                     isImageFull = true,
                                     isDiscount = true,
@@ -92,6 +95,23 @@ fun HomeScreen(
                                     titleListCard = "PHÒNG NỔI BẬT",
                                     onOpenDetailCardScreen = onOpenDetailCardScreen
                                 )
+
+                                TitleMain(title = "KHÁM PHÁ THÊM", onHandleClickShowAll = { navController.navigate("search/discount") })
+
+                                val randomNumbers = mutableSetOf<Int>()
+                                var i = 0
+                                while(randomNumbers.size <  rooms.size && i < 3) {
+                                    val nextNumber = Random.nextInt(0, rooms.size)
+                                    randomNumbers.add(nextNumber)
+                                    i++
+                                }
+
+                                randomNumbers.toList().forEachIndexed { index, item ->
+                                    ImageRightCard( rooms[item], navController = navController)
+                                }
+
+
+
 
                             }
                         }
@@ -121,6 +141,11 @@ fun HomeScreen(
                                 typeBooking = "hourly",
                                 titleListCard = "PHÒNG NỔI BẬT",
                             )
+
+                            TitleMain(title = "KHÁM PHÁ THÊM", onHandleClickShowAll = { navController.navigate("search/discount") })
+                            ImageRightCardShimmer()
+                            ImageRightCardShimmer()
+                            ImageRightCardShimmer()
                         }
                         Status.LOADING -> {
                             CardSectionShimmer(
@@ -147,6 +172,10 @@ fun HomeScreen(
                                 typeBooking = "hourly",
                                 titleListCard = "PHÒNG NỔI BẬT",
                             )
+                            TitleMain(title = "KHÁM PHÁ THÊM", onHandleClickShowAll = { navController.navigate("search/discount") })
+                            ImageRightCardShimmer()
+                            ImageRightCardShimmer()
+                            ImageRightCardShimmer()
                         }
                         null -> {
                             Log.e("<Error>", "Roi vao null")
@@ -174,15 +203,16 @@ fun HomeScreen(
                                 typeBooking = "hourly",
                                 titleListCard = "PHÒNG NỔI BẬT",
                             )
+
+                            TitleMain(title = "KHÁM PHÁ THÊM", onHandleClickShowAll = { navController.navigate("search/discount") })
+                            ImageRightCardShimmer()
+                            ImageRightCardShimmer()
+                            ImageRightCardShimmer()
                         }
                     }
 
                 }
             }
-            TitleMain(title = "KHÁM PHÁ THÊM", onHandleClickShowAll = { navController.navigate("search/discount") })
-            ImageRightCard(index = 0, dataTest, onOpenDetailCardScreen = onOpenDetailCardScreen)
-            ImageRightCard(index = 1, dataTest, isDiscount = true, onOpenDetailCardScreen = onOpenDetailCardScreen)
-            ImageRightCard(index = 2, dataTest, onOpenDetailCardScreen =onOpenDetailCardScreen)
 
         }
 

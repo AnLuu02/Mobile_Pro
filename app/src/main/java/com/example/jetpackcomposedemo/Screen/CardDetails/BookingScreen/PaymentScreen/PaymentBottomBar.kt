@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.CountDownPaymentViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
 import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
@@ -47,6 +48,7 @@ import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
 @Composable
 fun PaymentBottomBar(
     bookingViewModel: BookingViewModel,
+    countDownPaymentViewModel: CountDownPaymentViewModel,
     payloadChoose:OptionPayment,
     totalPrice:String,
     isClicked:Boolean,
