@@ -81,7 +81,6 @@ fun SearchTopBar(
             Box(
                 modifier = Modifier
                     .size(36.dp)
-                    .background(color = Color.White, shape = CircleShape)
                     .align(Alignment.CenterStart)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },

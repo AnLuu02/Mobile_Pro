@@ -1,15 +1,18 @@
 package com.example.jetpackcomposedemo.data.network
 
+//import com.example.jetpackcomposedemo.data.models.Room
+import com.example.jetpackcomposedemo.data.models.Booking.Booking
+import com.example.jetpackcomposedemo.data.models.Booking.MyBooking
 import com.example.jetpackcomposedemo.data.models.Coupon
 import com.example.jetpackcomposedemo.data.models.Identity
 import com.example.jetpackcomposedemo.data.models.POST_Body_UserCoupon
-import com.example.jetpackcomposedemo.data.models.Booking.Booking
 import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.models.RoomType
 import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.models.User
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -23,8 +26,18 @@ interface ApiService {
     //// get room by id ////
     @GET("api/room")
     suspend fun getRoomsById(@Query("id") id:String): Response<List<Room>>
+
+
+    //////////////////// my booking //////////////////////
     @POST("api/room")
     suspend fun bookingRoom(@Body booking: Booking): Response<List<Booking>>
+    @GET("api/mybooking")
+    suspend fun getListMyBooking(@Query("uid") id:String): Response<List<MyBooking>>
+    @DELETE("api/mybooking")
+    suspend fun deleteMyBooking(
+        @Query("bkid") bkId: Int,
+        @Query("billid") billId: Int
+    ): Response<String>
 
     //get all
     // Coupon - begin

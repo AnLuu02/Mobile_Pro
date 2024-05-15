@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.Search
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,8 +22,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +33,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -51,30 +57,83 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Scale
+import com.example.jetpackcomposedemo.MainActivity
 import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.CountDownPaymentViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.PaymentBottomBar
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.StatusBedType
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.StatusPayment
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.WaitingPaymentScreen.WaitingPaymentScreen
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
+import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
 import com.example.jetpackcomposedemo.Screen.User.LoginUiState
 import com.example.jetpackcomposedemo.Screen.User.MyUser
+import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
 import com.example.jetpackcomposedemo.data.models.BedType.BedType
 import com.example.jetpackcomposedemo.data.models.Bill.Bill
 import com.example.jetpackcomposedemo.data.models.Booking.Booking
+import com.example.jetpackcomposedemo.data.models.Booking.MyBooking
 import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
+import com.example.jetpackcomposedemo.handlePayment.Api.CreateOrder
+import com.example.jetpackcomposedemo.helpper.Status
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import vn.zalopay.sdk.ZaloPayError
+import vn.zalopay.sdk.ZaloPaySDK
+import vn.zalopay.sdk.listeners.PayOrderListener
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaymentScreen(
+    mainActivity:MainActivity,
     bookingViewModelApi:BookingViewModelApi,
     bookingViewModel:BookingViewModel,
     loginUiState:LoginUiState,
-    navController:NavHostController
+    navController:NavHostController,
+    countDownPaymentViewModel:CountDownPaymentViewModel
 ) {
-    val listState = rememberLazyListState()
 
+    LaunchedEffect(Unit) {
+        bookingViewModelApi.getListMyBooking("1")
+//        bookingViewModelApi.getListMyBooking(loginUiState.id.toString())
+    }
+
+    val resource = bookingViewModelApi.myBookingList.observeAsState()
+    val infoRoomIfUnfinished = remember {
+        mutableStateOf(MyBooking())
+    }
+    val openAlertDialogContinuePayment = remember{ mutableStateOf(false) }
+    when(resource.value?.status){
+        Status.SUCCESS->{
+            resource.value?.data?.let { myBooking->
+                val temp =  myBooking.filter { it.booking?.status == StatusPayment.PENDING.status }
+                if(temp.isNotEmpty()){
+                    infoRoomIfUnfinished.value = temp[0]
+                }
+            }
+        }
+
+        Status.ERROR -> {
+            Log.e("<ERRROR>","<ERRROR>")
+        }
+        Status.LOADING -> {
+            Log.e("<LOADING>","<LOADING>")
+
+        }
+        null -> {Log.e("<NULL>","<NULL>") }
+    }
+
+
+
+    val listState = rememberLazyListState()
     val year = LocalDateTime.now().year
     val typeBooking = bookingViewModel.getTypeBooking()
     val dateCheckinString = if(!bookingViewModel.getTimeCheckin()?.contains("/$year")!!) "${bookingViewModel.getTimeCheckin()}/$year" else bookingViewModel.getTimeCheckin()
@@ -84,49 +143,138 @@ fun PaymentScreen(
     val bedType = bookingViewModel.getBedType()
     val discount = bookingViewModel.getDiscount()
     val openChooseMethodPayment = remember{ mutableStateOf(false) }
-    val payloadChoose = remember{ mutableStateOf(OptionPayment()) }
-    val totalPrice = bedType?.let { CaculateTotalPriceRoom(it.total, discount?.percent) }
-        ?.let { formatCurrencyVND(it) }
+    val openWaitingPayment = remember{ mutableStateOf(false) }
+
+    val payloadChoose = remember{ mutableStateOf(bookingViewModel.getMethodPayment() ?: OptionPayment()) }
+    val totalPrice = formatCurrencyVND(CaculateTotalPriceFinal(
+        bedType?.total?.let { totalTime?.toInt()?.times(it) } ?: 1,
+        discount?.percentDiscount,
+        discount?.amountDiscount?.toInt()
+    ))
+
+    val (tokenPaymentZalopay,setTokenPaymentZalopay) = remember {
+        mutableStateOf("")
+    }
+
+    val (statusPayment,setStatusPayment) = remember {
+        mutableIntStateOf(StatusPayment.NON.status)
+    }
+    bookingViewModel.setStatus(statusPayment)
+    val (isClicked,setIsClicked) = remember{ mutableStateOf(false) }
+    val (loading,setLoading) = remember{ mutableStateOf(false) }
+
+
+    Log.e("Discount",discount.toString())
+
+
+    LaunchedEffect(statusPayment) {
+        if(statusPayment != StatusPayment.NON.status){
+            if (totalTime != null) {
+                if (bedType != null) {
+                    bedType.status = if(statusPayment == StatusPayment.PAID.status) StatusBedType.UNAVAILABLE.status else StatusBedType.AVAILABLE.status
+                    bookingViewModelApi.bookingRoom(
+                        Booking(
+                            null,
+                            MyUser(
+                                ID = 1,
+                                fullName = loginUiState.fullName ?: "Lưu Trường An",
+                                email = loginUiState.fullName ?: "anluu099@gmail.com",
+                                cccd =  "123456789",
+                                birthday = loginUiState.birthday ?: "24-04-2002",
+                                gender = loginUiState.gender ?: "Nam",
+                                sdt = loginUiState.phoneNumber ?: "0918064618"
+                            ),
+                            timeBooking = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy")),
+                            Bill(
+                                statusPayment = statusPayment,
+                                typePayment = payloadChoose.value.type,
+                                checkInDate = when(typeBooking){
+                                    "bydate"-> "07:00, $dateCheckinString"
+                                    "overnight"-> "22:00, $dateCheckinString"
+                                    else->dateCheckinString
+                                },
+                                checkOutDate = when(typeBooking){
+                                    "bydate"-> "06:00, $dateCheckoutString"
+                                    "overnight"-> "06:00, $dateCheckoutString"
+                                    else->dateCheckoutString
+                                },
+                                duration = totalTime.toInt(),
+                                discount = discount,
+                                typeBooking = typeBooking,
+                                bedType = bedType,
+                                infoRoom = bookingViewModel.getInfoRoom(),
+                                finalCharge = CaculateTotalPriceFinal(totalTime.toInt()*bedType.total,
+                                    discount?.percentDiscount,
+                                    discount?.amountDiscount?.toInt()
+                                ),
+                            )
+                        )
+                    )
+                }
+            }
+        }
+        if(statusPayment == StatusPayment.PAID.status){
+            navController.navigate("user/1/mybooking")
+//            navController.navigate("user/${loginUiState.id}/mybooking")
+
+        }
+    }
+
+
+
+
+
     Scaffold(
         topBar = {
             PaymentTopBar(navController = navController)
         },
         bottomBar = {
             if (totalPrice != null) {
-                PaymentBottomBar(bookingViewModel = bookingViewModel,
+                PaymentBottomBar(
+                    bookingViewModel = bookingViewModel,
+                    countDownPaymentViewModel = countDownPaymentViewModel,
                     payloadChoose = payloadChoose.value,
-                    totalPrice = totalPrice,
+                    totalPrice = totalPrice.toString(),
                     onChooseMethodPayment = {
                         openChooseMethodPayment.value = it
                     },
+                    isClicked = isClicked,
                     ///////////////////////// post data booking //////////////////////////
                     onApplyBooking = {
-                        if (infoRoom != null) {
-                            if (totalTime != null) {
-                                bookingViewModelApi.bookingRoom(
-                                    Booking(
-                                        null,
-                                        MyUser(
-                                            fullName = "Lưu Trường An",
-                                            email = "anluu099@gmail.com",
-                                            cccd = "123456789",
-                                            birthday = "24-04-2002",
-                                            gender = "Nam",
-                                            sdt = "0918064618"
-                                        ),
-                                        null,
-                                        Bill(
-                                            checkInDate = dateCheckinString,
-                                            checkOutDate = dateCheckoutString,
-                                            duration = totalTime.toInt(),
-                                        ),
-                                        bedType = bedType,
-                                        typePayment = payloadChoose.value.title,
-                                        typeBooking = typeBooking,
-                                        status = 1,
-                                        bookingViewModel.getInfoRoom()
-                                    )
-                                )
+                        if(infoRoomIfUnfinished.value.room != null){
+                            openAlertDialogContinuePayment.value = true
+                        }
+                        else{
+                            setLoading(true)
+//                            setStatusPayment(StatusPayment.PENDING.status)
+                            when(payloadChoose.value.type){
+                                "zalopay"->{
+                                    if (totalTime != null) {
+                                        paymentZalopay(
+                                            mainActivity,
+                                            CaculateTotalPriceFinal(totalTime.toInt()* (bedType?.total
+                                                ?: 1 ),
+                                                discount?.percentDiscount,
+                                                discount?.amountDiscount?.toInt()
+                                            ).toString(),
+                                            countDownPaymentViewModel = countDownPaymentViewModel,
+                                            showScreenWaiting = {
+                                                openWaitingPayment.value = it
+                                            },
+                                            setToken = { setTokenPaymentZalopay(it) },
+                                            setStatus = {
+                                                setStatusPayment(it)
+                                            },
+                                            setLoading = {
+                                                setLoading(it)
+                                                setIsClicked(it)
+                                            }
+                                        )
+                                    }
+
+                                }
+                                "momo"->{}
+                                else->{}
                             }
                         }
                     }
@@ -157,9 +305,9 @@ fun PaymentScreen(
                         )
                     }
                     Spacer(modifier = Modifier.height(10.dp))
-                    UserBooking()
+                    UserBooking(loginUiState = loginUiState)
                     Spacer(modifier = Modifier.height(10.dp))
-                    DiscountBooking(navController = navController)
+                    DiscountBooking(navController = navController, bookingViewModel = bookingViewModel)
                     Spacer(modifier = Modifier.height(10.dp))
                     if (bedType != null) {
                         PaymentDetails(bookingViewModel = bookingViewModel)
@@ -174,6 +322,7 @@ fun PaymentScreen(
         }
     }
 
+
     if(openChooseMethodPayment.value){
         MethodPaymentScreen(
             bookingViewModel = bookingViewModel,
@@ -185,6 +334,59 @@ fun PaymentScreen(
             }
         )
     }
+
+
+    if(openWaitingPayment.value){
+        if (infoRoom != null) {
+            WaitingPaymentScreen(
+                infoRoom = infoRoom,
+                countDownPaymentViewModel = countDownPaymentViewModel,
+                navController = navController,
+                closeScreenWaitingPayment =  {
+                    openWaitingPayment.value = it
+                },
+                onContinuePayment = {
+                    if (totalTime != null) {
+                        if (bedType != null) {
+                            paymentZalopay(
+                                mainActivity,
+                                (totalTime.toInt()*bedType.total).toString(),
+                                countDownPaymentViewModel = countDownPaymentViewModel,
+                                showScreenWaiting = {
+                                    openWaitingPayment.value = it
+                                },
+                                setToken = { setTokenPaymentZalopay(it) },
+                                setStatus = {
+                                    setStatusPayment(it)
+                                },
+                                setLoading = {
+                                    setLoading(it)
+                                    setIsClicked(it)
+                                }
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+
+    if(openAlertDialogContinuePayment.value){
+        DialogMessage(
+            onDismissRequest = {openAlertDialogContinuePayment.value = false},
+            onConfirmation = {
+                openAlertDialogContinuePayment.value = false
+                navController.navigate("user/${1}/mybooking")
+            },
+            dialogTitle = "Bạn có đặt phòng nhưng chưa thanh toán. Thanh toán để tiếp tục.",
+            dialogText = "Vui lòng thanh toán tất cả đơn đặt phòng trước khi đặt phòng mới."
+        )
+
+    }
+
+    LoadingScreen(isLoadingValue = loading)
+
 }
 
 @Composable
@@ -446,7 +648,9 @@ fun InfoRoom(
 
 
 @Composable
-fun UserBooking(){
+fun UserBooking(
+    loginUiState: LoginUiState
+){
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -488,13 +692,13 @@ fun UserBooking(){
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Số điện thoại",
+                    text =  "Số điện thoại",
                     fontSize = 16.sp,
                 )
 
 
                 Text(
-                    text = "+84 918064618",
+                    text = loginUiState.phoneNumber?: "+84 918064618",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                 )
@@ -518,7 +722,7 @@ fun UserBooking(){
 
 
                 Text(
-                    text = "Annn",
+                    text = loginUiState.fullName ?: "Annn",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
 
@@ -534,8 +738,17 @@ fun UserBooking(){
 
 @Composable
 fun DiscountBooking(
-    navController:NavHostController
+    navController:NavHostController,
+    bookingViewModel: BookingViewModel
 ){
+
+    val discount = remember{ mutableStateOf(bookingViewModel.getDiscount()) }
+    val (isDiscount,setIsDiscount) = remember{ mutableStateOf(false) }
+
+    if(discount.value !=null){
+        setIsDiscount(true)
+    }
+
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -579,12 +792,58 @@ fun DiscountBooking(
                     )
                 }
 
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                    contentDescription = "next",
-                    tint =Color.Red,
-                    modifier = Modifier.size(14.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        navController.navigate("roomDetails/chooseDiscount")
+                    }
+                ) {
 
-                )
+                    if(isDiscount){
+                        Row(
+                            modifier = Modifier
+                                .background(Color.Red.copy(0.1f), shape = RoundedCornerShape(4.dp))
+                                .clickable {
+                                    bookingViewModel.setDiscount(null)
+                                    discount.value = null
+                                    setIsDiscount(false)
+                                }
+                            ,
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                verticalAlignment = Alignment.CenterVertically
+
+                            ) {
+                                Text(
+                                    text =  "Giảm ${(if (discount.value?.amountDiscount == 0F
+                                        || discount.value?.amountDiscount == null) discount.value?.percentDiscount.toString() + "%"
+                                    else (discount.value!!.amountDiscount?.div(1000F))?.toInt().toString() + "K")}",
+                                    fontSize = 14.sp,
+                                    color = Color.Red,
+                                    fontWeight = FontWeight.W500,
+                                    modifier = Modifier
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Icon(imageVector = Icons.Rounded.Close,
+                                    contentDescription = "next",
+                                    tint =Color.Black,
+                                    modifier = Modifier
+                                        .size(14.dp)
+
+
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                    }
+                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                        contentDescription = "next",
+                        tint =Color.Red,
+                        modifier = Modifier.size(14.dp)
+
+                    )
+                }
             }
 
             Divider(
@@ -662,6 +921,7 @@ fun PaymentDetails(
     val infoRoom = bookingViewModel.getInfoRoom()
     val bedType = bookingViewModel.getBedType()
     val discount = bookingViewModel.getDiscount()
+    val totalTime = bookingViewModel.getTotalTime()
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -675,34 +935,9 @@ fun PaymentDetails(
                 text = "Chi tiết thanh toán",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(12.dp, 16.dp, 12.dp)
+                modifier = Modifier .padding(12.dp, 16.dp, 12.dp, 16.dp),
             )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp, 16.dp, 12.dp, 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Trạng thái",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.W500,
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(painter = painterResource(id = R.drawable.momo), contentDescription = "",modifier = Modifier.size(24.dp))
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = "Chưa thanh toán",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.W500
-                    )
-                }
-            }
 
             Divider(
                 modifier = Modifier
@@ -729,7 +964,7 @@ fun PaymentDetails(
 
                 if (bedType != null) {
                     Text(
-                        text = formatCurrencyVND(bedType.total),
+                        text = formatCurrencyVND(bedType.total * (totalTime?.toInt() ?: 1)),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
 
@@ -750,12 +985,25 @@ fun PaymentDetails(
                 )
 
 
+                if (discount != null) {
+                    if (bedType != null) {
+                        Text(
+                            text = "- ${formatCurrencyVND(CaculatePriceDiscount(bedType.total,
+                                discount.amountDiscount?.toInt(),discount.percentDiscount))}",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+
+                        )
+                    }
+                }
+                else{
                     Text(
-                        text = if(discount?.percent != null) formatCurrencyVND(discount.percent) else "0",
+                        text = "0",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
 
                     )
+                }
             }
 
             Divider(
@@ -781,24 +1029,49 @@ fun PaymentDetails(
                 )
 
                 if (bedType != null) {
-                    Text(
-                        text = formatCurrencyVND(CaculateTotalPriceRoom(bedType.total, discount?.percent)),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    if (discount != null) {
+                        Text(
+                            text = formatCurrencyVND(CaculateTotalPriceFinal(
+                                (totalTime?.toInt() ?: 1) *bedType.total,
+                                discount.percentDiscount,
+                                discount.amountDiscount?.toInt()
+                            )),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    else{
+                        Text(
+                            text = formatCurrencyVND(bedType.total),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-fun CaculateTotalPriceRoom(rommPrice:Int,discount: Int?): Int {
-    if(discount!= null){
-        return rommPrice+discount
+fun CaculateTotalPriceFinal(rommPrice:Int,amountDiscount: Int?, percentDiscount:Int? ): Int {
+    if(percentDiscount!= null){
+        return rommPrice - (rommPrice*percentDiscount/100)
+    }
+    else if(amountDiscount != null){
+        return rommPrice - amountDiscount
     }
     return rommPrice
 }
 
+fun CaculatePriceDiscount(rommPrice:Int,amountDiscount: Int?, percentDiscount:Int? ): Int {
+    if(percentDiscount!= null){
+        return rommPrice*percentDiscount/100
+    }
+    else if(amountDiscount != null){
+        return amountDiscount
+    }
+    return 0
+}
 @Composable
 fun CanclePolicy(){
     Box(modifier = Modifier
@@ -864,6 +1137,76 @@ fun CanclePolicy(){
 
 
 
+        }
+    }
+}
+
+
+fun paymentZalopay(
+    mainActivity: MainActivity,
+    amount: String,
+    countDownPaymentViewModel:CountDownPaymentViewModel,
+    showScreenWaiting:(Boolean)->Unit,
+    setToken: (String)->Unit,
+    setStatus:(Int)->Unit,
+    setLoading:(Boolean)->Unit
+){
+    val scope = CoroutineScope(Dispatchers.Main)
+    var token =  ""
+    scope.launch {
+        withContext(Dispatchers.IO) {
+            val orderApi = CreateOrder()
+
+            try {
+                val data: JSONObject =
+                    orderApi.createOrder(amount)!!
+                val code = data.getString("return_code")
+
+                if (code == "1") {
+                    token = data.getString("zp_trans_token")
+                    setToken(data.getString("zp_trans_token"))
+                    countDownPaymentViewModel.startCountdown()
+
+                    setLoading(true)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            ZaloPaySDK.getInstance().payOrder(
+                mainActivity,
+                token,
+                "demozpdk://app",
+                object : PayOrderListener {
+                    override fun onPaymentSucceeded(
+                        transactionId: String,
+                        transToken: String,
+                        appTransID: String
+                    ) {
+                        Log.e("success", "success")
+                        setStatus(StatusPayment.PAID.status)
+                        setLoading(false)
+                    }
+
+                    override fun onPaymentCanceled(
+                        zpTransToken: String,
+                        appTransID: String
+                    ) {
+                        Log.e("cancle", "cancle")
+                        setStatus(StatusPayment.PENDING.status)
+                        showScreenWaiting(true)
+                        setLoading(false)
+                    }
+
+                    override fun onPaymentError(
+                        zaloPayError: ZaloPayError,
+                        zpTransToken: String,
+                        appTransID: String
+                    ) {
+                        Log.e("error", "error")
+                        setStatus(StatusPayment.NON.status)
+                        setLoading(true)
+                    }
+                })
         }
     }
 }

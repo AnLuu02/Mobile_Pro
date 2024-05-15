@@ -15,24 +15,23 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
-import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChooseDiscountBottomBar(
+    navController: NavHostController,
     bookingViewModel: BookingViewModel,
-    onChooseMethodPayment:(Boolean)->Unit
+    onChooseDiscount:()->Unit
 ){
 
-    val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -52,7 +51,8 @@ fun ChooseDiscountBottomBar(
 
             Button(
                 onClick = {
-                    coroutineScope.launch {}
+                    onChooseDiscount()
+                    navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small),
                 colors = ButtonDefaults.buttonColors(

@@ -20,21 +20,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.Screen.Search.SearchViewModel
-import com.example.jetpackcomposedemo.Screen.Services.sortOptions
 import com.example.jetpackcomposedemo.components.Card.PriceCard
 import com.example.jetpackcomposedemo.data.models.Room.Room
+import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
 import com.example.jetpackcomposedemo.helpper.Status
 
