@@ -71,12 +71,9 @@ fun ChooseDiscountScreen(
     }
 
     LaunchedEffect(Unit) {
-        userCouponViewModel.getListCouponOfUser("1")
-//        userCouponViewModel.getListCouponOfUser(loginUiState.id.toString())
-
-//        if(loginUiState.id != null) {
-//            userCouponViewModel.getListCouponOfUser(loginUiState.id.toString())
-//        }
+        if(loginUiState.isLoggedIn) {
+            userCouponViewModel.getListCouponOfUser(loginUiState.id.toString())
+        }
     }
     val couponResource = userCouponViewModel.list.observeAsState()
 
