@@ -563,7 +563,7 @@ fun DiscountScreen(
     navController: NavHostController? = null,
     isLoggedIn: Boolean = true,
     isCheckedIn: Boolean = true,
-    timeCheckOut: String = "08/05/2024 18:01:00",
+    timeCheckOut: String = "16/05/2024 18:01:00",
     userName: String = "Nguyen Quoc An",
     phoneNumber: String = "0123456789",
     userID: Int? = null,
