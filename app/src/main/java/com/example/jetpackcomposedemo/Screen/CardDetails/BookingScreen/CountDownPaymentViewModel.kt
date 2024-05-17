@@ -9,7 +9,7 @@ import java.util.Date
 import java.util.Locale
 
 class CountDownPaymentViewModel: ViewModel() {
-    private val initialTime = 5 * 60 * 1000 // 5 phút
+    private val initialTime = 1 * 60 * 1000 // 5 phút
     private val timeFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
 
     // LiveData chứa chuỗi thời gian còn lại

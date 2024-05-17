@@ -14,15 +14,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,17 +36,16 @@ import androidx.compose.ui.unit.dp
 fun UserTopBar(
     loginUiState: LoginUiState,
     onLoginButtonClicked: () -> Unit = {},
-    onToogleSettingInfo:() -> Unit = {}
+    onToggleSettingInfo:() -> Unit = {}
 ) {
-//    Log.d("DEBUG","User Telephone Number at UserTopBar : ${loginUiState.phoneNumber} " )
     if(loginUiState.isShowingInfo){
         CenterAlignedTopAppBar(
             title = { Text(text = "Hồ sơ", style = MaterialTheme.typography.titleLarge) },
             navigationIcon = {
                 IconButton(onClick = {
-                    onToogleSettingInfo()
+                    onToggleSettingInfo()
                 }) {
-                    Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back")
                 }
             },
         )
@@ -81,7 +78,7 @@ fun UserTopBar(
                                 .clickable(
                                     interactionSource = null,
                                     indication = null
-                                ) { onToogleSettingInfo() })
+                                ) { onToggleSettingInfo() })
                     }
                     Text(
                         text = "${loginUiState.phoneNumber}",
@@ -138,25 +135,3 @@ fun UserTopBar(
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun preview() {
-//    Text(text = "Xin chào +840707584412",
-//        fontSize = 18.sp,
-//        modifier = Modifier.padding(12.dp,8.dp,12.dp,4.dp))
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp), horizontalArrangement = Arrangement.Center, ) {
-        OutlinedButton(
-            onClick = { /*TODO*/ },
-            modifier = Modifier.fillMaxWidth(),
-
-        ) {
-            Text(text = "Đăng xuất", color = Color.Red)
-        }
-    }
-    Spacer(modifier = Modifier
-        .fillMaxWidth()
-        .height(1.dp)
-        .border(1.dp, color = Color.LightGray))
-}

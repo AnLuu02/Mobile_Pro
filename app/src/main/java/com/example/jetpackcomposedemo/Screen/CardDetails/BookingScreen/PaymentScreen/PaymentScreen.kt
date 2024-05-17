@@ -1165,8 +1165,6 @@ fun paymentZalopay(
                 if (code == "1") {
                     token = data.getString("zp_trans_token")
                     setToken(data.getString("zp_trans_token"))
-                    countDownPaymentViewModel.startCountdown()
-
                     setLoading(true)
                 }
             } catch (e: Exception) {

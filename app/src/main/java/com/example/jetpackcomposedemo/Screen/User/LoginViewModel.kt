@@ -38,25 +38,15 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
     var isLoading by mutableStateOf(false)
-        private set
     var isDialogShown by mutableStateOf(false)
-        private set
     var isEmailLogin by mutableStateOf(false)
-        private set
     var phoneNumber by mutableStateOf("")
-        private set
     var fullName by  mutableStateOf("")
-        private set
-    var displaynameEmail by  mutableStateOf("")
-        private set
+    private var displaynameEmail by  mutableStateOf("")
     var email by  mutableStateOf("")
-        private set
     var gender by  mutableStateOf("")
-        private set
     var birthday by  mutableStateOf("")
-        private set
-    var initBirthday by  mutableStateOf("")
-        private set
+    private var initBirthday by  mutableStateOf("")
     var showError by  mutableStateOf(false)
     var isEntryValid by  mutableStateOf(false)
     var errorMessage by  mutableStateOf<String?>("")
@@ -77,7 +67,7 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
         updateGender(_uiState.value.gender.toString())
         updateBirthday(formatBirthday())
     }
-    fun continueWithUser(activity: Activity, user: FirebaseUser) {
+    private fun continueWithUser(activity: Activity, user: FirebaseUser) {
         Log.d("ViDat","ContinueWithUser ${user.email}")
         viewModelScope.launch {
             try {
@@ -122,24 +112,24 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
     fun updateInfoUser(context :Context,userId: Int, updatedUser: MyUser) {
         Log.d("ViDat","UPDATE")
         if(updatedUser.email.isNullOrBlank()){
-                viewModelScope.launch {
-                    try {
-                        userRepository.updateUser(userId,updatedUser)
-                        Log.d("update","Thanh cong")
-                        _uiState.update { currentState ->
-                            currentState.copy(
-                                fullName = fullName,
-                                email = email,
-                                gender = gender,
-                                birthday = birthday,
-                            )
-                        }
-                        initBirthday = formatBirthday()
-                        toogleSetting(_uiState.value.isShowingInfo)
-                    } catch (e: Exception) {
-                        Toast.makeText(context, "Server gặp lỗi,hãy thử lại", Toast.LENGTH_LONG).show()
+            viewModelScope.launch {
+                try {
+                    userRepository.updateUser(userId,updatedUser)
+                    Log.d("update","Thanh cong")
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            fullName = fullName,
+                            email = email,
+                            gender = gender,
+                            birthday = birthday,
+                        )
                     }
+                    initBirthday = formatBirthday()
+                    toogleSetting(_uiState.value.isShowingInfo)
+                } catch (e: Exception) {
+                    Toast.makeText(context, "Server gặp lỗi,hãy thử lại", Toast.LENGTH_LONG).show()
                 }
+            }
         }else if (isValidEmail(updatedUser.email)) {
             viewModelScope.launch {
                 try {
@@ -164,44 +154,44 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
 
     }
-    fun isValidEmail(email: String): Boolean {
+    private fun isValidEmail(email: String): Boolean {
         val emailRegex = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}".toRegex()
         return email.matches(emailRegex)
     }
-    fun formatBirthday() : String {
+    private fun formatBirthday() : String {
         val dateTimeString = _uiState.value.birthday ?: "2000-01-01T00:00:00.000Z"
         val dateParts = dateTimeString.split("T")[0].split("-")
         return "${dateParts[0].toInt()}-${dateParts[1].toInt()}-${dateParts[2].toInt()}"
     }
-    fun getInfoUser(phone: String) {
+    private fun getInfoUser(phone: String) {
         Log.d("ViDat","GETINFO")
         viewModelScope.launch {
-           try {
-               val info = userRepository.getUserByPhone(phone)
-               if(info.isSuccessful){
-                   _uiState.update { currentState ->
-                       currentState.copy(
-                           id = info.body()?.get(0)?.ID!!,
-                           gender = info.body()?.get(0)?.gender,
-                           birthday = info.body()?.get(0)?.birthday,
-                           fullName = info.body()?.get(0)?.fullName ,
-                           email = email,
-                           phoneNumber = info.body()?.get(0)?.sdt,
-                           isLoggedIn = true
-                       )
-                   }
-                   initBirthday = formatBirthday()
-                   updateBirthday(initBirthday)
-               }
-               else{
-                   Log.e("<Call Api loi>","")
-               }
-           } catch (e: Exception) {
-               Log.e("getInfoUser", "Exception caught in getInfoUser", e)
-           }
+            try {
+                val info = userRepository.getUserByPhone(phone)
+                if(info.isSuccessful){
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            id = info.body()?.get(0)?.ID!!,
+                            gender = info.body()?.get(0)?.gender,
+                            birthday = info.body()?.get(0)?.birthday,
+                            fullName = info.body()?.get(0)?.fullName ,
+                            email = email,
+                            phoneNumber = info.body()?.get(0)?.sdt,
+                            isLoggedIn = true
+                        )
+                    }
+                    initBirthday = formatBirthday()
+                    updateBirthday(initBirthday)
+                }
+                else{
+                    Log.e("<Call Api loi>","")
+                }
+            } catch (e: Exception) {
+                Log.e("getInfoUser", "Exception caught in getInfoUser", e)
+            }
         }
     }
-    fun addUser(user: MyUser,activity: Activity) {
+    private fun addUser(user: MyUser, activity: Activity) {
         Log.d("ViDat","ADD")
         viewModelScope.launch {
             try {
@@ -213,6 +203,7 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
                     )
                 }
                 getInfoUser(user.sdt!!.replaceFirst("+84","0"))
+                Toast.makeText(activity, "Đăng nhập thành công", Toast.LENGTH_SHORT).show()
 
             } catch (e: Exception) {
                 Toast.makeText(activity, "Server gặp lỗi,hãy thử lại", Toast.LENGTH_SHORT).show()
@@ -241,43 +232,34 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
         showError = false
     }
     fun updateFullname(inputFullname: String) {
-        if(inputFullname.equals("null")) {
+        if(inputFullname == "null") {
             fullName = "User${_uiState.value.phoneNumber}"
         }else {
             fullName = inputFullname
-            if(!fullName.equals(_uiState.value.fullName.toString().trim())){
-                isEntryValid = true
-            } else isEntryValid = false
+            isEntryValid = fullName != _uiState.value.fullName.toString().trim()
         }
     }
     fun updateDisplaynameEmail(inputDisplayname: String) {
         displaynameEmail = inputDisplayname
     }
     fun updateEmail(inputEmail: String) {
-        if(inputEmail.equals("null")) {
+        if(inputEmail == "null") {
             email = ""
         }else {
             email = inputEmail
-            if(!email.equals(_uiState.value.email.toString().trim())){
-                isEntryValid = true
-            } else isEntryValid = false
+            isEntryValid = email != _uiState.value.email.toString().trim()
         }
     }
     fun updateBirthday(inputBirthday: String) {
         birthday = inputBirthday
-        if(!birthday.equals(initBirthday)){
-            isEntryValid = true
-        } else isEntryValid = false
-        Log.d("BIRTHDAY",birthday)
+        isEntryValid = birthday != initBirthday
     }
     fun updateGender(inputGender: String) {
-        if(inputGender.equals("null")) {
+        if(inputGender == "null") {
             gender = "Nam"
         }else {
             gender = inputGender
-            if(!gender.equals(_uiState.value.gender)){
-                isEntryValid = true
-            } else isEntryValid = false
+            isEntryValid = gender != _uiState.value.gender
         }
     }
     fun toogleSetting(isShowingInfo:Boolean) {
@@ -291,7 +273,7 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
         isEmailLogin = !isEmailLogin
     }
     fun logout() {
-        FirebaseAuth.getInstance().signOut();
+        FirebaseAuth.getInstance().signOut()
         _uiState.update { currentState ->
             currentState.copy(
                 id = 0,
@@ -319,19 +301,19 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
                 .setCallbacks(/* p0 = */ object :
                     PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
                     override fun onVerificationCompleted(p0: PhoneAuthCredential) {
-                        Log.d("DEBUG","${mobileNum} send success")
+                        Log.d("DEBUG","$mobileNum send success")
                     }
 
                     override fun onVerificationFailed(p0: FirebaseException) {
                         isLoading = false
-                        Toast.makeText(activity, "${mobileNum} send failed", Toast.LENGTH_LONG).show()
+                        Toast.makeText(activity, "$mobileNum send failed", Toast.LENGTH_LONG).show()
                     }
 
                     override fun onCodeSent(otp: String, p1: PhoneAuthProvider.ForceResendingToken) {
                         super.onCodeSent(otp, p1)
                         isLoading = false
                         verificationOtp = otp
-                        Toast.makeText(activity, "${mobileNum} onCodeSend", Toast.LENGTH_LONG).show()
+                        Toast.makeText(activity, "$mobileNum onCodeSend", Toast.LENGTH_LONG).show()
                         isDialogShown = true
                     }
                 }).build()

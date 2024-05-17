@@ -1,13 +1,13 @@
 package com.example.jetpackcomposedemo
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
-import android.content.Intent
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,9 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -37,7 +35,6 @@ import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
 import com.example.jetpackcomposedemo.Screen.Discount.RollUpScreen
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.VideoScreen
-import com.example.jetpackcomposedemo.Screen.GlobalScreen.showError
 import com.example.jetpackcomposedemo.Screen.Home.HomeScreen
 import com.example.jetpackcomposedemo.Screen.Home.HomeTopBar
 import com.example.jetpackcomposedemo.Screen.Notifications.NotificationsScreen
@@ -65,10 +62,10 @@ import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
 import com.example.jetpackcomposedemo.data.repository.BookingRepository
 import com.example.jetpackcomposedemo.data.repository.RoomRepository
 import com.example.jetpackcomposedemo.data.repository.RoomTypeRepository
-import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModel
-import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModelFactory
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApiFactory
+import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModel
+import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModelFactory
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModelFactory
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
@@ -76,14 +73,8 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.concurrent.TimeUnit
 import vn.zalopay.sdk.ZaloPaySDK
 
 
@@ -233,6 +224,7 @@ fun MainApp(mainActivity: MainActivity) {
 
             /////////  thời gian thanh toán còn lại trước khi tự động hủy  //////////////////////////
             val countDownPaymentViewModel:CountDownPaymentViewModel = viewModel()
+
             NavHost(navController = navController, startDestination = "StartingAppScreen" ){
 
 
@@ -436,7 +428,7 @@ fun MainApp(mainActivity: MainActivity) {
                             navController = navController,
                             topBar = { UserTopBar( loginUiState = loginUiState,
                                 onLoginButtonClicked = { navController.navigate("login") },
-                                onToogleSettingInfo = {
+                                onToggleSettingInfo = {
                                     loginViewModel1.toogleSetting(loginUiState.isShowingInfo)
                                     loginViewModel1.reset()
                                 }) },

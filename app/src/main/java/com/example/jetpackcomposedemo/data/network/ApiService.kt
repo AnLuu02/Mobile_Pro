@@ -8,8 +8,9 @@ import com.example.jetpackcomposedemo.data.models.Identity
 import com.example.jetpackcomposedemo.data.models.POST_Body_UserCoupon
 import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.models.RoomType
-import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.models.User
+import com.example.jetpackcomposedemo.data.models.UserCoupon
+import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.StateCallApi
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -37,7 +38,7 @@ interface ApiService {
     suspend fun deleteMyBooking(
         @Query("bkid") bkId: Int,
         @Query("billid") billId: Int
-    ): Response<String>
+    ): Response<StateCallApi>
 
     //get all
     // Coupon - begin

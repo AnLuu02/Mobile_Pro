@@ -1,7 +1,6 @@
 package com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -161,11 +160,11 @@ fun PaymentBottomBar(
                 Button(
                     enabled = !isClicked,
                     onClick = {
-                        Log.e("payloadCHoos",payloadChoose.type.toString())
                         if(payloadChoose.type == null){
                             openAlertDialog.value = true
                         }
                         else{
+                            countDownPaymentViewModel.startCountdown()
                             onApplyBooking()
                         }
                     },

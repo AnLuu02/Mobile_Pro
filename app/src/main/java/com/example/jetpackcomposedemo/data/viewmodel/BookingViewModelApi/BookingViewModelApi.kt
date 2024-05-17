@@ -1,5 +1,6 @@
 package com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
@@ -20,8 +21,12 @@ class BookingViewModelApi(private val repository: BookingRepository) : ViewModel
     val myBookingList: LiveData<Resource<List<MyBooking>>> = _myBookingList
 
 
-    private var _message  = mutableStateOf("")
-    val message: State<String> = _message
+    private var _stateCallApi  = mutableStateOf(StateCallApi())
+    val stateCallApi: State<StateCallApi> = _stateCallApi
+
+    fun setStatusCallApi(st:StateCallApi){
+        _stateCallApi.value = st
+    }
 
     init {
 
@@ -59,17 +64,21 @@ class BookingViewModelApi(private val repository: BookingRepository) : ViewModel
         }
     }
 
-    fun deleteMyBooking(bkId:Int,billId:Int){
+    fun deleteMyBooking(bkId:Int,billId:Int,uid:Int){
         viewModelScope.launch {
             try {
                 val response = repository.deleteMyBooking(bkId,billId)
+                Log.e("responsebody",response.body().toString())
+                Log.e("response",response.toString())
+
                 if (response.isSuccessful) {
-                    _message.value = response.body().toString()
+                    getListMyBooking(uid.toString())
+                    _stateCallApi.value = response.body()!!
                 } else {
-                   _message.value = "error"
+                    _stateCallApi.value =response.body()!!
                 }
             } catch (e: Exception) {
-                _message.value = "error"
+                Log.e(">-<","",e)
             }
         }
     }

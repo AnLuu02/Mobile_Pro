@@ -62,9 +62,9 @@ import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
 import com.example.jetpackcomposedemo.data.models.Booking.MyBooking
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
+import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.StateCallApi
 import com.example.jetpackcomposedemo.helpper.Status
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -76,17 +76,35 @@ fun MyBookingScreen(
     bookingViewModelApi:BookingViewModelApi,
     navController:NavHostController
 ) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-
-    LaunchedEffect(bookingViewModel) {
+    LaunchedEffect(Unit) {
         bookingViewModelApi.getListMyBooking(uid)
     }
-
+    var roomList = remember { mutableListOf<MyBooking>() }
     val resourceMyBooking = bookingViewModelApi.myBookingList.observeAsState()
-
-    val (loading, setLoading) = remember {
-        mutableStateOf(false)
+    val (loading, setLoading) = remember { mutableStateOf(false) }
+    when (resourceMyBooking.value?.status) {
+        Status.SUCCESS -> {
+            resourceMyBooking.value?.data?.let { rooms ->
+                roomList = rooms.toMutableList()
+            }
+            setLoading(false)
+        }
+        Status.ERROR -> {
+            setLoading(true);
+        }
+        Status.LOADING -> {
+            setLoading(true)
+        }
+        null ->  Log.e("<Error>", "Roi vao null")
     }
+    if(bookingViewModelApi.stateCallApi.value.status == 1){
+        Toast.makeText(context, "Xóa thành công", Toast.LENGTH_SHORT).show()
+        bookingViewModelApi.setStatusCallApi(StateCallApi())
+    }
+
     Scaffold(
         topBar = {
             MyBookingTopBar(navController = navController)
@@ -102,60 +120,48 @@ fun MyBookingScreen(
                 .padding(padding)
                 .background(Color.LightGray.copy(alpha = 0.3f))
         ) {
-            when(resourceMyBooking.value?.status){
-                Status.SUCCESS->{
-                    resourceMyBooking.value?.data?.let {
-                        setLoading(false)
-                        if(it.isEmpty()){
-                            item{
-                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                                    Button(
-                                        onClick = {
-                                            navController.navigate("search")
-                                        },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp)
-                                            .align(Alignment.Center)
-                                            .clip(MaterialTheme.shapes.small),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color.Red,
-                                            contentColor = Color.White,
-                                        )
-                                    ) {
-                                        Text(
-                                            text = "Bạn chưa có phòng? Đặt phòng ngay...",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            color = Color.White,
-                                            fontWeight = FontWeight.Bold,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        else{
-                            items(it){item->
-                                CardMyBooKing(bookingRoom = item,
-                                    navController = navController,
-                                    bookingViewModel = bookingViewModel,
-                                    bookingViewModelApi = bookingViewModelApi,
-                                    countDownPaymentViewModel = countDownPaymentViewModel)
-                            }
+            if(roomList.isEmpty()){
+                item{
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        Button(
+                            onClick = {
+                                navController.navigate("search")
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .align(Alignment.Center)
+                                .clip(MaterialTheme.shapes.small),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Red,
+                                contentColor = Color.White,
+                            )
+                        ) {
+                            Text(
+                                text = "Bạn chưa có phòng? Đặt phòng ngay...",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                            )
                         }
                     }
                 }
-                Status.LOADING->{
-                    setLoading(true)
-                }
-                Status.ERROR->{
-                    setLoading(true)
-                }
-
-                null -> {
-                    setLoading(true)
+            }
+            else {
+                items(roomList){item->
+                    CardMyBooKing(
+                        coroutineScope = coroutineScope,
+                        bookingRoom = item,
+                        navController = navController,
+                        bookingViewModel = bookingViewModel,
+                        bookingViewModelApi = bookingViewModelApi,
+                        countDownPaymentViewModel = countDownPaymentViewModel,
+                        onDeleteClicked = {bkid,billid,uid->
+                            bookingViewModelApi.deleteMyBooking(bkid,billid,uid)
+                        }
+                    )
                 }
             }
-
         }
     }
 
@@ -164,14 +170,14 @@ fun MyBookingScreen(
 
 @Composable
 fun CardMyBooKing(
+    coroutineScope:CoroutineScope,
     bookingRoom: MyBooking,
     navController:NavHostController,
     bookingViewModel:BookingViewModel,
     bookingViewModelApi:BookingViewModelApi,
-    countDownPaymentViewModel: CountDownPaymentViewModel
+    countDownPaymentViewModel: CountDownPaymentViewModel,
+    onDeleteClicked:(Int, Int, Int)->Unit
 ){
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
     val timeLeftFormatted by countDownPaymentViewModel.timeLeftFormatted.observeAsState()
     val date = bookingRoom.booking?.timeBooking?.split(",")?.get(1)?.trim()
     val hourly = bookingRoom.booking?.timeBooking?.split(",")?.get(0)?.trim()
@@ -208,11 +214,10 @@ fun CardMyBooKing(
 
     val bedTypeApi = bookingRoom.room?.roomTypes?.bedTypes?.filter {
         it.type.trim() == (bookingRoom.bill?.bedTypeApi?.trim() ?: "single")
-    }
-        ?.get(0)
+    }?.get(0)
 
 
-    var expanded = remember { mutableStateOf(false) }
+    val expanded = remember { mutableStateOf(false) }
 
 
     Spacer(modifier = Modifier.height(6.dp))
@@ -239,7 +244,7 @@ fun CardMyBooKing(
                 ) {
                     Text(
                         text = date ?: "22/04/2024",
-                        fontSize = 16.sp
+                        fontSize = 12.sp
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -382,6 +387,7 @@ fun CardMyBooKing(
             }
 
         }
+
         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "", modifier = Modifier
             .size(24.dp)
             .align(Alignment.TopEnd)
@@ -438,24 +444,8 @@ fun CardMyBooKing(
                         .width(200.dp)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                         .clickable {
-                            coroutineScope.launch {
-                                bookingRoom.booking?.id?.let {
-                                    bookingRoom.bill?.id?.let { it1 ->
-                                        Log.e("<bill id>", it1.toString())
-                                        Log.e("<booking id>", it.toString())
-
-                                        bookingViewModelApi.deleteMyBooking(
-                                            it,
-                                            it1
-                                        )
-                                    }
-                                }
-                                expanded.value = false
-                                delay(500)
-                                Toast
-                                    .makeText(context, "Xóa thành công", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
+                            bookingRoom.booking?.id?.let { bookingRoom.bill?.id?.let { it1 -> bookingRoom.booking.uID?.let { it2 -> onDeleteClicked(it, it1, it2) } } }
+                            expanded.value = false
                         }
 
                 ) {
