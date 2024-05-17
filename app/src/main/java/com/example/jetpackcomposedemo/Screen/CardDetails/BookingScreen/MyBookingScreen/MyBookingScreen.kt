@@ -79,12 +79,11 @@ fun MyBookingScreen(
     val listState = rememberLazyListState()
 
     LaunchedEffect(bookingViewModel) {
-        bookingViewModelApi.getListMyBooking("1")
-//        bookingViewModelApi.getListMyBooking(uid)
-
+        bookingViewModelApi.getListMyBooking(uid)
     }
 
     val resourceMyBooking = bookingViewModelApi.myBookingList.observeAsState()
+
     val (loading, setLoading) = remember {
         mutableStateOf(false)
     }
