@@ -1,12 +1,10 @@
 package com.example.jetpackcomposedemo.Screen.User
 
-import com.example.jetpackcomposedemo.data.models.Coupon
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 //private val baseUrl =
@@ -24,7 +22,7 @@ interface MyApiService {
 //    suspend fun getUsers(): List<MyUser>
 
     @GET("api/user")
-    suspend fun getUserByPhone(@Query("phone") phone:String): List<MyUser>
+    suspend fun getUserByPhone(@Query("phone") phone:String): Response<List<MyUser>>
     @POST("api/user")
     suspend fun addUser(@Body newUser: MyUser)
 

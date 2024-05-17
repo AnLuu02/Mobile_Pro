@@ -22,7 +22,6 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -83,25 +82,24 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 val validPhone = phoneNumber.replaceFirst("+84", "0")
-                val myUser = MyUser(sdt = validPhone)
+                val myUser = MyUser(fullName = "User$validPhone",sdt = validPhone)
                 userRepository.createUser(myUser)
                 val info = userRepository.getUserByPhone(validPhone)
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        id = info[0].ID!!,
-                        gender = info[0].gender,
-                        birthday = info[0].birthday,
-                        fullName = info[0].fullName,
-                        email = email,
-                        phoneNumber = info[0].sdt,
-                        isLoggedIn = true
-                    )
+                if(info.isSuccessful){
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            id = info.body()?.get(0)?.ID!!,
+                            gender = info.body()?.get(0)?.gender,
+                            birthday = info.body()?.get(0)?.birthday,
+                            fullName = info.body()?.get(0)?.fullName ,
+                            email = email,
+                            phoneNumber = info.body()?.get(0)?.sdt,
+                            isLoggedIn = true
+                        )
+                    }
+                    initBirthday = formatBirthday()
+                    updateBirthday(initBirthday)
                 }
-                Log.d("ViDat","ID: ${info[0].ID}")
-                delay(1000)
-                initBirthday = formatBirthday()
-                updateBirthday(initBirthday)
-
                 val googleUser = MyUser(
                     fullName = user.displayName,
                     email = user.email
@@ -180,22 +178,26 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
         viewModelScope.launch {
            try {
                val info = userRepository.getUserByPhone(phone)
-               _uiState.update { currentState ->
-                   currentState.copy(
-                       id = info[0].ID!!,
-                       gender = info[0].gender,
-                       birthday = info[0].birthday,
-                       fullName = info[0].fullName ?: "User${info[0].ID}",
-                       email = email,
-                       phoneNumber = info[0].sdt,
-                       isLoggedIn = true
-                   )
+               if(info.isSuccessful){
+                   _uiState.update { currentState ->
+                       currentState.copy(
+                           id = info.body()?.get(0)?.ID!!,
+                           gender = info.body()?.get(0)?.gender,
+                           birthday = info.body()?.get(0)?.birthday,
+                           fullName = info.body()?.get(0)?.fullName ,
+                           email = email,
+                           phoneNumber = info.body()?.get(0)?.sdt,
+                           isLoggedIn = true
+                       )
+                   }
+                   initBirthday = formatBirthday()
+                   updateBirthday(initBirthday)
                }
-               Log.d("ViDat","ID: ${info[0].ID}")
-               initBirthday = formatBirthday()
-               updateBirthday(initBirthday)
+               else{
+                   Log.e("<Call Api loi>","")
+               }
            } catch (e: Exception) {
-               logout()
+               Log.e("getInfoUser", "Exception caught in getInfoUser", e)
            }
         }
     }
@@ -214,7 +216,7 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
 
             } catch (e: Exception) {
                 Toast.makeText(activity, "Server gặp lỗi,hãy thử lại", Toast.LENGTH_SHORT).show()
-                logout()
+//                logout()
             }
         }
     }
@@ -240,7 +242,7 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
     }
     fun updateFullname(inputFullname: String) {
         if(inputFullname.equals("null")) {
-            fullName = "User${_uiState.value.id}"
+            fullName = "User${_uiState.value.phoneNumber}"
         }else {
             fullName = inputFullname
             if(!fullName.equals(_uiState.value.fullName.toString().trim())){
@@ -350,6 +352,7 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
                     if (phoneNumber != null) {
                         val validPhone = phoneNumber.replaceFirst("+84","0")
                         val myUser = MyUser(
+                            fullName = "User$validPhone",
                             sdt = validPhone
                         )
                         if (isLoginWithGoogle) {
@@ -361,26 +364,6 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
                         updatePhoneNumber("")
                         onSuccess()
                     }
-//                    val databaseRef = Firebase.database.reference.child("users").child(uid ?: "")
-//                    databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
-//                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                            // Người dùng không tồn tại trong database
-//                            if (!dataSnapshot.exists()) {
-//                                // Thực hiện việc thêm người dùng mới
-//                                databaseRef.child("phoneNumber").setValue(phoneNumber).addOnCompleteListener {
-//                                    if (it.isSuccessful) {
-//                                        Log.d("DEBUG", "User added to database")
-//                                    } else {
-//                                        Log.d("DEBUG", "Failed to add user to database")
-//                                    }
-//                                }
-//                            }
-//                        }
-//
-//                        override fun onCancelled(databaseError: DatabaseError) {
-//                            Log.d("DEBUG", "Database error: ${databaseError.message}")
-//                        }
-//                    })
                 } else {
                     Toast.makeText(activity, "OTP không đúng,hãy thử lại", Toast.LENGTH_SHORT).show()
                 }

@@ -1,10 +1,8 @@
 package com.example.jetpackcomposedemo.Screen.User
 
 import com.google.gson.annotations.SerializedName
-import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.LocalDate
 
 @Serializable
 data class MyUser(
@@ -23,7 +21,7 @@ data class MyUser(
     @SerialName(value = "Birthday")
     val birthday:String? = null,
     @SerialName(value = "Point")
-    val point:Int = 0,
-    @SerializedName("WeekRollUp") val WeekRollUp: String = "0000000",
+    val point:Int? = null,
+    @SerializedName("WeekRollUp") val WeekRollUp: String? = null,
     @SerializedName("LastDayRollUp") val LastDayRollUp: String? = null,
 )
