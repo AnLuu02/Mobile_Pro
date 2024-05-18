@@ -15,12 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -60,12 +59,12 @@ fun ListRoomTopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 48.dp),
-        ){
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 12.dp,end=12.dp, bottom = 16.dp)
-            ){
+                    .padding(start = 12.dp, end = 12.dp, bottom = 16.dp)
+            ) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterStart)
@@ -74,10 +73,9 @@ fun ListRoomTopBar(
                             indication = rememberRipple(bounded = false, radius = 24.dp),
                             onClick = onBack
 
-                        )
-                    ,
+                        ),
                     contentAlignment = Alignment.Center
-                ){
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.ArrowBackIosNew,
                         contentDescription = "back",
@@ -93,7 +91,7 @@ fun ListRoomTopBar(
                 )
 
             }
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(0.5.dp)
@@ -141,17 +139,19 @@ fun ListRoomTopBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    when(typeBooking){
-                        "hourly"-> Icon(
+                    when (typeBooking) {
+                        "hourly" -> Icon(
                             painter = painterResource(id = R.drawable.outline_hourglass_top_24),
                             contentDescription = "", modifier = Modifier.size(16.dp),
                             tint = Color.Red
                         )
-                        "overnight"-> Icon(
+
+                        "overnight" -> Icon(
                             painter = painterResource(id = R.drawable.outline_dark_mode_24),
                             contentDescription = "", modifier = Modifier.size(16.dp),
                             tint = Color(138, 43, 226)
                         )
+
                         else -> Icon(
                             painter = painterResource(id = R.drawable.outline_calendar_month_24),
                             contentDescription = "", modifier = Modifier.size(16.dp),
@@ -161,14 +161,15 @@ fun ListRoomTopBar(
 
                     Spacer(modifier = Modifier.width(6.dp))
 
-                    Text(text = if(typeBooking == "hourly") "${if(totalTime.toInt() < 9) "0${totalTime}" else totalTime} giờ"
-                    else "${if(totalTime.toInt() < 9) "0${totalTime}" else totalTime} ngày" ,
+                    Text(
+                        text = if (typeBooking == "hourly") "${if (totalTime.toInt() < 9) "0${totalTime}" else totalTime} giờ"
+                        else "${if (totalTime.toInt() < 9) "0${totalTime}" else totalTime} ngày",
                         style = MaterialTheme.typography.bodyMedium
                     )
 
                     Spacer(modifier = Modifier.width(6.dp))
 
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier
                             .width(1.dp)
                             .height(6.dp)
@@ -178,7 +179,11 @@ fun ListRoomTopBar(
                     Text(text = dateCheckinString, style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.width(6.dp))
 
-                    Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = "", modifier = Modifier.size(16.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                        contentDescription = "",
+                        modifier = Modifier.size(16.dp)
+                    )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(text = dateCheckoutString, style = MaterialTheme.typography.bodyMedium)
                 }

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -30,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -126,7 +124,7 @@ fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolea
 
   Column(
     modifier = Modifier
-      .padding(0.dp, 25.dp, 0.dp, 0.dp)
+      .padding(0.dp, 40.dp, 0.dp, 0.dp)
   ) {
     Row(
       modifier = Modifier
@@ -227,11 +225,11 @@ fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolea
               for ((index, coupon) in listCoupon.withIndex()) {
                 var showDiscount = ""
                 var showExpDate = ""
-                if (coupon.amountDiscount == 0F || coupon.amountDiscount == null) {
-                  showDiscount = coupon.percentDiscount.toString() + "%"
+                showDiscount = if (coupon.amountDiscount == 0F || coupon.amountDiscount == null) {
+                  coupon.percentDiscount.toString() + "%"
                 } else {
-                  var temp = coupon.amountDiscount / 1000F
-                  showDiscount = temp.toInt().toString() + "K"
+                  val temp = coupon.amountDiscount / 1000F
+                  temp.toInt().toString() + "K"
                 }
 
                 if (coupon.expirationDate == null) {
@@ -243,7 +241,7 @@ fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolea
                 }
 
                 val handleClickCoupon: () -> Unit = {
-//                  navController?.navigate("listroom")
+                  navController?.navigate("")
                 }
 
                 ItemInList(
@@ -298,14 +296,4 @@ fun CouponScreen(navController: NavHostController?, userID: Int?, isDemo: Boolea
 
 fun selectButton(IDValue: String) {
 
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CouponScreenDemo() {
-  CouponScreen(
-    navController = null,
-    userID = null,
-    isDemo = true
-  )
 }

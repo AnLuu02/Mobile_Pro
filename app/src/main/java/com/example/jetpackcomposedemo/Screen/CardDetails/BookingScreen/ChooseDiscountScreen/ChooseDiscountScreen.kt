@@ -71,12 +71,7 @@ fun ChooseDiscountScreen(
     }
 
     LaunchedEffect(Unit) {
-        userCouponViewModel.getListCouponOfUser("1")
-//        userCouponViewModel.getListCouponOfUser(loginUiState.id.toString())
-
-//        if(loginUiState.id != null) {
-//            userCouponViewModel.getListCouponOfUser(loginUiState.id.toString())
-//        }
+        userCouponViewModel.getListCouponOfUser(loginUiState.id.toString())
     }
     val couponResource = userCouponViewModel.list.observeAsState()
 
@@ -87,7 +82,6 @@ fun ChooseDiscountScreen(
         bottomBar = {
             ChooseDiscountBottomBar(
                 navController = navController,
-                bookingViewModel = bookingViewModel,
                 onChooseDiscount = {
                     bookingViewModel.setDiscount(selectedDiscount.value)
                 }
@@ -142,7 +136,7 @@ fun PromotionItem(
     }
     val sizeCard = screenWidth*10/12
 
-    val selectedDiscount = remember { mutableStateOf<Int>(-1) }
+    val selectedDiscount = remember { mutableStateOf(-1) }
 
     listCoupon.forEachIndexed { index, userCoupon ->
         if(selectedDiscountPayload!=null && selectedDiscountPayload.id == listCoupon[index].id ){
@@ -176,7 +170,7 @@ fun PromotionItem(
                         .align(Alignment.CenterVertically)
                 ) {
                     Text(
-                        text = userCoupon.name ?: "Giảm giá tới 50% cho 2 đêm 3 ngày",
+                        text = userCoupon.name,
                         fontSize = 20.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

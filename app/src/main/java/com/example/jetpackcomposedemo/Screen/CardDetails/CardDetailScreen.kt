@@ -22,7 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -326,9 +326,10 @@ fun CardDetailScreen(
                                 Icon(
                                     imageVector = Icons.Rounded.Star,
                                     contentDescription = "",
-                                    tint = Color(255,215,0),
+                                    tint = Color(255, 215, 0),
                                     modifier = Modifier
-                                        .size(24.dp))
+                                        .size(24.dp)
+                                )
 
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
@@ -343,10 +344,14 @@ fun CardDetailScreen(
                                 )
                             }
 
-                            Box(modifier = Modifier
-                                .background(Color.Red.copy(0.2f), shape = RoundedCornerShape(4.dp)),
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        Color.Red.copy(0.2f),
+                                        shape = RoundedCornerShape(4.dp)
+                                    ),
                                 contentAlignment = Alignment.Center
-                            ){
+                            ) {
                                 Row(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically,
@@ -357,7 +362,8 @@ fun CardDetailScreen(
                                         contentDescription = "",
                                         tint = Color.Red,
                                         modifier = Modifier
-                                            .size(12.dp))
+                                            .size(12.dp)
+                                    )
                                     Spacer(modifier = Modifier.width(2.dp))
                                     Text(
                                         text = "Nổi bật",
@@ -422,7 +428,7 @@ fun CardDetailScreen(
 
                         Spacer(modifier = Modifier.height(4.dp))
 
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier
                                 .height(0.5.dp)   // The divider will fill the height of the Row
                                 .fillMaxWidth(),
@@ -626,7 +632,7 @@ fun Evaluate(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Bottom
-            ){
+            ) {
 
                 Text(
                     text = data.rating.toString(),
@@ -638,7 +644,7 @@ fun Evaluate(
 
                 Column {
                     Text(
-                        text ="Tuyệt vời",
+                        text = "Tuyệt vời",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -646,7 +652,7 @@ fun Evaluate(
                     Spacer(modifier = Modifier.height(2.dp))
 
                     Text(
-                        text ="97 đánh giá",
+                        text = "97 đánh giá",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
@@ -657,7 +663,7 @@ fun Evaluate(
             Spacer(modifier = Modifier.height(30.dp))
             Comment()
             Spacer(modifier = Modifier.height(20.dp))
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .height(0.5.dp)   // The divider will fill the height of the Row
                     .fillMaxWidth(),
@@ -670,7 +676,7 @@ fun Evaluate(
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
-            ){
+            ) {
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -692,8 +698,6 @@ fun Evaluate(
                     )
                 }
             }
-
-
 
 
         }
@@ -905,7 +909,7 @@ fun CheckInCheckOut(){
                 .padding(16.dp)
         ) {
             Text(
-                text ="Giờ nhận phòng/trả phòng",
+                text = "Giờ nhận phòng/trả phòng",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -935,7 +939,7 @@ fun CheckInCheckOut(){
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .height(0.5.dp)   // The divider will fill the height of the Row
                     .fillMaxWidth(),

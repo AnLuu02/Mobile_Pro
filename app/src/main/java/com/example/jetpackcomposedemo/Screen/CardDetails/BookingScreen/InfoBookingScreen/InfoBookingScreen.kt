@@ -24,7 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -70,14 +70,11 @@ import java.time.LocalDateTime
 fun InfoBookingScreen(
     countDownPaymentViewModel:CountDownPaymentViewModel,
     status:String,
-    roomId:String,
     bookingViewModel:BookingViewModel,
     navController:NavHostController,
     loginUiState:LoginUiState
 ) {
     val listState = rememberLazyListState()
-
-
     val year = LocalDateTime.now().year
     val typeBooking = bookingViewModel.getTypeBooking()
     val dateCheckinString = if(!bookingViewModel.getTimeCheckin()?.contains("/$year")!!) "${bookingViewModel.getTimeCheckin()}/$year" else bookingViewModel.getTimeCheckin()
@@ -85,6 +82,17 @@ fun InfoBookingScreen(
     val totalTime = bookingViewModel.getTotalTime()
     val infoRoom = bookingViewModel.getInfoRoom()
     val bedType = bookingViewModel.getBedType()
+    val discount = bookingViewModel.getDiscount()
+    val priceRoom = (bedType?.total ?: 1) * (totalTime?.toInt()!!)
+    val amountDiscount = bedType?.let {
+        calculatePriceDiscount(
+            it.total,
+            discount?.amountDiscount?.toInt(), discount?.percentDiscount
+        )
+    }
+
+    val finalPrice = priceRoom - amountDiscount!!
+
     Scaffold(
         topBar = {
             InfoBookingTopBar(navController = navController)
@@ -103,24 +111,26 @@ fun InfoBookingScreen(
                     TimerComponentInfoRoom(status,navController = navController,infoRoom = infoRoom,countDownPaymentViewModel = countDownPaymentViewModel)
                 }
                 Spacer(modifier = Modifier.height(10.dp))
-                if (bedType != null) {
-                    if (infoRoom != null) {
-                        BookingDetails(
-                            bedType = bedType,
-                            infoRoom = infoRoom,
-                            dateCheckinString.toString(),
-                            dateCheckoutString.toString(),
-                            totalTime ?: "1",
-                            typeBooking.toString(),
-                            loginUiState = loginUiState
-                        )
-                    }
+                if (infoRoom != null) {
+                    BookingDetails(
+                        bedType = bedType,
+                        infoRoom = infoRoom,
+                        dateCheckinString.toString(),
+                        dateCheckoutString.toString(),
+                        totalTime,
+                        typeBooking.toString(),
+                        loginUiState = loginUiState
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
-                DiscountBookingInfoRoom(navController = navController)
+                DiscountBookingInfoRoom(bookingViewModel = bookingViewModel)
                 Spacer(modifier = Modifier.height(10.dp))
-                PaymentDetailsInfoBooking(bookingViewModel = bookingViewModel)
+                PaymentDetailsInfoBooking(
+                    bookingViewModel = bookingViewModel,
+                    priceRoom = priceRoom,
+                    finalPrice = finalPrice
+                )
                 Spacer(modifier = Modifier.height(10.dp))
                 CanclePolicyInfoBooking(status)
             }
@@ -419,7 +429,7 @@ fun BookingDetails(
             }
 
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(0.5.dp),
@@ -494,7 +504,7 @@ fun BookingDetails(
             }
 
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(0.5.dp),
@@ -656,8 +666,9 @@ fun BookingDetails(
 
 @Composable
 fun DiscountBookingInfoRoom(
-    navController:NavHostController
+    bookingViewModel: BookingViewModel
 ){
+    val discount  = bookingViewModel.getDiscount()
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -675,15 +686,29 @@ fun DiscountBookingInfoRoom(
                     .padding(12.dp, 16.dp, 12.dp, 16.dp)
 
             )
-            Text(
-                text = "Bạn không sử dụng khuyến mãi nào cho đặt phòng này.",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.W500,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp, 0.dp, 12.dp, 16.dp)
+            if(discount != null){
+                Text(
+                    text = discount.name,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.W500,
+                    color = Color.Red,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp, 0.dp, 12.dp, 16.dp)
 
-            )
+                )
+            }
+            else{
+                Text(
+                    text = "Bạn không sử dụng khuyến mãi nào cho đặt phòng này.",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.W500,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp, 0.dp, 12.dp, 16.dp)
+
+                )
+            }
         }
 
     }
@@ -692,7 +717,9 @@ fun DiscountBookingInfoRoom(
 
 @Composable
 fun PaymentDetailsInfoBooking(
-    bookingViewModel: BookingViewModel
+    bookingViewModel: BookingViewModel,
+    priceRoom:Int,
+    finalPrice:Int
 ){
     val bedType = bookingViewModel.getBedType()
     val discount = bookingViewModel.getDiscount()
@@ -741,7 +768,7 @@ fun PaymentDetailsInfoBooking(
                 }
             }
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
@@ -794,7 +821,7 @@ fun PaymentDetailsInfoBooking(
                 if (discount != null) {
                     if (bedType != null) {
                         Text(
-                            text = "- ${formatCurrencyVND(CaculatePriceDiscount(bedType.total,
+                            text = "- ${formatCurrencyVND(calculatePriceDiscount(bedType.total,
                                 discount.amountDiscount?.toInt(),discount.percentDiscount))}",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
@@ -812,13 +839,12 @@ fun PaymentDetailsInfoBooking(
                 }
             }
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
                     .padding(start = 12.dp, end = 12.dp),
                 color = Color.LightGray.copy(0.5f)
-
             )
 
             Row(
@@ -837,15 +863,14 @@ fun PaymentDetailsInfoBooking(
                 if (bedType != null) {
                     if (discount != null) {
                         Text(
-                            text = formatCurrencyVND(CaculateTotalPriceFinal(bedType.total,
-                                discount.amountDiscount?.toInt(),discount.percentDiscount)),
+                            text = formatCurrencyVND(finalPrice),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
                     else{
                         Text(
-                            text = formatCurrencyVND(bedType.total),
+                            text = formatCurrencyVND(priceRoom),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )

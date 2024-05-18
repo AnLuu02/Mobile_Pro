@@ -21,7 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -199,7 +199,7 @@ fun PriceCard(
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
 
-                                    Divider(
+                                    HorizontalDivider(
                                         modifier = Modifier
                                             .height(12.dp)   // The divider will fill the height of the Row
                                             .width(1.dp),      // Set the thickness of the divider

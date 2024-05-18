@@ -217,9 +217,7 @@ fun MainApp(mainActivity: MainActivity) {
             ))
 
             if(loginUiState.isLoggedIn){
-                bookingViewModelApi.getListMyBooking(1.toString())
-//                bookingViewModelApi.getListMyBooking(loginUiState.id.toString())
-
+                bookingViewModelApi.getListMyBooking(loginUiState.id.toString())
             }
 
             /////////  thời gian thanh toán còn lại trước khi tự động hủy  //////////////////////////
@@ -238,12 +236,10 @@ fun MainApp(mainActivity: MainActivity) {
                         }
                     )
                 ){backStackEntry->
-                    val roomId = backStackEntry.arguments?.getString("roomId").toString()
                     val status = backStackEntry.arguments?.getString("status").toString()
                     InfoBookingScreen(
                         countDownPaymentViewModel = countDownPaymentViewModel,
                         status = status,
-                        roomId = roomId,
                         bookingViewModel = bookingViewModel,
                         navController = navController,
                         loginUiState = loginUiState
@@ -334,7 +330,7 @@ fun MainApp(mainActivity: MainActivity) {
                         },
                     )
                 ){ backStackEntry ->
-                    val type = backStackEntry.arguments?.getString("type").toString();
+                    val type = backStackEntry.arguments?.getString("type").toString()
                     ServiceScreen(
                         serviceType = type,
                         navController = navController,
@@ -557,9 +553,8 @@ fun MainApp(mainActivity: MainActivity) {
                         navArgument("roomId") {
                             type = NavType.StringType
                         })
-                ){ backStackEntry ->
+                ){
 
-                    val roomId = backStackEntry.arguments?.getString("roomId")
                     PaymentScreen(
                         mainActivity = mainActivity,
                         bookingViewModelApi = bookingViewModelApi,

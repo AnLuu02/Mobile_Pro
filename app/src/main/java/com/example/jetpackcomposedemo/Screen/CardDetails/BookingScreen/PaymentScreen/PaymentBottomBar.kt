@@ -22,7 +22,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.CountDownPaymentViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
+import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
 import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -49,7 +50,7 @@ fun PaymentBottomBar(
     bookingViewModel: BookingViewModel,
     countDownPaymentViewModel: CountDownPaymentViewModel,
     payloadChoose:OptionPayment,
-    totalPrice:String,
+    finalPrice:Int,
     isClicked:Boolean,
     onChooseMethodPayment:(Boolean)->Unit,
     onApplyBooking:()->Unit
@@ -133,7 +134,7 @@ fun PaymentBottomBar(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
@@ -154,7 +155,7 @@ fun PaymentBottomBar(
                     Text(text = "Tổng thanh toán", style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    Text(text = totalPrice, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(text = formatCurrencyVND(finalPrice), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 }
 
                 Button(

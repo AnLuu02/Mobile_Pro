@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -112,7 +112,7 @@ fun ImageRightCard(
                                     Icon(
                                         imageVector = Icons.Rounded.Star,
                                         contentDescription = "",
-                                        tint = Color(255,215,0),
+                                        tint = Color(255, 215, 0),
                                         modifier = Modifier.size(24.dp)
 
                                     )
@@ -156,7 +156,8 @@ fun ImageRightCard(
                                 Spacer(modifier = Modifier.height(4.dp))
 
                                 Text(
-                                    text = data.roomTypes?.bedTypes?.get(0)?.let { formatCurrencyVND( it.total ) }.toString(),
+                                    text = data.roomTypes?.bedTypes?.get(0)
+                                        ?.let { formatCurrencyVND(it.total) }.toString(),
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -189,13 +190,12 @@ fun ImageRightCard(
             }
 
         }
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .height(1.dp)
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp)
-                .align(Alignment.BottomCenter)
-            ,
+                .align(Alignment.BottomCenter),
             color = Color.LightGray.copy(0.5f)
         )
     }

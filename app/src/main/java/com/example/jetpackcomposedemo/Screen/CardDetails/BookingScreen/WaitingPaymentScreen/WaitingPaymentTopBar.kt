@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
@@ -44,12 +44,12 @@ fun MethodWaitingPaymentTopBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-        ){
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp)
-            ){
+            ) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterStart)
@@ -63,10 +63,9 @@ fun MethodWaitingPaymentTopBar(
                                 }
 
                             }
-                        )
-                    ,
+                        ),
                     contentAlignment = Alignment.Center
-                ){
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.Close,
                         contentDescription = "back",
@@ -83,7 +82,7 @@ fun MethodWaitingPaymentTopBar(
                 )
 
             }
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(0.5.dp)

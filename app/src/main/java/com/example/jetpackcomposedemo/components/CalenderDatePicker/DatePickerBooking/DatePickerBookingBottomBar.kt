@@ -13,8 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -69,12 +69,11 @@ fun DatePickerBookingBottomBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-    ){
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 20.dp)
-            ,
+                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -85,7 +84,7 @@ fun DatePickerBookingBottomBar(
             ) {
                 Column(
                     horizontalAlignment = Alignment.Start,
-                    modifier=Modifier.padding(end = 8.dp)
+                    modifier = Modifier.padding(end = 8.dp)
 
                 ) {
                     Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
@@ -101,13 +100,14 @@ fun DatePickerBookingBottomBar(
                 Text("-")
                 Column(
                     horizontalAlignment = Alignment.Start,
-                    modifier=Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = 8.dp)
                 ) {
                     Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = dateCheckoutStringFormat,
-                        color = Color.Red, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        color = Color.Red, fontSize = 14.sp, fontWeight = FontWeight.Bold
+                    )
 
                 }
             }
@@ -119,14 +119,21 @@ fun DatePickerBookingBottomBar(
                     bookingViewModel.setTotalTime(totalTime.toString())
                     bookingViewModel.setTypeBooking(typeBooking)
 
-                    searchViewModel.setSelectedCalendar(typeBooking, BookRoom(
-                        timeCheckin = saveDateCheckin,
-                        timeCheckOut = saveDateCheckout,
-                        totalTime = totalTime.toInt()
-                    ))
+                    searchViewModel.setSelectedCalendar(
+                        typeBooking, BookRoom(
+                            timeCheckin = saveDateCheckin,
+                            timeCheckOut = saveDateCheckout,
+                            totalTime = totalTime.toInt()
+                        )
+                    )
                     coroutineScope.launch {
                         sheetState.hide()
-                        onHandleApplyTimeBooking(dateCheckinString,dateCheckoutString,totalTime.toString(),typeBooking)
+                        onHandleApplyTimeBooking(
+                            dateCheckinString,
+                            dateCheckoutString,
+                            totalTime.toString(),
+                            typeBooking
+                        )
                         onCloseDatePicker(false)
                     }
                 },
@@ -146,13 +153,12 @@ fun DatePickerBookingBottomBar(
             }
 
         }
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .height(0.5.dp)
                 .fillMaxWidth()
                 .background(Color.LightGray.copy(alpha = 0.5f))
                 .align(Alignment.TopCenter)
-
         )
     }
 }

@@ -28,8 +28,8 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -77,7 +77,6 @@ fun MyBookingScreen(
     navController:NavHostController
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     LaunchedEffect(Unit) {
         bookingViewModelApi.getListMyBooking(uid)
@@ -150,11 +149,9 @@ fun MyBookingScreen(
             else {
                 items(roomList){item->
                     CardMyBooKing(
-                        coroutineScope = coroutineScope,
                         bookingRoom = item,
                         navController = navController,
                         bookingViewModel = bookingViewModel,
-                        bookingViewModelApi = bookingViewModelApi,
                         countDownPaymentViewModel = countDownPaymentViewModel,
                         onDeleteClicked = {bkid,billid,uid->
                             bookingViewModelApi.deleteMyBooking(bkid,billid,uid)
@@ -170,11 +167,9 @@ fun MyBookingScreen(
 
 @Composable
 fun CardMyBooKing(
-    coroutineScope:CoroutineScope,
     bookingRoom: MyBooking,
     navController:NavHostController,
     bookingViewModel:BookingViewModel,
-    bookingViewModelApi:BookingViewModelApi,
     countDownPaymentViewModel: CountDownPaymentViewModel,
     onDeleteClicked:(Int, Int, Int)->Unit
 ){
@@ -216,7 +211,7 @@ fun CardMyBooKing(
         it.type.trim() == (bookingRoom.bill?.bedTypeApi?.trim() ?: "single")
     }?.get(0)
 
-
+    val discount = bookingViewModel.getDiscount()
     val expanded = remember { mutableStateOf(false) }
 
 
@@ -318,11 +313,21 @@ fun CardMyBooKing(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Không sử dụng khuyến mãi.",
-                        fontSize = 14.sp,
-                        fontStyle = FontStyle.Italic
-                    )
+                    if(discount!=null){
+                        Text(
+                            text = discount.name,
+                            fontSize = 14.sp,
+                            fontStyle = FontStyle.Italic,
+                            color = Color.Red
+                        )
+                    }
+                    else{
+                        Text(
+                            text = "Không sử dụng khuyến mãi.",
+                            fontSize = 14.sp,
+                            fontStyle = FontStyle.Italic
+                        )
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                     if (bedTypeApi != null) {
                         Text(
@@ -427,12 +432,16 @@ fun CardMyBooKing(
                             expanded.value = false
                         }
                 ) {
-                    Icon(imageVector = Icons.Rounded.Info, contentDescription = "", modifier = Modifier.size(16.dp))
+                    Icon(
+                        imageVector = Icons.Rounded.Info,
+                        contentDescription = "",
+                        modifier = Modifier.size(16.dp)
+                    )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text("Xem thông tin", fontSize = 14.sp)
 
                 }
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(0.5.dp),
@@ -444,14 +453,28 @@ fun CardMyBooKing(
                         .width(200.dp)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                         .clickable {
-                            bookingRoom.booking?.id?.let { bookingRoom.bill?.id?.let { it1 -> bookingRoom.booking.uID?.let { it2 -> onDeleteClicked(it, it1, it2) } } }
+                            bookingRoom.booking?.id?.let {
+                                bookingRoom.bill?.id?.let { it1 ->
+                                    bookingRoom.booking.uID?.let { it2 ->
+                                        onDeleteClicked(
+                                            it,
+                                            it1,
+                                            it2
+                                        )
+                                    }
+                                }
+                            }
                             expanded.value = false
                         }
 
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.baseline_delete_24), contentDescription = "", modifier = Modifier.size(16.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_delete_24),
+                        contentDescription = "",
+                        modifier = Modifier.size(16.dp)
+                    )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Xóa",fontSize = 14.sp )
+                    Text("Xóa", fontSize = 14.sp)
 
                 }
 

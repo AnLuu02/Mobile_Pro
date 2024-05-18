@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,12 +38,11 @@ fun DatePickerBottomBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-    ){
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 20.dp)
-            ,
+                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -59,7 +58,8 @@ fun DatePickerBottomBar(
                     },
                     indication = rememberRipple(bounded = false)
                 ) {
-                    searchViewModel.setSelectedCalendar(typeBooking,
+                    searchViewModel.setSelectedCalendar(
+                        typeBooking,
                         BookRoom(
                             timeCheckin = "Bất kì",
                             timeCheckOut = "Bất kì",
@@ -84,20 +84,18 @@ fun DatePickerBottomBar(
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 30.dp,end=30.dp)
+                    modifier = Modifier.padding(start = 30.dp, end = 30.dp)
                 )
             }
 
 
-
         }
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .height(0.5.dp)
                 .fillMaxWidth()
                 .background(Color.LightGray.copy(alpha = 0.5f))
                 .align(Alignment.TopCenter)
-
         )
     }
 }

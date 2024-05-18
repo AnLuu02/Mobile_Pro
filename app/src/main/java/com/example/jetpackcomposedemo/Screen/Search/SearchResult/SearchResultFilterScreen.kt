@@ -32,8 +32,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -128,7 +128,7 @@ fun SearchResultFilterScreen(
                 }
             },
             dragHandle = {
-                Box(modifier = Modifier.fillMaxWidth()){
+                Box(modifier = Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -137,7 +137,7 @@ fun SearchResultFilterScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = 6.dp),
-                        ){
+                        ) {
                             Box(
                                 modifier = Modifier
                                     .size(36.dp)
@@ -155,10 +155,9 @@ fun SearchResultFilterScreen(
                                                 onCloseFilter(false)
                                             }
                                         }
-                                    )
-                                ,
+                                    ),
                                 contentAlignment = Alignment.Center
-                            ){
+                            ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Close,
                                     contentDescription = "Close",
@@ -177,13 +176,12 @@ fun SearchResultFilterScreen(
 
 
                     }
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(0.5.dp)
                             .background(Color.Black.copy(alpha = 0.2f))
                             .align(Alignment.BottomCenter)
-
                     )
 
                 }
@@ -194,23 +192,24 @@ fun SearchResultFilterScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                    ){
+                    ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp)
-                            ,
+                                .padding(12.dp),
                         ) {
                             Button(
                                 onClick = {
-                                    searchViewModel.setFilterRoom(FilterRoom(
-                                        minPriceRoom = minPriceRoom,
-                                        maxPriceRoom = maxPriceRoom,
-                                        rateScore = rateScore,
+                                    searchViewModel.setFilterRoom(
+                                        FilterRoom(
+                                            minPriceRoom = minPriceRoom,
+                                            maxPriceRoom = maxPriceRoom,
+                                            rateScore = rateScore,
 //                                        cleanScore = cleanScore,
-                                        typeRoom = typeRoom,
-                                        utilitiesRoom = utilitiesRoom
-                                    ))
+                                            typeRoom = typeRoom,
+                                            utilitiesRoom = utilitiesRoom
+                                        )
+                                    )
                                     coroutineScope.launch {
                                         sheetState.hide()
                                         onCloseFilter(false)
@@ -230,17 +229,16 @@ fun SearchResultFilterScreen(
                                     style = MaterialTheme.typography.titleMedium,
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(start = 30.dp,end=30.dp)
+                                    modifier = Modifier.padding(start = 30.dp, end = 30.dp)
                                 )
                             }
                         }
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(0.5.dp)
                                 .background(Color.Black.copy(alpha = 0.2f))
                                 .align(Alignment.TopCenter)
-
                         )
                     }
 
@@ -320,10 +318,12 @@ fun PriceRangeSlider(
     minPriceRoom(slideStart.value.toInt())
     maxPriceRoom(slideEnd.value.toInt())
 
-    Box(modifier = Modifier.fillMaxWidth()){
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding( 16.dp)) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
             Text(
                 text = "Khoảng giá",
                 fontSize = 20.sp,
@@ -336,7 +336,7 @@ fun PriceRangeSlider(
                 onValueChange = { newRange ->
                     slideStart.value = (newRange.start.roundToInt()).toString()
                     slideEnd.value = (newRange.endInclusive.roundToInt()).toString()
-                    priceRange.value = newRange.start .. newRange.endInclusive
+                    priceRange.value = newRange.start..newRange.endInclusive
                 },
                 valueRange = rangeLimit,
                 steps = step,
@@ -369,27 +369,28 @@ fun PriceRangeSlider(
                             focusRequesterPriceStart.requestFocus()
                         }
 
-                ){
+                ) {
                     OutlinedTextField(
-                        value = if(editPriceStart.value) slideStart.value else formatCurrencyVND(slideStart.value.toInt()),
+                        value = if (editPriceStart.value) slideStart.value else formatCurrencyVND(
+                            slideStart.value.toInt()
+                        ),
                         onValueChange = { newValue ->
                             newValue.toIntOrNull()?.let {
                                 if (it <= 1000000) {
-                                    if(it < 20000){
+                                    if (it < 20000) {
                                         slideStart.value = "20000"
-                                    }
-                                    else if(it >= slideEnd.value.toInt()){
+                                    } else if (it >= slideEnd.value.toInt()) {
                                         slideStart.value = it.toString()
                                         slideEnd.value = slideStart.value
-                                    }
-                                    else{
+                                    } else {
                                         slideStart.value = it.toString()
                                     }
-                                } else{
+                                } else {
                                     slideStart.value = "1000000"
-                                    slideEnd.value =  slideStart.value
+                                    slideEnd.value = slideStart.value
                                 }
-                                priceRange.value = slideStart.value.toFloat() .. slideEnd.value.toFloat()
+                                priceRange.value =
+                                    slideStart.value.toFloat()..slideEnd.value.toFloat()
 
                             }
                         },
@@ -409,8 +410,7 @@ fun PriceRangeSlider(
                             editPriceStart.value = false
                             focusManager.clearFocus()
                         }),
-                        placeholder = {slideStart.value}
-                        ,
+                        placeholder = { slideStart.value },
                         colors = OutlinedTextFieldDefaults.colors(
                             disabledBorderColor = Color.Transparent,
                             focusedBorderColor = Color.Transparent,
@@ -422,8 +422,7 @@ fun PriceRangeSlider(
                             .focusRequester(focusRequesterPriceStart)
                             .onFocusChanged {
                                 editPriceStart.value = it.isFocused
-                            }
-                        ,
+                            },
                         textStyle = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = MaterialTheme.typography.titleLarge.fontSize,
@@ -446,27 +445,28 @@ fun PriceRangeSlider(
                         focusRequesterPriceEnd.requestFocus()
                     }
 
-                ){
+                ) {
                     OutlinedTextField(
-                        value = if(editPriceEnd.value) slideEnd.value else formatCurrencyVND(slideEnd.value.toInt()),
+                        value = if (editPriceEnd.value) slideEnd.value else formatCurrencyVND(
+                            slideEnd.value.toInt()
+                        ),
                         onValueChange = { newValue ->
                             newValue.toIntOrNull()?.let {
                                 if (it <= 1000000) {
-                                    if(it < 20000){
+                                    if (it < 20000) {
                                         slideEnd.value = "20000"
                                         slideStart.value = slideEnd.value
-                                    }
-                                    else if(it >= slideStart.value.toInt()){
+                                    } else if (it >= slideStart.value.toInt()) {
                                         slideEnd.value = it.toString()
-                                    }
-                                    else {
+                                    } else {
                                         slideEnd.value = it.toString()
                                         slideStart.value = slideEnd.value
                                     }
                                 } else {
                                     slideEnd.value = "1000000"
                                 }
-                                priceRange.value = slideStart.value.toFloat() .. slideEnd.value.toFloat()
+                                priceRange.value =
+                                    slideStart.value.toFloat()..slideEnd.value.toFloat()
                             }
                         },
                         label = {
@@ -486,8 +486,7 @@ fun PriceRangeSlider(
                             editPriceEnd.value = false
                             focusManager.clearFocus()
                         }),
-                        placeholder = {slideEnd.value}
-                        ,
+                        placeholder = { slideEnd.value },
                         colors = OutlinedTextFieldDefaults.colors(
                             disabledBorderColor = Color.Transparent,
                             focusedBorderColor = Color.Transparent,
@@ -499,9 +498,7 @@ fun PriceRangeSlider(
                             .focusRequester(focusRequesterPriceEnd)
                             .onFocusChanged {
                                 editPriceEnd.value = it.isFocused
-                            }
-
-                        ,
+                            },
                         textStyle = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = MaterialTheme.typography.titleLarge.fontSize,
@@ -511,13 +508,12 @@ fun PriceRangeSlider(
                 }
             }
         }
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)
                 .background(Color.LightGray.copy(alpha = 0.1f))
                 .align(Alignment.BottomCenter)
-
         )
     }
 }
@@ -531,7 +527,7 @@ fun StarRating(
     val dataStarRate = listOf("4.5","4","3.5")
     var lastPadding: Dp
 
-    Box(modifier = Modifier.fillMaxWidth()){
+    Box(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -541,7 +537,7 @@ fun StarRating(
                 text = title,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding( bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
             Row(
@@ -549,10 +545,10 @@ fun StarRating(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                dataStarRate.forEachIndexed{index,item->
-                    lastPadding = if(index < dataStarRate.size-1){
+                dataStarRate.forEachIndexed { index, item ->
+                    lastPadding = if (index < dataStarRate.size - 1) {
                         8.dp
-                    } else{
+                    } else {
                         0.dp
                     }
                     val selected = item == selectedRate.value
@@ -579,7 +575,7 @@ fun StarRating(
                                 starRating(item)
                             }
 
-                    ){
+                    ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -591,13 +587,13 @@ fun StarRating(
                                 text = "> $item",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.W500,
-                                color = if(selected) Color.Red else  Color.Black
+                                color = if (selected) Color.Red else Color.Black
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = "",
-                                tint = Color(255,215,0),
+                                tint = Color(255, 215, 0),
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -605,13 +601,12 @@ fun StarRating(
                 }
             }
         }
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)
                 .background(Color.LightGray.copy(alpha = 0.1f))
                 .align(Alignment.BottomCenter)
-
         )
     }
 }
@@ -625,7 +620,7 @@ fun BedTypeSelector(
     val dataStarRate = listOf("Đơn","Đôi","Đa")
     var lastPadding: Dp
 
-    Box(modifier = Modifier.fillMaxWidth()){
+    Box(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -635,7 +630,7 @@ fun BedTypeSelector(
                 text = title,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding( bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
             Row(
@@ -643,10 +638,10 @@ fun BedTypeSelector(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                dataStarRate.forEachIndexed{index,item->
-                    lastPadding = if(index < dataStarRate.size-1){
+                dataStarRate.forEachIndexed { index, item ->
+                    lastPadding = if (index < dataStarRate.size - 1) {
                         8.dp
-                    } else{
+                    } else {
                         0.dp
                     }
                     val selected = item == selectedRate.value
@@ -673,7 +668,7 @@ fun BedTypeSelector(
                                 starRating(item)
                             }
 
-                    ){
+                    ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -685,7 +680,7 @@ fun BedTypeSelector(
                                 text = "> $item",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.W500,
-                                color = if(selected) Color.Red else  Color.Black
+                                color = if (selected) Color.Red else Color.Black
                             )
                             Spacer(modifier = Modifier.height(4.dp))
 //                            Icon(
@@ -699,13 +694,12 @@ fun BedTypeSelector(
                 }
             }
         }
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)
                 .background(Color.LightGray.copy(alpha = 0.1f))
                 .align(Alignment.BottomCenter)
-
         )
     }
 }
@@ -726,7 +720,7 @@ fun TypeHotel(
     )
     val selectedTypeHotel = remember{ mutableStateOf("") }
 
-    Box(modifier = Modifier.fillMaxWidth()){
+    Box(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -742,7 +736,7 @@ fun TypeHotel(
             androidx.compose.foundation.layout.FlowRow(
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                dataTypeHotel.forEachIndexed{ _, item->
+                dataTypeHotel.forEachIndexed { _, item ->
                     val selected = item == selectedTypeHotel.value
                     Box(
                         modifier = Modifier
@@ -766,16 +760,21 @@ fun TypeHotel(
                                 typeRoom(item)
                             }
 
-                    ){
+                    ) {
                         Row(
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top=12.dp, bottom = 12.dp),
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 12.dp,
+                                bottom = 12.dp
+                            ),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Text(
                                 text = item,
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = if(selected) Color.Red else  Color.Black
+                                color = if (selected) Color.Red else Color.Black
                             )
 
                         }
@@ -783,13 +782,12 @@ fun TypeHotel(
                 }
             }
         }
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)
                 .background(Color.LightGray.copy(alpha = 0.1f))
                 .align(Alignment.BottomCenter)
-
         )
     }
 }
@@ -877,8 +875,8 @@ fun UtilitiesHotel(
                             )
                         )
                     }
-                    if(index<dataUtilitiesHotel.size-1){
-                        Divider(
+                    if (index < dataUtilitiesHotel.size - 1) {
+                        HorizontalDivider(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(0.4.dp)

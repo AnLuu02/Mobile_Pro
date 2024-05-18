@@ -23,7 +23,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -71,10 +71,9 @@ fun SearchResultTopBar(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = rememberRipple(bounded = false, radius = 24.dp),
                         onClick = { onBackSearchScreen() }
-                    )
-                ,
+                    ),
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Icon(
                     imageVector = Icons.Rounded.ArrowBackIosNew,
                     contentDescription = "Back",
@@ -85,23 +84,25 @@ fun SearchResultTopBar(
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            TextFieldSearchResult(typeBooking = typeBooking,searchViewModel=searchViewModel) {onOpenSearchScreen()}
+            TextFieldSearchResult(
+                typeBooking = typeBooking,
+                searchViewModel = searchViewModel
+            ) { onOpenSearchScreen() }
 
         }
 
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)
                 .background(Color.LightGray.copy(alpha = 0.5f))
         )
 
-        Box(modifier = Modifier.fillMaxWidth()){
+        Box(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(30.dp, 40.dp)
-                ,
+                    .heightIn(30.dp, 40.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
 
@@ -117,7 +118,11 @@ fun SearchResultTopBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Icon(imageVector = Icons.AutoMirrored.Rounded.Sort, contentDescription = "Sap xep",modifier = Modifier.size(24.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.Sort,
+                        contentDescription = "Sap xep",
+                        modifier = Modifier.size(24.dp)
+                    )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "Sắp xếp",
@@ -125,11 +130,14 @@ fun SearchResultTopBar(
                         fontSize = 16.sp
                     )
 
-                    if(searchViewModel.getSortMethod().value.sortMethod != null
-                        && searchViewModel.getSortMethod().value.sortMethod != "phuhopnhat" ){
-                        Box(modifier = Modifier
-                            .size(6.dp)
-                            .background(Color.Red, shape = CircleShape))
+                    if (searchViewModel.getSortMethod().value.sortMethod != null
+                        && searchViewModel.getSortMethod().value.sortMethod != "phuhopnhat"
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(6.dp)
+                                .background(Color.Red, shape = CircleShape)
+                        )
 
                     }
 
@@ -147,7 +155,11 @@ fun SearchResultTopBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Icon(imageVector = Icons.Rounded.FilterList, contentDescription = "Sap xep", modifier = Modifier.size(24.dp))
+                    Icon(
+                        imageVector = Icons.Rounded.FilterList,
+                        contentDescription = "Sap xep",
+                        modifier = Modifier.size(24.dp)
+                    )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "Chọn lọc theo",
@@ -158,7 +170,7 @@ fun SearchResultTopBar(
 
                 }
             }
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .width(0.5.dp)
                     .height(26.dp)
@@ -167,7 +179,7 @@ fun SearchResultTopBar(
             )
         }
 
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)

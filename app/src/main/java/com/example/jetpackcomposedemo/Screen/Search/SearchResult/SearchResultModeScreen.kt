@@ -15,8 +15,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -133,7 +133,7 @@ fun OptionsSort(
             .fillMaxWidth()
 
     ) {
-        options.value.forEachIndexed{index,item->
+        options.value.forEachIndexed { index, item ->
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .clickable(
@@ -174,22 +174,20 @@ fun OptionsSort(
                         )
                     )
                 }
-                if(index<options.value.size-1){
-                    Divider(
+                if (index < options.value.size - 1) {
+                    HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(0.5.dp)
                             .background(Color.Black.copy(alpha = 0.5f))
                             .align(Alignment.BottomCenter)
-
                     )
                 }
             }
         }
-        Divider(
+        HorizontalDivider(
             modifier = Modifier.height(30.dp),
             color = Color.Transparent
-
         )
     }
 }

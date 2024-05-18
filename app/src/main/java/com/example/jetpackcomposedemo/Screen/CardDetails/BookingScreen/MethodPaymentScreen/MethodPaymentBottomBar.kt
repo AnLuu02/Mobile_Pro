@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -40,8 +40,8 @@ fun MethodPaymentBottomBar(
     Column(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
-    ){
-        Divider(
+    ) {
+        HorizontalDivider(
             modifier = Modifier.fillMaxWidth().height(1.dp),
             color = Color.LightGray.copy(alpha = 0.5f)
         )
@@ -73,7 +73,7 @@ fun MethodPaymentBottomBar(
                     style = MaterialTheme.typography.titleSmall,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 16.dp,end=16.dp)
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp)
                 )
             }
         }

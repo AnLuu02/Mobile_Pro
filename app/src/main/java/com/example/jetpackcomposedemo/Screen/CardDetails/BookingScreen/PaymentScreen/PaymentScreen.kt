@@ -26,7 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -102,8 +102,7 @@ fun PaymentScreen(
 ) {
 
     LaunchedEffect(Unit) {
-        bookingViewModelApi.getListMyBooking("1")
-//        bookingViewModelApi.getListMyBooking(loginUiState.id.toString())
+        bookingViewModelApi.getListMyBooking(loginUiState.id.toString())
     }
 
     val resource = bookingViewModelApi.myBookingList.observeAsState()
@@ -146,11 +145,16 @@ fun PaymentScreen(
     val openWaitingPayment = remember{ mutableStateOf(false) }
 
     val payloadChoose = remember{ mutableStateOf(bookingViewModel.getMethodPayment() ?: OptionPayment()) }
-    val totalPrice = formatCurrencyVND(CaculateTotalPriceFinal(
-        bedType?.total?.let { totalTime?.toInt()?.times(it) } ?: 1,
-        discount?.percentDiscount,
-        discount?.amountDiscount?.toInt()
-    ))
+
+    val priceRoom = (bedType?.total ?: 1) * (totalTime?.toInt()!!)
+    val amountDiscount = bedType?.let {
+        calculatePriceDiscount(
+            it.total,
+            discount?.amountDiscount?.toInt(), discount?.percentDiscount
+        )
+    }
+
+    val finalPrice = priceRoom - amountDiscount!!
 
     val (tokenPaymentZalopay,setTokenPaymentZalopay) = remember {
         mutableStateOf("")
@@ -163,59 +167,47 @@ fun PaymentScreen(
     val (isClicked,setIsClicked) = remember{ mutableStateOf(false) }
     val (loading,setLoading) = remember{ mutableStateOf(false) }
 
-
-    Log.e("Discount",discount.toString())
-
-
     LaunchedEffect(statusPayment) {
         if(statusPayment != StatusPayment.NON.status){
-            if (totalTime != null) {
-                if (bedType != null) {
-                    bedType.status = if(statusPayment == StatusPayment.PAID.status) StatusBedType.UNAVAILABLE.status else StatusBedType.AVAILABLE.status
-                    bookingViewModelApi.bookingRoom(
-                        Booking(
-                            null,
-                            MyUser(
-                                ID = 1,
-                                fullName = loginUiState.fullName ?: "Lưu Trường An",
-                                email = loginUiState.fullName ?: "anluu099@gmail.com",
-                                cccd =  "123456789",
-                                birthday = loginUiState.birthday ?: "24-04-2002",
-                                gender = loginUiState.gender ?: "Nam",
-                                sdt = loginUiState.phoneNumber ?: "0918064618"
-                            ),
-                            timeBooking = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy")),
-                            Bill(
-                                statusPayment = statusPayment,
-                                typePayment = payloadChoose.value.type,
-                                checkInDate = when(typeBooking){
-                                    "bydate"-> "07:00, $dateCheckinString"
-                                    "overnight"-> "22:00, $dateCheckinString"
-                                    else->dateCheckinString
-                                },
-                                checkOutDate = when(typeBooking){
-                                    "bydate"-> "06:00, $dateCheckoutString"
-                                    "overnight"-> "06:00, $dateCheckoutString"
-                                    else->dateCheckoutString
-                                },
-                                duration = totalTime.toInt(),
-                                discount = discount,
-                                typeBooking = typeBooking,
-                                bedType = bedType,
-                                infoRoom = bookingViewModel.getInfoRoom(),
-                                finalCharge = CaculateTotalPriceFinal(totalTime.toInt()*bedType.total,
-                                    discount?.percentDiscount,
-                                    discount?.amountDiscount?.toInt()
-                                ),
-                            )
-                        )
+            bedType.status = if(statusPayment == StatusPayment.PAID.status) StatusBedType.UNAVAILABLE.status else StatusBedType.AVAILABLE.status
+            bookingViewModelApi.bookingRoom(
+                Booking(
+                    null,
+                    MyUser(
+                        ID = loginUiState.id,
+                        fullName = loginUiState.fullName ?: "Lưu Trường An",
+                        email = loginUiState.fullName ?: "anluu099@gmail.com",
+                        cccd =  "123456789",
+                        birthday = loginUiState.birthday ?: "24-04-2002",
+                        gender = loginUiState.gender ?: "Nam",
+                        sdt = loginUiState.phoneNumber ?: "0918064618"
+                    ),
+                    timeBooking = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy")),
+                    Bill(
+                        statusPayment = statusPayment,
+                        typePayment = payloadChoose.value.type,
+                        checkInDate = when(typeBooking){
+                            "bydate"-> "07:00, $dateCheckinString"
+                            "overnight"-> "22:00, $dateCheckinString"
+                            else->dateCheckinString
+                        },
+                        checkOutDate = when(typeBooking){
+                            "bydate"-> "06:00, $dateCheckoutString"
+                            "overnight"-> "06:00, $dateCheckoutString"
+                            else->dateCheckoutString
+                        },
+                        duration = totalTime.toInt(),
+                        discount = discount,
+                        typeBooking = typeBooking,
+                        bedType = bedType,
+                        infoRoom = bookingViewModel.getInfoRoom(),
+                        finalCharge = finalPrice,
                     )
-                }
-            }
+                )
+            )
         }
         if(statusPayment == StatusPayment.PAID.status){
-            navController.navigate("user/1/mybooking")
-//            navController.navigate("user/${loginUiState.id}/mybooking")
+            navController.navigate("user/${loginUiState.id}/mybooking")
 
         }
     }
@@ -229,57 +221,48 @@ fun PaymentScreen(
             PaymentTopBar(navController = navController)
         },
         bottomBar = {
-            if (totalPrice != null) {
-                PaymentBottomBar(
-                    bookingViewModel = bookingViewModel,
-                    countDownPaymentViewModel = countDownPaymentViewModel,
-                    payloadChoose = payloadChoose.value,
-                    totalPrice = totalPrice.toString(),
-                    onChooseMethodPayment = {
-                        openChooseMethodPayment.value = it
-                    },
-                    isClicked = isClicked,
-                    ///////////////////////// post data booking //////////////////////////
-                    onApplyBooking = {
-                        if(infoRoomIfUnfinished.value.room != null){
-                            openAlertDialogContinuePayment.value = true
-                        }
-                        else{
-                            setLoading(true)
+            PaymentBottomBar(
+                bookingViewModel = bookingViewModel,
+                countDownPaymentViewModel = countDownPaymentViewModel,
+                payloadChoose = payloadChoose.value,
+                finalPrice = finalPrice,
+                onChooseMethodPayment = {
+                    openChooseMethodPayment.value = it
+                },
+                isClicked = isClicked,
+                ///////////////////////// post data booking //////////////////////////
+                onApplyBooking = {
+                    if(infoRoomIfUnfinished.value.room != null){
+                        openAlertDialogContinuePayment.value = true
+                    }
+                    else{
+                        setLoading(true)
 //                            setStatusPayment(StatusPayment.PENDING.status)
-                            when(payloadChoose.value.type){
-                                "zalopay"->{
-                                    if (totalTime != null) {
-                                        paymentZalopay(
-                                            mainActivity,
-                                            CaculateTotalPriceFinal(totalTime.toInt()* (bedType?.total
-                                                ?: 1 ),
-                                                discount?.percentDiscount,
-                                                discount?.amountDiscount?.toInt()
-                                            ).toString(),
-                                            countDownPaymentViewModel = countDownPaymentViewModel,
-                                            showScreenWaiting = {
-                                                openWaitingPayment.value = it
-                                            },
-                                            setToken = { setTokenPaymentZalopay(it) },
-                                            setStatus = {
-                                                setStatusPayment(it)
-                                            },
-                                            setLoading = {
-                                                setLoading(it)
-                                                setIsClicked(it)
-                                            }
-                                        )
+                        when(payloadChoose.value.type){
+                            "zalopay"->{
+                                paymentZaloPay(
+                                    mainActivity,
+                                    finalPrice.toString(),
+                                    showScreenWaiting = {
+                                        openWaitingPayment.value = it
+                                    },
+                                    setToken = { setTokenPaymentZalopay(it) },
+                                    setStatus = {
+                                        setStatusPayment(it)
+                                    },
+                                    setLoading = {
+                                        setLoading(it)
+                                        setIsClicked(it)
                                     }
+                                )
 
-                                }
-                                "momo"->{}
-                                else->{}
                             }
+                            "momo"->{}
+                            else->{}
                         }
                     }
-                )
-            }
+                }
+            )
         }
 
     ) { padding ->
@@ -294,26 +277,26 @@ fun PaymentScreen(
             item {
                 if (infoRoom != null) {
                     Spacer(modifier = Modifier.height(10.dp))
-                    if (bedType != null) {
-                        InfoRoom(
-                            bedType = bedType,
-                            infoRoom = infoRoom,
-                            dateCheckinString.toString(),
-                            dateCheckoutString.toString(),
-                            totalTime ?: "1",
-                            typeBooking.toString()
-                        )
-                    }
+                    InfoRoom(
+                        bedType = bedType,
+                        infoRoom = infoRoom,
+                        dateCheckinString.toString(),
+                        dateCheckoutString.toString(),
+                        totalTime,
+                        typeBooking.toString()
+                    )
                     Spacer(modifier = Modifier.height(10.dp))
                     UserBooking(loginUiState = loginUiState)
                     Spacer(modifier = Modifier.height(10.dp))
                     DiscountBooking(navController = navController, bookingViewModel = bookingViewModel)
                     Spacer(modifier = Modifier.height(10.dp))
-                    if (bedType != null) {
-                        PaymentDetails(bookingViewModel = bookingViewModel)
-                    }
+                    PaymentDetails(
+                        bookingViewModel = bookingViewModel,
+                        priceRoom = priceRoom,
+                        amountDiscount = amountDiscount
+                    )
                     Spacer(modifier = Modifier.height(10.dp))
-                    CanclePolicy()
+                    CancelPolicy()
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 
@@ -346,26 +329,21 @@ fun PaymentScreen(
                     openWaitingPayment.value = it
                 },
                 onContinuePayment = {
-                    if (totalTime != null) {
-                        if (bedType != null) {
-                            paymentZalopay(
-                                mainActivity,
-                                (totalTime.toInt()*bedType.total).toString(),
-                                countDownPaymentViewModel = countDownPaymentViewModel,
-                                showScreenWaiting = {
-                                    openWaitingPayment.value = it
-                                },
-                                setToken = { setTokenPaymentZalopay(it) },
-                                setStatus = {
-                                    setStatusPayment(it)
-                                },
-                                setLoading = {
-                                    setLoading(it)
-                                    setIsClicked(it)
-                                }
-                            )
+                    paymentZaloPay(
+                        mainActivity,
+                        finalPrice.toString(),
+                        showScreenWaiting = {
+                            openWaitingPayment.value = it
+                        },
+                        setToken = { setTokenPaymentZalopay(it) },
+                        setStatus = {
+                            setStatusPayment(it)
+                        },
+                        setLoading = {
+                            setLoading(it)
+                            setIsClicked(it)
                         }
-                    }
+                    )
                 }
             )
         }
@@ -486,7 +464,7 @@ fun InfoRoom(
                 }
 
 
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(0.5.dp),
@@ -749,6 +727,8 @@ fun DiscountBooking(
         setIsDiscount(true)
     }
 
+
+
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -846,7 +826,7 @@ fun DiscountBooking(
                 }
             }
 
-            Divider(
+            HorizontalDivider(
                 Modifier
                     .fillMaxWidth()
                     .height(0.5.dp),
@@ -916,12 +896,13 @@ fun DiscountBooking(
 
 @Composable
 fun PaymentDetails(
-    bookingViewModel: BookingViewModel
+    bookingViewModel: BookingViewModel,
+    priceRoom:Int,
+    amountDiscount: Int?
 ){
-    val infoRoom = bookingViewModel.getInfoRoom()
     val bedType = bookingViewModel.getBedType()
     val discount = bookingViewModel.getDiscount()
-    val totalTime = bookingViewModel.getTotalTime()
+
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -939,7 +920,7 @@ fun PaymentDetails(
             )
 
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
@@ -964,7 +945,7 @@ fun PaymentDetails(
 
                 if (bedType != null) {
                     Text(
-                        text = formatCurrencyVND(bedType.total * (totalTime?.toInt() ?: 1)),
+                        text = formatCurrencyVND(priceRoom),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
 
@@ -988,8 +969,7 @@ fun PaymentDetails(
                 if (discount != null) {
                     if (bedType != null) {
                         Text(
-                            text = "- ${formatCurrencyVND(CaculatePriceDiscount(bedType.total,
-                                discount.amountDiscount?.toInt(),discount.percentDiscount))}",
+                            text = "- ${amountDiscount?.let { formatCurrencyVND(it) }}",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
 
@@ -1006,13 +986,12 @@ fun PaymentDetails(
                 }
             }
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
                     .padding(start = 12.dp, end = 12.dp),
                 color = Color.LightGray.copy(0.5f)
-
             )
 
             Row(
@@ -1031,18 +1010,14 @@ fun PaymentDetails(
                 if (bedType != null) {
                     if (discount != null) {
                         Text(
-                            text = formatCurrencyVND(CaculateTotalPriceFinal(
-                                (totalTime?.toInt() ?: 1) *bedType.total,
-                                discount.percentDiscount,
-                                discount.amountDiscount?.toInt()
-                            )),
+                            text = formatCurrencyVND(priceRoom- amountDiscount!!),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
                     else{
                         Text(
-                            text = formatCurrencyVND(bedType.total),
+                            text = formatCurrencyVND(priceRoom),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -1053,17 +1028,8 @@ fun PaymentDetails(
     }
 }
 
-fun CaculateTotalPriceFinal(rommPrice:Int,amountDiscount: Int?, percentDiscount:Int? ): Int {
-    if(percentDiscount!= null){
-        return rommPrice - (rommPrice*percentDiscount/100)
-    }
-    else if(amountDiscount != null){
-        return rommPrice - amountDiscount
-    }
-    return rommPrice
-}
 
-fun CaculatePriceDiscount(rommPrice:Int,amountDiscount: Int?, percentDiscount:Int? ): Int {
+fun calculatePriceDiscount(rommPrice:Int, amountDiscount: Int?, percentDiscount:Int? ): Int {
     if(percentDiscount!= null){
         return rommPrice*percentDiscount/100
     }
@@ -1072,8 +1038,12 @@ fun CaculatePriceDiscount(rommPrice:Int,amountDiscount: Int?, percentDiscount:In
     }
     return 0
 }
+
+
+
+
 @Composable
-fun CanclePolicy(){
+fun CancelPolicy(){
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -1142,10 +1112,9 @@ fun CanclePolicy(){
 }
 
 
-fun paymentZalopay(
+fun paymentZaloPay(
     mainActivity: MainActivity,
     amount: String,
-    countDownPaymentViewModel:CountDownPaymentViewModel,
     showScreenWaiting:(Boolean)->Unit,
     setToken: (String)->Unit,
     setStatus:(Int)->Unit,

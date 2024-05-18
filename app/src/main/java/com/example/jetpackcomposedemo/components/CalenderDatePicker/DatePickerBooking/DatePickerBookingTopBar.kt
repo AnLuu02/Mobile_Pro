@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,14 +48,14 @@ fun DatePickerBookingTopBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth(),
-        ){
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
-            ){
+            ) {
 
                 Box(
                     modifier = Modifier
@@ -63,7 +63,10 @@ fun DatePickerBookingTopBar(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = when(typeBooking){"hourly"->"Chọn giờ" else ->"Chọn ngày"},
+                        text = when (typeBooking) {
+                            "hourly" -> "Chọn giờ"
+                            else -> "Chọn ngày"
+                        },
                         color = Color.Black,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
@@ -83,7 +86,7 @@ fun DatePickerBookingTopBar(
 //                        })
 //                }
             }
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(2.dp)
@@ -117,15 +120,20 @@ fun DatePickerBookingTopBar(
                     ) {
                         Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text(text = dateCheckinStringFormat, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = dateCheckinStringFormat,
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
 
                     }
 
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier
                             .width(0.5.dp)
                             .fillMaxHeight()
-                            .padding(top = 8.dp,bottom=8.dp)
+                            .padding(top = 8.dp, bottom = 8.dp)
                             .background(Color.Gray.copy(alpha = 0.2f))
                     )
 
@@ -139,19 +147,24 @@ fun DatePickerBookingTopBar(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.Start,
-                        modifier = Modifier.padding(start=12.dp)
+                        modifier = Modifier.padding(start = 12.dp)
                     ) {
                         Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text(text = dateCheckoutStringFormat, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = dateCheckoutStringFormat,
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
 
                     }
 
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier
                             .width(0.5.dp)
                             .fillMaxHeight()
-                            .padding(top = 8.dp,bottom=8.dp)
+                            .padding(top = 8.dp, bottom = 8.dp)
                             .background(Color.Gray.copy(alpha = 0.2f))
                     )
 
@@ -164,15 +177,23 @@ fun DatePickerBookingTopBar(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(start=12.dp)
+                        modifier = Modifier.padding(start = 12.dp)
                     ) {
-                        Text(text = if(typeBooking == "hourly") "Số giờ" else "Số ngày", style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            text = if (typeBooking == "hourly") "Số giờ" else "Số ngày",
+                            style = MaterialTheme.typography.bodySmall
+                        )
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text(text = totalTime.toString(), color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = totalTime.toString(),
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
 
                     }
 
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier
                             .width(0.dp)
                             .fillMaxHeight()
@@ -183,7 +204,7 @@ fun DatePickerBookingTopBar(
             }
             Spacer(modifier = Modifier.height(6.dp))
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(0.5.dp)
@@ -223,7 +244,7 @@ fun SubNavItemNoIcon(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 12.dp)
         )
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)

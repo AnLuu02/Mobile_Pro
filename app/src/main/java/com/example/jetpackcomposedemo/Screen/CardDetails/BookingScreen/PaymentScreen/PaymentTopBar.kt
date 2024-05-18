@@ -9,11 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,23 +39,22 @@ fun PaymentTopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 48.dp),
-        ){
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 12.dp,end=12.dp, bottom = 16.dp)
-            ){
+                    .padding(start = 12.dp, end = 12.dp, bottom = 16.dp)
+            ) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = false, radius = 24.dp),
-                            onClick = {navController.popBackStack()}
-                        )
-                    ,
+                            onClick = { navController.popBackStack() }
+                        ),
                     contentAlignment = Alignment.Center
-                ){
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.ArrowBackIosNew,
                         contentDescription = "back",
@@ -72,7 +70,7 @@ fun PaymentTopBar(
                 )
 
             }
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(0.5.dp)

@@ -19,7 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -53,22 +53,21 @@ fun DatePickerTopBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-        ){
+        ) {
             Box(
                 modifier = Modifier
                     .size(36.dp)
-                    .padding(top=4.dp)
+                    .padding(top = 4.dp)
                     .background(color = Color.Transparent, shape = CircleShape)
                     .align(Alignment.CenterStart)
                     .clickable(
-                        interactionSource =  remember { MutableInteractionSource() },
+                        interactionSource = remember { MutableInteractionSource() },
                         indication = rememberRipple(bounded = false, radius = 24.dp),
-                    ){
+                    ) {
                         onCloseCalenderScreen()
-                    }
-                ,
+                    },
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Icon(
                     imageVector = Icons.Rounded.Close,
                     contentDescription = "Close",
@@ -79,14 +78,14 @@ fun DatePickerTopBar(
             Text(
                 text = "Chọn thời gian",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.align(Alignment.Center).padding(top=4.dp),
+                modifier = Modifier.align(Alignment.Center).padding(top = 4.dp),
                 fontWeight = FontWeight.Bold
             )
         }
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)
@@ -111,15 +110,20 @@ fun DatePickerTopBar(
                 ) {
                     Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = dateCheckinStringFormat, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = dateCheckinStringFormat,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
 
                 }
 
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier
                         .width(0.5.dp)
                         .fillMaxHeight()
-                        .padding(top = 8.dp,bottom=8.dp)
+                        .padding(top = 8.dp, bottom = 8.dp)
                         .background(Color.Gray.copy(alpha = 0.2f))
                 )
 
@@ -133,19 +137,24 @@ fun DatePickerTopBar(
             ) {
                 Column(
                     horizontalAlignment = Alignment.Start,
-                    modifier = Modifier.padding(start=12.dp)
+                    modifier = Modifier.padding(start = 12.dp)
                 ) {
                     Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = dateCheckoutStringFormat, color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = dateCheckoutStringFormat,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
 
                 }
 
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier
                         .width(0.5.dp)
                         .fillMaxHeight()
-                        .padding(top = 8.dp,bottom=8.dp)
+                        .padding(top = 8.dp, bottom = 8.dp)
                         .background(Color.Gray.copy(alpha = 0.2f))
                 )
 
@@ -158,15 +167,23 @@ fun DatePickerTopBar(
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(start=12.dp)
+                    modifier = Modifier.padding(start = 12.dp)
                 ) {
-                    Text(text = if(isHourly) "Số giờ" else "Số ngày", style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        text = if (isHourly) "Số giờ" else "Số ngày",
+                        style = MaterialTheme.typography.bodySmall
+                    )
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = if(isHourly) totalHourlyCheckin.toString() else totalDate.toString(), color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = if (isHourly) totalHourlyCheckin.toString() else totalDate.toString(),
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
 
                 }
 
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier
                         .width(0.dp)
                         .fillMaxHeight()
@@ -177,7 +194,7 @@ fun DatePickerTopBar(
         }
         Spacer(modifier = Modifier.height(6.dp))
 
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)

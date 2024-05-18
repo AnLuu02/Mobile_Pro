@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -101,14 +101,13 @@ fun ImageRightCardShimmer() {
                             .weight(0.5f),
                         shape = MaterialTheme.shapes.small
                     ) {
-                        if(loading.value){
+                        if (loading.value) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .background(brush),
                             )
-                        }
-                        else {
+                        } else {
                             Image(
                                 painter = painterResource(id = R.drawable.hotel_2),
                                 contentScale = ContentScale.Crop,
@@ -135,12 +134,16 @@ fun ImageRightCardShimmer() {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    if(loading.value){
-                                        Spacer(modifier = Modifier
-                                            .size(100.dp, 20.dp)
-                                            .background(brush, shape = MaterialTheme.shapes.small))
-                                    }
-                                    else{
+                                    if (loading.value) {
+                                        Spacer(
+                                            modifier = Modifier
+                                                .size(100.dp, 20.dp)
+                                                .background(
+                                                    brush,
+                                                    shape = MaterialTheme.shapes.small
+                                                )
+                                        )
+                                    } else {
                                         Text(
                                             text = "4.0",
                                             style = MaterialTheme.typography.bodySmall,
@@ -156,7 +159,7 @@ fun ImageRightCardShimmer() {
                                         Icon(
                                             imageVector = Icons.Rounded.Star,
                                             contentDescription = "",
-                                            tint = Color(255,215,0),
+                                            tint = Color(255, 215, 0),
                                             modifier = Modifier.size(16.dp)
 
                                         )
@@ -165,13 +168,13 @@ fun ImageRightCardShimmer() {
 
                             }
 
-                            if(loading.value){
+                            if (loading.value) {
                                 Spacer(
                                     modifier = Modifier
                                         .size(200.dp, 20.dp)
                                         .background(brush, shape = MaterialTheme.shapes.small)
                                 )
-                            }else{
+                            } else {
                                 Text(
                                     text = "LỒNG ĐÈN ĐỎ HOTEL",
                                     style = MaterialTheme.typography.titleMedium,
@@ -182,7 +185,7 @@ fun ImageRightCardShimmer() {
 
 
                             Column {
-                                if(loading.value){
+                                if (loading.value) {
                                     Spacer(
                                         modifier = Modifier
                                             .size(50.dp, 20.dp)
@@ -196,8 +199,7 @@ fun ImageRightCardShimmer() {
                                             .size(100.dp, 20.dp)
                                             .background(brush, shape = MaterialTheme.shapes.small)
                                     )
-                                }
-                                else{
+                                } else {
                                     Text(
                                         text = "Chỉ từ",
                                         color = Color.Gray,
@@ -219,13 +221,12 @@ fun ImageRightCardShimmer() {
             }
 
         }
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .height(1.dp)
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp)
-                .align(Alignment.BottomCenter)
-            ,
+                .align(Alignment.BottomCenter),
             color = Color.LightGray.copy(0.5f)
         )
     }

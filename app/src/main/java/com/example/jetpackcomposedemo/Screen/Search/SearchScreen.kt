@@ -22,7 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowOutward
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -214,17 +214,22 @@ fun SearchScreen(
                                 Column(
                                     horizontalAlignment = Alignment.Start
                                 ) {
-                                    Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
+                                    Text(
+                                        text = "Nhận phòng",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Text(
                                         text = timeCheckin,
-                                        color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold,
+                                        color = Color.Red,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold,
                                     )
 
 
                                 }
 
-                                Divider(
+                                HorizontalDivider(
                                     modifier = Modifier
                                         .width(1.dp)
                                         .fillMaxHeight()
@@ -242,17 +247,23 @@ fun SearchScreen(
                             ) {
                                 Column(
                                     horizontalAlignment = Alignment.Start,
-                                    modifier = Modifier.padding(start=16.dp)
+                                    modifier = Modifier.padding(start = 16.dp)
                                 ) {
-                                    Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
+                                    Text(
+                                        text = "Trả phòng",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Text(
                                         text = timeCheckOut,
-                                        color = Color.Red, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                        color = Color.Red,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold
+                                    )
 
                                 }
 
-                                Divider(
+                                HorizontalDivider(
                                     modifier = Modifier
                                         .width(0.dp)
                                         .fillMaxHeight()

@@ -20,7 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -102,17 +102,19 @@ fun BottomCardDetail(
                     ,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    when(typeBooking){
-                        "hourly"-> Icon(
+                    when (typeBooking) {
+                        "hourly" -> Icon(
                             painter = painterResource(id = R.drawable.outline_hourglass_top_24),
                             contentDescription = "", modifier = Modifier.size(16.dp),
                             tint = Color.Red
                         )
-                        "overnight"-> Icon(
+
+                        "overnight" -> Icon(
                             painter = painterResource(id = R.drawable.outline_dark_mode_24),
                             contentDescription = "", modifier = Modifier.size(16.dp),
                             tint = Color(138, 43, 226)
                         )
+
                         else -> Icon(
                             painter = painterResource(id = R.drawable.outline_calendar_month_24),
                             contentDescription = "", modifier = Modifier.size(16.dp),
@@ -122,28 +124,38 @@ fun BottomCardDetail(
 
 
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = if(typeBooking == "hourly") "${if(totalTime.toInt() < 9) "0${totalTime}" else totalTime} giờ"
-                    else "${if(totalTime.toInt() < 9) "0${totalTime}" else totalTime} ngày" ,
+                    Text(
+                        text = if (typeBooking == "hourly") "${if (totalTime.toInt() < 9) "0${totalTime}" else totalTime} giờ"
+                        else "${if (totalTime.toInt() < 9) "0${totalTime}" else totalTime} ngày",
                         style = MaterialTheme.typography.bodyMedium
                     )
 
                     Spacer(modifier = Modifier.width(6.dp))
 
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier
                             .width(1.dp)
-                            .height(10.dp)
-                        ,
+                            .height(10.dp),
                         color = Color.Black.copy(alpha = 0.3f)
                     )
 
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = dateCheckinStringFormat, style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = dateCheckinStringFormat,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                     Spacer(modifier = Modifier.width(6.dp))
 
-                    Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = "", modifier = Modifier.size(16.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                        contentDescription = "",
+                        modifier = Modifier.size(16.dp)
+                    )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = dateCheckoutStringFormat, style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = dateCheckoutStringFormat,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
 

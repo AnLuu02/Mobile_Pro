@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.AppColor
-import androidx.compose.ui.graphics.Color as ComposeColor
 
 @Composable
 fun ItemInList (
@@ -89,7 +88,8 @@ fun ItemInList (
           Text(
             color = appColor.gray2,
             fontSize = 10.sp,
-            text = "Hạn sử dụng:" + dateExp)
+            text = "Hạn sử dụng: $dateExp"
+          )
         }
       }
       Box(

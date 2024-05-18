@@ -39,7 +39,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -173,35 +173,44 @@ fun ListRoomScreen(
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    when(typeBooking.value){
-                                        "hourly"-> Icon(
+                                    when (typeBooking.value) {
+                                        "hourly" -> Icon(
                                             painter = painterResource(id = R.drawable.outline_hourglass_top_24),
-                                            contentDescription = "", modifier = Modifier.size(16.dp),
+                                            contentDescription = "",
+                                            modifier = Modifier.size(16.dp),
                                             tint = Color.Red
                                         )
-                                        "overnight"-> Icon(
+
+                                        "overnight" -> Icon(
                                             painter = painterResource(id = R.drawable.outline_dark_mode_24),
-                                            contentDescription = "", modifier = Modifier.size(16.dp),
+                                            contentDescription = "",
+                                            modifier = Modifier.size(16.dp),
                                             tint = Color(138, 43, 226)
                                         )
+
                                         else -> Icon(
                                             painter = painterResource(id = R.drawable.outline_calendar_month_24),
-                                            contentDescription = "", modifier = Modifier.size(16.dp),
+                                            contentDescription = "",
+                                            modifier = Modifier.size(16.dp),
                                             tint = Color(135, 206, 235)
                                         )
                                     }
 
                                     Spacer(modifier = Modifier.width(6.dp))
 
-                                    Text(text = when(typeBooking.value){
-                                        "hourly"->"Theo giờ"
-                                        "overnight"->"Qua đêm"
-                                        else -> "Theo ngày"
-                                    }, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.W500)
+                                    Text(
+                                        text = when (typeBooking.value) {
+                                            "hourly" -> "Theo giờ"
+                                            "overnight" -> "Qua đêm"
+                                            else -> "Theo ngày"
+                                        },
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.W500
+                                    )
 
                                     Spacer(modifier = Modifier.width(6.dp))
 
-                                    Divider(
+                                    HorizontalDivider(
                                         modifier = Modifier
                                             .width(1.dp)
                                             .height(12.dp),
@@ -209,9 +218,12 @@ fun ListRoomScreen(
                                     )
 
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text(text = if(typeBooking.value == "hourly") "${if(totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} giờ"
-                                    else "${if(totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} ngày",
-                                        style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.W500)
+                                    Text(
+                                        text = if (typeBooking.value == "hourly") "${if (totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} giờ"
+                                        else "${if (totalTime.value.toInt() < 9) "0${totalTime.value}" else totalTime.value} ngày",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.W500
+                                    )
                                 }
 
                                 Text(
@@ -224,12 +236,11 @@ fun ListRoomScreen(
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            Divider(
+                            HorizontalDivider(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(1.dp)
-                                    .padding(start = 16.dp, end = 16.dp)
-                                ,
+                                    .padding(start = 16.dp, end = 16.dp),
                                 color = when (typeBooking.value) {
                                     "hourly" -> Color.Red
                                     "overnight" -> Color(138, 43, 226)
@@ -256,17 +267,22 @@ fun ListRoomScreen(
                                         Column(
                                             horizontalAlignment = Alignment.Start
                                         ) {
-                                            Text(text = "Nhận phòng", style = MaterialTheme.typography.bodySmall)
+                                            Text(
+                                                text = "Nhận phòng",
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
                                             Spacer(modifier = Modifier.height(6.dp))
                                             Text(
                                                 text = dateCheckinStringFormat,
-                                                color = Color.Black, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold,
+                                                color = Color.Black,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontWeight = FontWeight.Bold,
                                             )
 
 
                                         }
 
-                                        Divider(
+                                        HorizontalDivider(
                                             modifier = Modifier
                                                 .width(1.dp)
                                                 .fillMaxHeight()
@@ -284,17 +300,23 @@ fun ListRoomScreen(
                                     ) {
                                         Column(
                                             horizontalAlignment = Alignment.Start,
-                                            modifier = Modifier.padding(start=16.dp)
+                                            modifier = Modifier.padding(start = 16.dp)
                                         ) {
-                                            Text(text = "Trả phòng", style = MaterialTheme.typography.bodySmall)
+                                            Text(
+                                                text = "Trả phòng",
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
                                             Spacer(modifier = Modifier.height(6.dp))
                                             Text(
                                                 text = dateCheckoutStringFormat,
-                                                color = Color.Black, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                                color = Color.Black,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontWeight = FontWeight.Bold
+                                            )
 
                                         }
 
-                                        Divider(
+                                        HorizontalDivider(
                                             modifier = Modifier
                                                 .width(0.dp)
                                                 .fillMaxHeight()
@@ -307,7 +329,7 @@ fun ListRoomScreen(
                         }
                     }
                 }
-                dataRoom.value?.roomTypes?.bedTypes?.forEachIndexed { index, bedType ->
+                dataRoom.value?.roomTypes?.bedTypes?.forEachIndexed { _, bedType ->
                     CardListRoom(bookingViewModel,bedType, dataRoom.value!!,onOpenPayment)
                     Spacer(modifier = Modifier.height(12.dp))
                 }
@@ -471,7 +493,7 @@ fun CardListRoom(
                             )
 
                             Spacer(modifier = Modifier.height(20.dp))
-                            Divider(
+                            HorizontalDivider(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(1.dp),
@@ -495,7 +517,7 @@ fun CardListRoom(
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
 
-                                        Box(modifier = Modifier){
+                                        Box(modifier = Modifier) {
                                             Text(
                                                 text = "-4%",
                                                 style = MaterialTheme.typography.bodySmall,
@@ -506,7 +528,12 @@ fun CardListRoom(
                                         }
                                     }
                                     Text(
-                                        text = formatCurrencyVND(OriginalRoomPrice(bedType.total,4)),
+                                        text = formatCurrencyVND(
+                                            originalRoomPrice(
+                                                bedType.total,
+                                                4
+                                            )
+                                        ),
                                         fontSize = 16.sp,
                                         color = Color.Gray,
                                         textDecoration = TextDecoration.LineThrough
@@ -530,7 +557,7 @@ fun CardListRoom(
                                         style = MaterialTheme.typography.titleMedium,
                                         color = Color.White,
                                         fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(start = 16.dp,end=16.dp)
+                                        modifier = Modifier.padding(start = 16.dp, end = 16.dp)
                                     )
                                 }
 
@@ -539,26 +566,27 @@ fun CardListRoom(
 
                             Spacer(modifier = Modifier.height(10.dp))
 
-                            Box(modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    Color.LightGray.copy(alpha = 0.3f),
-                                    shape = MaterialTheme.shapes.small
-                                ),
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        Color.LightGray.copy(alpha = 0.3f),
+                                        shape = MaterialTheme.shapes.small
+                                    ),
 
-                                ){
+                                ) {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(12.dp)
-                                    ,
+                                        .padding(12.dp),
                                 ) {
 
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                     ) {
 
-                                        Icon(imageVector = Icons.Default.Check,
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
                                             contentDescription = "Check",
                                             tint = Color.Black.copy(alpha = 0.6f),
                                             modifier = Modifier.size(14.dp)
@@ -567,7 +595,8 @@ fun CardListRoom(
 
                                         Spacer(modifier = Modifier.width(6.dp))
 
-                                        Text(text = "Tất cả phương thức thanh toán",
+                                        Text(
+                                            text = "Tất cả phương thức thanh toán",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = Color.Black.copy(alpha = 0.6f),
                                         )
@@ -579,7 +608,8 @@ fun CardListRoom(
                                         modifier = Modifier.fillMaxWidth(),
                                     ) {
 
-                                        Icon(imageVector = Icons.Default.MonetizationOn,
+                                        Icon(
+                                            imageVector = Icons.Default.MonetizationOn,
                                             contentDescription = "Check",
                                             tint = Color.Black.copy(alpha = 0.6f),
                                             modifier = Modifier.size(14.dp)
@@ -588,7 +618,8 @@ fun CardListRoom(
 
                                         Spacer(modifier = Modifier.width(6.dp))
 
-                                        Text(text = "Nhận thưởng lên đến 2.400 Easy Xu",
+                                        Text(
+                                            text = "Nhận thưởng lên đến 2.400 Easy Xu",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = Color.Black.copy(alpha = 0.6f),
                                         )
@@ -600,7 +631,8 @@ fun CardListRoom(
                                         modifier = Modifier.fillMaxWidth(),
                                     ) {
 
-                                        Icon(imageVector = Icons.Default.Discount,
+                                        Icon(
+                                            imageVector = Icons.Default.Discount,
                                             contentDescription = "Check",
                                             tint = Color.Black.copy(alpha = 0.6f),
                                             modifier = Modifier.size(14.dp)
@@ -608,7 +640,8 @@ fun CardListRoom(
 
                                         Spacer(modifier = Modifier.width(6.dp))
 
-                                        Text(text = "Nhận ưu đãi giảm giá 12%",
+                                        Text(
+                                            text = "Nhận ưu đãi giảm giá 12%",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = Color.Black.copy(alpha = 0.6f),
                                         )
@@ -625,9 +658,10 @@ fun CardListRoom(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row{
+                                Row {
 
-                                    Icon(imageVector = Icons.Default.WarningAmber,
+                                    Icon(
+                                        imageVector = Icons.Default.WarningAmber,
                                         contentDescription = "warning",
                                         tint = Color.Black.copy(alpha = 0.6f),
                                         modifier = Modifier.size(14.dp)
@@ -636,7 +670,8 @@ fun CardListRoom(
 
                                     Spacer(modifier = Modifier.width(6.dp))
 
-                                    Text(text = "Chính sách hủy phòng",
+                                    Text(
+                                        text = "Chính sách hủy phòng",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = Color.Black.copy(alpha = 0.6f),
                                     )
@@ -649,7 +684,8 @@ fun CardListRoom(
                                 ) {
 
 
-                                    Text(text = "Chi tiết phòng",
+                                    Text(
+                                        text = "Chi tiết phòng",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = Color.Red,
                                     )
@@ -657,9 +693,10 @@ fun CardListRoom(
                                     Spacer(modifier = Modifier.width(6.dp))
 
 
-                                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                                         contentDescription = "next",
-                                        tint =Color.Red,
+                                        tint = Color.Red,
                                         modifier = Modifier.size(14.dp)
 
                                     )
@@ -674,18 +711,6 @@ fun CardListRoom(
         }
     }
     if(openAlertDialog.value){
-//        AlertDialogExample(
-//            onDismissRequest = {
-//                openAlertDialog.value = false
-//            },
-//            onConfirmation = {
-//                openAlertDialog.value = false
-//                onOpenPayment()
-//            },
-//            dialogTitle = "Yêu cầu thanh toán trả trước",
-//            dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm.",
-//        )
-
         DialogMessage(
             onDismissRequest = {openAlertDialog.value = false},
             onConfirmation = {
@@ -725,9 +750,7 @@ fun PagerIndicator(
     }
 }
 
-fun CaculateRoomPrice(price:Int,percent:Int): Int {
-    return price - (price*percent/100)
-}
-fun OriginalRoomPrice(price:Int,percent:Int): Int {
+
+fun originalRoomPrice(price:Int, percent:Int): Int {
     return price + (price*percent/100)
 }
