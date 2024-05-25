@@ -24,10 +24,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.jetpackcomposedemo.Screen.User.LoginUiState
 
 @Composable
 fun InfoBookingTopBar(
-    navController:NavHostController
+    navController:NavHostController,
+    loginUiState: LoginUiState
 ) {
 
 
@@ -51,7 +53,7 @@ fun InfoBookingTopBar(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = false, radius = 24.dp),
-                            onClick = { navController.popBackStack("home", inclusive = false) }
+                            onClick = { navController.navigate("user/${loginUiState.id}/mybooking") }
                         ),
                     contentAlignment = Alignment.Center
                 ) {

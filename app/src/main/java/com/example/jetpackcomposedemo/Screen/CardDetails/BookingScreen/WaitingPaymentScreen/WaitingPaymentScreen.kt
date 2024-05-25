@@ -25,8 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,9 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.CountDownPaymentViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.StatusPayment
 import com.example.jetpackcomposedemo.data.models.Room.Room
+import com.example.jetpackcomposedemo.handlePayment.CountDown.CountdownViewModel
 import kotlinx.coroutines.launch
 
 
@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun WaitingPaymentScreen(
     infoRoom: Room,
-    countDownPaymentViewModel: CountDownPaymentViewModel,
+    countDownPaymentViewModel: CountdownViewModel,
     navController: NavHostController,
     closeScreenWaitingPayment:(Boolean)->Unit,
     onContinuePayment:()->Unit
@@ -109,9 +109,9 @@ fun WaitingPaymentScreen(
 @Composable
 fun TimerComponent(
     padding:PaddingValues,
-    countDownPaymentViewModel:CountDownPaymentViewModel
+    countDownPaymentViewModel:CountdownViewModel
 ) {
-    val timeLeftFormatted by countDownPaymentViewModel.timeLeftFormatted.observeAsState()
+    val remainingTime by countDownPaymentViewModel.remainingTime.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -184,14 +184,12 @@ fun TimerComponent(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Box(modifier = Modifier.background(Color.LightGray.copy(0.3f), shape = RoundedCornerShape(4.dp))){
-                timeLeftFormatted?.let {
                     Text(
-                        text = it,
+                        text =  "${remainingTime / 60}:${"%02d".format(remainingTime % 60)}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(10.dp)
                     )
-                }
             }
 
         }

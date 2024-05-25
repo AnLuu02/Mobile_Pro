@@ -13,4 +13,5 @@ data class BillApi(
     @SerializedName("LateCharge")val lateCharge:Int? = null,
     @SerializedName("DamageCharge")val damageCharge: Int? = null,
     @SerializedName("FinalCharge")val finalCharge: Int? = null,
+    @SerializedName("BedType_ID")val bedTypeId: Int? = null
 )

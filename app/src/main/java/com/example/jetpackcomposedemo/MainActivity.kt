@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,7 +19,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -28,8 +32,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.jetpackcomposedemo.Screen.BookQuickly.DiscountScreen
-import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.CountDownPaymentViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.CardDetailScreen
 import com.example.jetpackcomposedemo.Screen.Discount.CouponScreen
@@ -56,18 +61,26 @@ import com.example.jetpackcomposedemo.Screen.User.LoginViewModel
 import com.example.jetpackcomposedemo.Screen.User.RegisterScreen
 import com.example.jetpackcomposedemo.Screen.User.UserScreen
 import com.example.jetpackcomposedemo.Screen.User.UserTopBar
-import com.example.jetpackcomposedemo.components.LoadingSpinner
+import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
 import com.example.jetpackcomposedemo.components.ScreenWithBottomNavigationBar
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance.apiService
 import com.example.jetpackcomposedemo.data.repository.BookingRepository
 import com.example.jetpackcomposedemo.data.repository.RoomRepository
 import com.example.jetpackcomposedemo.data.repository.RoomTypeRepository
+import com.example.jetpackcomposedemo.data.room.Entity.ReminderEntity
+import com.example.jetpackcomposedemo.data.room.Repository.NotificationRepository
+import com.example.jetpackcomposedemo.data.room.Repository.ReminderRepository
+import com.example.jetpackcomposedemo.data.room.SQLite.NotificationDB
+import com.example.jetpackcomposedemo.data.room.SQLite.RemindersDB
+import com.example.jetpackcomposedemo.data.room.ViewModel.NotificationViewModel
+import com.example.jetpackcomposedemo.data.room.ViewModel.ReminderViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApiFactory
 import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomTypeViewModelFactory
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.RoomViewModelApi.RoomViewModelFactory
+import com.example.jetpackcomposedemo.handlePayment.CountDown.CountdownViewModel
 import com.example.jetpackcomposedemo.ui.theme.JetpackComposeDemoTheme
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
@@ -76,6 +89,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import vn.zalopay.sdk.ZaloPaySDK
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : ComponentActivity() {
@@ -157,29 +171,7 @@ class MainActivity : ComponentActivity() {
         ZaloPaySDK.init(2554, vn.zalopay.sdk.Environment.SANDBOX)
 
         setContent {
-//            val context = LocalContext.current
-//            val db = RemindersDB.getInstance(context)
-//            val reminderRepository = ReminderRepository(db)
-//            val myViewModel = ReminderViewModel(reminderRepository)
-//            val reminders by myViewModel.reminders.collectAsState(initial = emptyList())
-//
-//           if(reminders.isNotEmpty()){
-//               reminders.forEach{
-//                   ScheduleNotification(context, it.time)
-//                   myViewModel.deleteReminder(ReminderEntity(it.id,it.time))
-//               }
-//           }
-//            val delayInMillis = TimeUnit.SECONDS.toMillis(30)
-//            val notificationWorkRequest = OneTimeWorkRequestBuilder<NotifyWorker>()
-//                .setInitialDelay(delayInMillis, TimeUnit.MILLISECONDS) // Đặt độ trễ ban đầu là 30 giây
-//                .build()
-//
-//            WorkManager.getInstance(context).enqueue(notificationWorkRequest)
-
-
-
             MainApp(this@MainActivity)
-//            HomeScreenReminder()
         }
     }
     override fun onNewIntent(intent: Intent?) {
@@ -197,6 +189,7 @@ fun MainApp(mainActivity: MainActivity) {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
+            val context = LocalContext.current
             val loginViewModel1: LoginViewModel = viewModel(factory = LoginViewModel.Factory)
             val searchViewModel: SearchViewModel = viewModel()
             val bookingViewModel: BookingViewModel = viewModel()
@@ -216,12 +209,48 @@ fun MainApp(mainActivity: MainActivity) {
                 BookingRepository(apiService)
             ))
 
+            /////////////////////////////// Handle notification reminder /////////////////////////////
+            val dbReminder = RemindersDB.getInstance(context)
+            val reminderRepository = ReminderRepository(dbReminder)
+            val reminderViewModel = ReminderViewModel(reminderRepository)
+
             if(loginUiState.isLoggedIn){
                 bookingViewModelApi.getListMyBooking(loginUiState.id.toString())
+
+                val reminders by reminderViewModel.getRemindersByUser_ID(loginUiState.id).collectAsState(
+                    initial = emptyList()
+                )
+                var earlyTime = ReminderEntity(
+                    time = 99999999999,
+                    user_id = loginUiState.id
+                )
+                if(reminders.isNotEmpty()){
+                    reminders.forEach {
+                        if(earlyTime.time > it.time){
+                            earlyTime = it
+                        }
+                    }
+                    val delayInMillis = earlyTime.time
+                    val notificationWorkRequest = OneTimeWorkRequestBuilder<NotifyWorker>()
+                        .setInitialDelay(delayInMillis, TimeUnit.MILLISECONDS) // Đặt độ trễ ban đầu là 30 giây
+                        .build()
+
+                    WorkManager.getInstance(context).enqueue(notificationWorkRequest)
+                    ScheduleNotification(context, earlyTime.time)
+                }
             }
+            /////////////////////////////// Handle notification by RoomDB /////////////////////////////
+            val db = NotificationDB.getInstance(context)
+            val notificationRepository = NotificationRepository(db)
+            val notificationViewModel = NotificationViewModel(notificationRepository)
+
 
             /////////  thời gian thanh toán còn lại trước khi tự động hủy  //////////////////////////
-            val countDownPaymentViewModel:CountDownPaymentViewModel = viewModel()
+
+
+            /////////////////////////// thời gian giữ đơn đặt phòng, sau 5p không thanh toán sẽ tự động hủy ///////////////////
+            val countDownPaymentViewModel:CountdownViewModel = viewModel()
+
 
             NavHost(navController = navController, startDestination = "StartingAppScreen" ){
 
@@ -241,6 +270,7 @@ fun MainApp(mainActivity: MainActivity) {
                         countDownPaymentViewModel = countDownPaymentViewModel,
                         status = status,
                         bookingViewModel = bookingViewModel,
+                        bookingViewModelApi = bookingViewModelApi,
                         navController = navController,
                         loginUiState = loginUiState
                     )
@@ -248,15 +278,21 @@ fun MainApp(mainActivity: MainActivity) {
 
                 //----------------------------------- HOME ------------------------------
                 composable("home"){
-                    LoadingSpinner()
+                    val openDialogLoginRequired = remember{ mutableStateOf(false) }
                     ScreenWithBottomNavigationBar(
                         navController = navController,
-                        topBar ={listState-> HomeTopBar(listState,
+                        topBar ={ listState-> HomeTopBar(
+                            loginUiState = loginUiState,
+                            notificationViewModel = notificationViewModel,
+                            listState = listState,
                             onOpenNotifications = {
                                 navController.navigate("notification")
                             },
                             onOpenScreenSearch ={
                                 navController.navigate("search")
+                            },
+                            openDialogLoginRequired = {
+                                openDialogLoginRequired.value = it
                             }
                         ) } ,
                         content = { padding,listState->
@@ -275,17 +311,35 @@ fun MainApp(mainActivity: MainActivity) {
                                     navController.navigate("search/$filter")
                                 })
                         })
+                    if(openDialogLoginRequired.value){
+                        DialogMessage(
+                            onDismissRequest = { openDialogLoginRequired.value = false },
+                            onConfirmation = {
+                                openDialogLoginRequired.value = false
+                                navController.navigate("login")
+                            },
+                            dialogTitle =  "Yêu cầu đăng nhâp",
+                            dialogText ="Vui lòng đăng nhập để nhận thông báo. Xin cảm ơn",
+                        )
+                    }
                 }
 
                 //----------------------------------- NOTIFICATION ------------------------------
                 composable("notification"){
-                    NotificationsScreen(navController = navController)
+
+                    NotificationsScreen(
+                        notificationViewModel = notificationViewModel,
+                        navController = navController,
+                        loginUiState = loginUiState
+                    )
                 }
 
                 //----------------------------------- SEARCH ------------------------------
                 composable("search") {
                     SearchScreen(
                         searchViewModel = searchViewModel,
+                        loginUiState = loginUiState,
+                        notificationViewModel = notificationViewModel,
                         onHandleSearchClickButtonSearch = {filter->
                             navController.navigate("search/$filter")
                         },
@@ -344,7 +398,7 @@ fun MainApp(mainActivity: MainActivity) {
                             navController.navigate("roomDetails/$roomId")
                         },
 
-                    )
+                        )
                 }
 
                 //----------------------------------- PROPOSED ------------------------------
@@ -371,6 +425,7 @@ fun MainApp(mainActivity: MainActivity) {
                         if(loginUiState.isLoggedIn) {
                             DiscountScreen(
                                 padding = padding,
+                                notificationViewModel = notificationViewModel,
                                 navController = navController,
                                 isLoggedIn = true,
                                 isCheckedIn = true,
@@ -382,6 +437,7 @@ fun MainApp(mainActivity: MainActivity) {
                         } else {
                             DiscountScreen(
                                 padding = padding,
+                                notificationViewModel = notificationViewModel,
                                 navController = navController,
                                 isLoggedIn = false,
                                 isCheckedIn = false,
@@ -419,22 +475,22 @@ fun MainApp(mainActivity: MainActivity) {
                 //----------------------------------- USER ------------------------------
                 composable("user"){
 
-                        ScreenWithBottomNavigationBar(
-                            isBotNav = !loginUiState.isShowingInfo,
-                            navController = navController,
-                            topBar = { UserTopBar( loginUiState = loginUiState,
-                                onLoginButtonClicked = { navController.navigate("login") },
-                                onToggleSettingInfo = {
-                                    loginViewModel1.toogleSetting(loginUiState.isShowingInfo)
-                                    loginViewModel1.reset()
-                                }) },
-                            content = { padding, _ ->
-                                if(loginUiState.isShowingInfo){
-                                    InfoUser(padding = padding,loginUiState = loginUiState, loginViewModel = loginViewModel1)
-                                }else{
-                                    UserScreen(navController = navController,padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
-                                }
-                            })
+                    ScreenWithBottomNavigationBar(
+                        isBotNav = !loginUiState.isShowingInfo,
+                        navController = navController,
+                        topBar = { UserTopBar( loginUiState = loginUiState,
+                            onLoginButtonClicked = { navController.navigate("login") },
+                            onToggleSettingInfo = {
+                                loginViewModel1.toogleSetting(loginUiState.isShowingInfo)
+                                loginViewModel1.reset()
+                            }) },
+                        content = { padding, _ ->
+                            if(loginUiState.isShowingInfo){
+                                InfoUser(padding = padding,loginUiState = loginUiState, loginViewModel = loginViewModel1)
+                            }else{
+                                UserScreen(navController = navController,padding = padding, onLogoutSuccess = { loginViewModel1.logout() }, loginUiState = loginUiState )
+                            }
+                        })
 
                 }
 
@@ -559,6 +615,8 @@ fun MainApp(mainActivity: MainActivity) {
                         mainActivity = mainActivity,
                         bookingViewModelApi = bookingViewModelApi,
                         bookingViewModel = bookingViewModel,
+                        notificationViewModel = notificationViewModel,
+                        reminderViewModel = reminderViewModel,
                         loginUiState = loginUiState,
                         navController = navController,
                         countDownPaymentViewModel = countDownPaymentViewModel

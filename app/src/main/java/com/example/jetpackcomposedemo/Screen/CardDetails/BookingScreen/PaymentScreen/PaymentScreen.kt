@@ -59,7 +59,6 @@ import coil.request.ImageRequest
 import coil.size.Scale
 import com.example.jetpackcomposedemo.MainActivity
 import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.CountDownPaymentViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.PaymentBottomBar
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.StatusBedType
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.StatusPayment
@@ -69,14 +68,21 @@ import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
 import com.example.jetpackcomposedemo.Screen.User.LoginUiState
 import com.example.jetpackcomposedemo.Screen.User.MyUser
+import com.example.jetpackcomposedemo.components.CalenderDatePicker.convertStringToMillis
 import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
 import com.example.jetpackcomposedemo.data.models.BedType.BedType
 import com.example.jetpackcomposedemo.data.models.Bill.Bill
 import com.example.jetpackcomposedemo.data.models.Booking.Booking
 import com.example.jetpackcomposedemo.data.models.Booking.MyBooking
 import com.example.jetpackcomposedemo.data.models.Room.Room
+import com.example.jetpackcomposedemo.data.room.Entity.NotificationEntity
+import com.example.jetpackcomposedemo.data.room.Entity.NotificationType
+import com.example.jetpackcomposedemo.data.room.Entity.ReminderEntity
+import com.example.jetpackcomposedemo.data.room.ViewModel.NotificationViewModel
+import com.example.jetpackcomposedemo.data.room.ViewModel.ReminderViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
 import com.example.jetpackcomposedemo.handlePayment.Api.CreateOrder
+import com.example.jetpackcomposedemo.handlePayment.CountDown.CountdownViewModel
 import com.example.jetpackcomposedemo.helpper.Status
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -96,11 +102,13 @@ fun PaymentScreen(
     mainActivity:MainActivity,
     bookingViewModelApi:BookingViewModelApi,
     bookingViewModel:BookingViewModel,
+    notificationViewModel:NotificationViewModel,
+    reminderViewModel:ReminderViewModel,
     loginUiState:LoginUiState,
     navController:NavHostController,
-    countDownPaymentViewModel:CountDownPaymentViewModel
+    countDownPaymentViewModel:CountdownViewModel
 ) {
-
+    val (loading,setLoading) = remember{ mutableStateOf(false) }
     LaunchedEffect(Unit) {
         bookingViewModelApi.getListMyBooking(loginUiState.id.toString())
     }
@@ -121,13 +129,12 @@ fun PaymentScreen(
         }
 
         Status.ERROR -> {
-            Log.e("<ERRROR>","<ERRROR>")
         }
         Status.LOADING -> {
-            Log.e("<LOADING>","<LOADING>")
 
         }
-        null -> {Log.e("<NULL>","<NULL>") }
+        null -> {}
+
     }
 
 
@@ -165,11 +172,10 @@ fun PaymentScreen(
     }
     bookingViewModel.setStatus(statusPayment)
     val (isClicked,setIsClicked) = remember{ mutableStateOf(false) }
-    val (loading,setLoading) = remember{ mutableStateOf(false) }
-
     LaunchedEffect(statusPayment) {
         if(statusPayment != StatusPayment.NON.status){
-            bedType.status = if(statusPayment == StatusPayment.PAID.status) StatusBedType.UNAVAILABLE.status else StatusBedType.AVAILABLE.status
+            bedType.status = if(statusPayment == StatusPayment.PAID.status || statusPayment == StatusPayment.PENDING.status )
+                StatusBedType.UNAVAILABLE.status else StatusBedType.AVAILABLE.status
             bookingViewModelApi.bookingRoom(
                 Booking(
                     null,
@@ -206,9 +212,38 @@ fun PaymentScreen(
                 )
             )
         }
-        if(statusPayment == StatusPayment.PAID.status){
+        if(statusPayment == StatusPayment.PENDING.status){
+            notificationViewModel.addNotification(  NotificationEntity(
+                userId = loginUiState.id,
+                title = "Thông báo đặt phòng",
+                content = "Đơn đặt phòng ${bookingViewModel.getInfoRoom()?.name} tại EasyBookingHotel của bạn chưa được thanh toán. Vui lòng thanh toán để được giữ phòng.",
+                type = NotificationType.BOOKING.type,
+                createdDate = LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy"))
+            ))
+        }
+        else if(statusPayment == StatusPayment.PAID.status){
+            notificationViewModel.addNotification(  NotificationEntity(
+                userId = loginUiState.id,
+                title = "Thông báo đặt phòng",
+                content = "Bạn đã hoàn thành đặt phòng ${bookingViewModel.getInfoRoom()?.name} tại EasyBookingHotel. Vui lòng đến nhận phòng đúng hẹn. Xin cảm ơn và hẹn gặp lại.",
+                type = NotificationType.BOOKING.type,
+                createdDate = LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy"))
+            ))
+            val timeCheckinString = when(typeBooking){
+                "bydate"-> "07:00, $dateCheckinString"
+                "overnight"-> "22:00, $dateCheckinString"
+                else->dateCheckinString
+            }
+            if(timeCheckinString != null){
+                reminderViewModel.addReminder(ReminderEntity(
+                    time = convertStringToMillis(timeCheckinString),
+                    user_id = loginUiState.id
+                ))
+            }
             navController.navigate("user/${loginUiState.id}/mybooking")
-
+            countDownPaymentViewModel.resetCountdown()
         }
     }
 
@@ -355,7 +390,7 @@ fun PaymentScreen(
             onDismissRequest = {openAlertDialogContinuePayment.value = false},
             onConfirmation = {
                 openAlertDialogContinuePayment.value = false
-                navController.navigate("user/${1}/mybooking")
+                navController.navigate("user/${loginUiState.id}/mybooking")
             },
             dialogTitle = "Bạn có đặt phòng nhưng chưa thanh toán. Thanh toán để tiếp tục.",
             dialogText = "Vui lòng thanh toán tất cả đơn đặt phòng trước khi đặt phòng mới."

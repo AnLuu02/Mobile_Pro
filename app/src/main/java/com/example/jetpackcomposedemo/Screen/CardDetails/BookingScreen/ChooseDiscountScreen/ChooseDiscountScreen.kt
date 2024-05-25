@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -29,7 +29,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -156,12 +155,12 @@ fun PromotionItem(
                     }
                     .padding(16.dp)
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.zalopay),
+                Icon(
+                    painter = painterResource(id = R.drawable.coupon),
                     contentDescription = null,
+                    tint = Color.Red,
                     modifier = Modifier
                         .size(80.dp)
-                        .clip(RoundedCornerShape(4.dp))
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(

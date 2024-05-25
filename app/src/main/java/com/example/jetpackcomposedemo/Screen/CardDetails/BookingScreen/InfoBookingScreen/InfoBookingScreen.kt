@@ -31,8 +31,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,23 +57,28 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Scale
 import com.example.jetpackcomposedemo.R
-import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.CountDownPaymentViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.InfoBookingScreen.InfoBookingTopBar
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.StatusPayment
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
 import com.example.jetpackcomposedemo.Screen.User.LoginUiState
+import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
 import com.example.jetpackcomposedemo.data.models.BedType.BedType
+import com.example.jetpackcomposedemo.data.models.Booking.MyBooking
 import com.example.jetpackcomposedemo.data.models.Room.Room
+import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
+import com.example.jetpackcomposedemo.handlePayment.CountDown.CountdownViewModel
+import com.example.jetpackcomposedemo.helpper.Status
 import java.time.LocalDateTime
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun InfoBookingScreen(
-    countDownPaymentViewModel:CountDownPaymentViewModel,
+    countDownPaymentViewModel:CountdownViewModel,
     status:String,
     bookingViewModel:BookingViewModel,
+    bookingViewModelApi:BookingViewModelApi,
     navController:NavHostController,
     loginUiState:LoginUiState
 ) {
@@ -93,9 +101,12 @@ fun InfoBookingScreen(
 
     val finalPrice = priceRoom - amountDiscount!!
 
+    val openAlertDialogCancelBookingRoom = remember{ mutableStateOf(false) }
+    val payloadInfoBookingRoom = remember{ mutableStateOf<MyBooking?>(null) }
+
     Scaffold(
         topBar = {
-            InfoBookingTopBar(navController = navController)
+            InfoBookingTopBar(navController = navController,loginUiState = loginUiState)
         }
     ) { padding ->
 
@@ -129,17 +140,54 @@ fun InfoBookingScreen(
                 PaymentDetailsInfoBooking(
                     bookingViewModel = bookingViewModel,
                     priceRoom = priceRoom,
-                    finalPrice = finalPrice
+                    finalPrice = finalPrice,
+                    status = status
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                CanclePolicyInfoBooking(status)
+                CanclePolicyInfoBooking(
+                    status,
+                    navController = navController,
+                    infoRoom = infoRoom,
+                    bookingViewModelApi = bookingViewModelApi,
+                    bedType = bedType,
+                    payloadInfoBookingRoom = {
+
+                    },
+                    openAlertDialogCancelBookingRoom = {
+                        openAlertDialogCancelBookingRoom.value = it
+                    }
+                )
+
             }
 
         }
 
     }
 
-//    LoadingScreen(isLoadingValue = loading)
+    if(openAlertDialogCancelBookingRoom.value){
+        DialogMessage(
+            onDismissRequest = {openAlertDialogCancelBookingRoom.value = false},
+            onConfirmation = {
+                openAlertDialogCancelBookingRoom.value = false
+                val booking = payloadInfoBookingRoom.value?.booking
+                val bill = payloadInfoBookingRoom.value?.bill
+                val bookingId = booking?.id
+                if (bookingId != null) {
+                    bookingViewModelApi.updateStatusBooking(bookingId,StatusPayment.CANCEL.status)
+                    val bedTypeId = bill?.bedTypeId
+                    val roomId = bill?.roomId
+                    val status = 1
+                    if(bedTypeId != null && roomId != null ){
+                        bookingViewModelApi.updateBedTypeBooking(bedTypeId,roomId,status)
+                    }
+                }
+                navController.popBackStack()
+            },
+            dialogTitle = "Bạn muốn hủy phòng sao?.",
+            dialogText = "Sao khi đồng ý, phòng sẽ hủy và sẽ không hoàn trả bất kì chi phí nào."
+        )
+
+    }
 
 }
 @Composable
@@ -147,10 +195,10 @@ fun TimerComponentInfoRoom(
     status: String,
     navController: NavHostController,
     infoRoom:Room,
-    countDownPaymentViewModel: CountDownPaymentViewModel
+    countDownPaymentViewModel: CountdownViewModel
 ) {
     // State để theo dõi tổng số giây đã trôi qua
-    val timeLeftFormatted by countDownPaymentViewModel.timeLeftFormatted.observeAsState()
+    val remainingTime by countDownPaymentViewModel.remainingTime.collectAsState()
 
 
     Column(
@@ -200,7 +248,12 @@ fun TimerComponentInfoRoom(
                 },
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleLarge,
-                color = Color.Black
+                color =  when(status.toInt()) {
+                    StatusPayment.PENDING.status -> Color.Red
+                    StatusPayment.PAID.status -> Color.Green
+                    StatusPayment.CANCEL.status -> Color.Black.copy(0.8f)
+                    else -> Color.Blue
+                }
             )
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -276,54 +329,44 @@ fun TimerComponentInfoRoom(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Box(modifier = Modifier.background(Color.LightGray.copy(0.3f), shape = RoundedCornerShape(4.dp))){
-                    timeLeftFormatted?.let {
-                        Text(
-                            text = it,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(10.dp)
-                        )
-                    }
+                    Text(
+                        text = "${remainingTime / 60}:${"%02d".format(remainingTime % 60)}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(10.dp)
+                    )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
             }
-            Button(
-                enabled = when(status.toInt()){
-                    StatusPayment.PENDING.status->true
-                    else->false
-                },
-                onClick = {
-                    navController.navigate("roomDetails/${infoRoom.id}/payment")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp)
-                    .clip(MaterialTheme.shapes.small),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red,
-                    contentColor = Color.White,
-                    disabledContainerColor = Color.Gray,
-                    disabledContentColor = Color.White
-                )
-            ) {
-                Text(
-                    text = when(status.toInt()){
-                        StatusPayment.CANCEL.status->"Đã hủy"
-                        StatusPayment.PENDING.status->"Tiếp tục thanh toán"
-                        StatusPayment.PAID.status->"Đã thanh toán"
-                        else->"Hoàn thành"
+            if(status.toInt() == StatusPayment.PENDING.status){
+                Button(
+                    enabled = true,
+                    onClick = {
+                        navController.navigate("roomDetails/${infoRoom.id}/payment")
                     },
-                    style = MaterialTheme.typography.titleSmall,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                )
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                        .clip(MaterialTheme.shapes.small),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red,
+                        contentColor = Color.White,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Tiếp tục thanh toán",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(8.dp))
 
         }
-
-
     }
 }
 @Composable
@@ -405,8 +448,7 @@ fun BookingDetails(
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -416,18 +458,14 @@ fun BookingDetails(
                     fontWeight = FontWeight.W500
 
                 )
-
-
                 Text(
                     text = loginUiState.fullName ?: "Annn",
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-
-                    )
-
-
+                    fontWeight = FontWeight.Bold
+                )
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
 
             HorizontalDivider(
                 modifier = Modifier
@@ -688,7 +726,9 @@ fun DiscountBookingInfoRoom(
             )
             if(discount != null){
                 Text(
-                    text = discount.name,
+                    text = discount.name  +" Giảm ${(if (discount.amountDiscount == 0F
+                        || discount.amountDiscount == null) discount.percentDiscount.toString() + "%"
+                    else (discount.amountDiscount / 1000F).toInt().toString() + "K")}",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.W500,
                     color = Color.Red,
@@ -719,7 +759,8 @@ fun DiscountBookingInfoRoom(
 fun PaymentDetailsInfoBooking(
     bookingViewModel: BookingViewModel,
     priceRoom:Int,
-    finalPrice:Int
+    finalPrice:Int,
+    status:String
 ){
     val bedType = bookingViewModel.getBedType()
     val discount = bookingViewModel.getDiscount()
@@ -761,7 +802,12 @@ fun PaymentDetailsInfoBooking(
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
-                        text = "Chưa thanh toán",
+                        text = when(status.toInt()){
+                            StatusPayment.PENDING.status->"Chờ thanh toán"
+                            StatusPayment.CANCEL.status->"Đã hủy"
+                            StatusPayment.PAID.status->"Đã thanh toán"
+                            else ->"Hoàn thành"
+                        },
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W500
                     )
@@ -883,8 +929,28 @@ fun PaymentDetailsInfoBooking(
 
 @Composable
 fun CanclePolicyInfoBooking(
-    status:String
+    status:String,
+    navController: NavHostController,
+    infoRoom: Room?,
+    bookingViewModelApi:BookingViewModelApi,
+    bedType:BedType,
+    payloadInfoBookingRoom:(MyBooking)->Unit,
+    openAlertDialogCancelBookingRoom:(Boolean)->Unit
 ){
+    val bookingRoom = remember { mutableStateOf<MyBooking?>(null) }
+    val resourceMyBooking = bookingViewModelApi.myBookingList.observeAsState()
+    when (resourceMyBooking.value?.status) {
+        Status.SUCCESS -> {
+            resourceMyBooking.value?.data?.let { rooms ->
+                if (infoRoom != null) {
+                    bookingRoom.value = rooms.find { it.room?.id == infoRoom.id && it.bedType?.id == bedType.id}
+                }
+            }
+        }
+        Status.ERROR -> {}
+        Status.LOADING -> {}
+        null ->  {}
+    }
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -938,22 +1004,30 @@ fun CanclePolicyInfoBooking(
             Spacer(modifier = Modifier.height(30.dp))
 
             Button(
-                enabled = status.toInt() != StatusPayment.CANCEL.status,
+                enabled = status.toInt() == StatusPayment.CANCEL.status,
                 onClick = {
-
+                    if(status.toInt() != StatusPayment.CANCEL.status){
+                        if(bookingRoom.value != null){
+                            openAlertDialogCancelBookingRoom(true)
+                            payloadInfoBookingRoom(bookingRoom.value!!)
+                        }
+                    }
+                    else{
+                        if (infoRoom != null) {
+                            navController.navigate("roomDetails/${infoRoom.id}")
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.small),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Gray,
+                    containerColor = Color.Red,
                     contentColor = Color.White,
-                    disabledContainerColor = Color.Gray,
-                    disabledContentColor = Color.White
                 )
             ) {
                 Text(
-                    text =if(status.toInt() == StatusPayment.CANCEL.status) "Đã hủy" else "Hủy đặt phòng",
+                    text = if(status.toInt() == StatusPayment.CANCEL.status) "Đặt lại" else "Hủy đặt phòng",
                     style = MaterialTheme.typography.titleSmall,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,

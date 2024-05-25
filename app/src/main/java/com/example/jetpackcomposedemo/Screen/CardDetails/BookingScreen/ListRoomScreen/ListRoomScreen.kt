@@ -60,6 +60,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.StatusBedType
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
 import com.example.jetpackcomposedemo.components.CalenderDatePicker.DatePickerBooking.DatePickerBookingScreen
@@ -395,6 +396,7 @@ fun CardListRoom(
     })
 
     val openAlertDialog = remember { mutableStateOf(false) }
+    val openAlertDialogBedTypeUnavailable = remember { mutableStateOf(false) }
 
     var services = ""
     dataRoom.services?.forEachIndexed { index, s ->
@@ -543,8 +545,13 @@ fun CardListRoom(
 
                                 Button(
                                     onClick = {
-                                        bookingViewModel.setBedType(bedType = bedType)
-                                        openAlertDialog.value = true
+                                        if(bedType.status == StatusBedType.AVAILABLE.status){
+                                            bookingViewModel.setBedType(bedType = bedType)
+                                            openAlertDialog.value = true
+                                        }
+                                        else{
+                                            openAlertDialogBedTypeUnavailable.value = true
+                                        }
                                     },
                                     modifier = Modifier.clip(MaterialTheme.shapes.small),
                                     colors = ButtonDefaults.buttonColors(
@@ -719,6 +726,18 @@ fun CardListRoom(
             },
             dialogTitle = "Yêu cầu thanh toán trả trước",
             dialogText = "Vui lòng thanh toán trước để giữ phòng hoặc sử dụng sản phẩm đặt kèm."
+        )
+
+    }
+
+    if(openAlertDialogBedTypeUnavailable.value){
+        DialogMessage(
+            onDismissRequest = {openAlertDialogBedTypeUnavailable.value = false},
+            onConfirmation = {
+                openAlertDialogBedTypeUnavailable.value = false
+            },
+            dialogTitle = "Phòng không khả dụng",
+            dialogText = "Vui lòng chọn phòng khác, phòng này hiện tại đã có người đặt."
         )
 
     }

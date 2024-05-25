@@ -4,7 +4,6 @@ package com.example.jetpackcomposedemo.data.network
 import com.example.jetpackcomposedemo.data.models.Booking.Booking
 import com.example.jetpackcomposedemo.data.models.Booking.MyBooking
 import com.example.jetpackcomposedemo.data.models.Coupon
-import com.example.jetpackcomposedemo.data.models.Identity
 import com.example.jetpackcomposedemo.data.models.POST_Body_UserCoupon
 import com.example.jetpackcomposedemo.data.models.Room.Room
 import com.example.jetpackcomposedemo.data.models.RoomType
@@ -40,6 +39,20 @@ interface ApiService {
         @Query("billid") billId: Int
     ): Response<StateCallApi>
 
+
+    @PUT("api/bedtype")
+    suspend fun updateBedTypeBooking(
+        @Query("bedtypeId") bedTypeId:Int,
+        @Query("roomId") roomId:Int,
+        @Query("status") status:Int,
+    ): Response<StateCallApi>
+    @PUT("api/booking")
+    suspend fun updateStatusBooking(
+        @Query("id") userBookingInfoId:Int,
+        @Query("status") status:Int,
+    ): Response<StateCallApi>
+
+
     //get all
     // Coupon - begin
     @GET("api/coupons")
@@ -58,7 +71,7 @@ interface ApiService {
     @POST("api/UserCoupon/Add")
     suspend fun postUserCoupon(
         @Body post_body: POST_Body_UserCoupon
-    ): Response<List<Identity>>
+    ): Response<List<UserCoupon>>
     // UserCoupon - end
 
     // User - begin

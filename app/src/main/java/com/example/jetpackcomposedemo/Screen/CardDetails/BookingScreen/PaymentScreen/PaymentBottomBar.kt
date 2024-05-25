@@ -38,17 +38,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.CountDownPaymentViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.Search.OptionPayment
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
 import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
+import com.example.jetpackcomposedemo.handlePayment.CountDown.CountdownViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaymentBottomBar(
     bookingViewModel: BookingViewModel,
-    countDownPaymentViewModel: CountDownPaymentViewModel,
+    countDownPaymentViewModel: CountdownViewModel,
     payloadChoose:OptionPayment,
     finalPrice:Int,
     isClicked:Boolean,
@@ -165,6 +165,7 @@ fun PaymentBottomBar(
                             openAlertDialog.value = true
                         }
                         else{
+                            countDownPaymentViewModel.resetCountdown()
                             countDownPaymentViewModel.startCountdown()
                             onApplyBooking()
                         }

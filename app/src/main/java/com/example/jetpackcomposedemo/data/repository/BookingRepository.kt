@@ -11,5 +11,8 @@ class BookingRepository(private val apiService: ApiService) {
     suspend fun getListMyBooking(id:String): Response<List<MyBooking>> = apiService.getListMyBooking(id)
     suspend fun deleteMyBooking(bkId:Int,billId:Int): Response<StateCallApi> = apiService.deleteMyBooking(bkId,billId)
 
+    suspend fun updateBedTypeBooking(bedTypeId:Int, roomId:Int, status:Int): Response<StateCallApi> = apiService.updateBedTypeBooking(bedTypeId,roomId,status)
+    suspend fun updateStatusBooking(userBookingInfoId:Int,status:Int): Response<StateCallApi> = apiService.updateStatusBooking(userBookingInfoId,status)
+
 
 }

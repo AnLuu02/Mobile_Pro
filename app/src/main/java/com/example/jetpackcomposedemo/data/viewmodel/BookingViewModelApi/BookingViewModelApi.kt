@@ -28,9 +28,6 @@ class BookingViewModelApi(private val repository: BookingRepository) : ViewModel
         _stateCallApi.value = st
     }
 
-    init {
-
-    }
     fun bookingRoom(booking: Booking) {
         _bookingList.postValue(Resource.loading(null))
         viewModelScope.launch {
@@ -68,11 +65,39 @@ class BookingViewModelApi(private val repository: BookingRepository) : ViewModel
         viewModelScope.launch {
             try {
                 val response = repository.deleteMyBooking(bkId,billId)
-                Log.e("responsebody",response.body().toString())
-                Log.e("response",response.toString())
-
                 if (response.isSuccessful) {
                     getListMyBooking(uid.toString())
+                    _stateCallApi.value = response.body()!!
+                } else {
+                    _stateCallApi.value =response.body()!!
+                }
+            } catch (e: Exception) {
+                Log.e(">-<","",e)
+            }
+        }
+    }
+
+
+    fun updateBedTypeBooking(bedTypeId:Int, roomId:Int, status:Int){
+        viewModelScope.launch {
+            try {
+                val response = repository.updateBedTypeBooking(bedTypeId,roomId,status)
+                if (response.isSuccessful) {
+                    _stateCallApi.value = response.body()!!
+                } else {
+                    _stateCallApi.value =response.body()!!
+                }
+            } catch (e: Exception) {
+                Log.e(">-<","",e)
+            }
+        }
+    }
+
+    fun updateStatusBooking(userBookingInfoId:Int, status:Int){
+        viewModelScope.launch {
+            try {
+                val response = repository.updateStatusBooking(userBookingInfoId,status)
+                if (response.isSuccessful) {
                     _stateCallApi.value = response.body()!!
                 } else {
                     _stateCallApi.value =response.body()!!

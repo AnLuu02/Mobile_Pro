@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.jetpackcomposedemo.data.models.Identity
 import com.example.jetpackcomposedemo.data.models.POST_Body_UserCoupon
 import com.example.jetpackcomposedemo.data.models.UserCoupon
 import com.example.jetpackcomposedemo.data.repository.UserCouponRepository
@@ -14,9 +13,9 @@ import kotlinx.coroutines.launch
 
 class UserCouponViewModel(private val repository: UserCouponRepository) : ViewModel() { // sửa repository
     private val _list = MutableLiveData<Resource<List<UserCoupon>>>() // sửa class
-    private val _list2 = MutableLiveData<Resource<List<Identity>>>()
+    private val _list2 = MutableLiveData<Resource<List<UserCoupon>>>()
     val list: LiveData<Resource<List<UserCoupon>>> = _list // sửa class
-    val list2: LiveData<Resource<List<Identity>>> = _list2
+    val list2: LiveData<Resource<List<UserCoupon>>> = _list2
     private var isCallApi_getListCouponOfUser = false
     private var isCallApi_AddUserCoupon = false
 

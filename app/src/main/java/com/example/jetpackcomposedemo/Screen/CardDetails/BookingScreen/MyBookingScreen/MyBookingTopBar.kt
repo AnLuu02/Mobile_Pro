@@ -52,7 +52,7 @@ fun MyBookingTopBar(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = false, radius = 24.dp),
                             onClick = {
-                                navController.popBackStack("home", inclusive = false)
+                                navController.navigate("user")
                             }
                         ),
                     contentAlignment = Alignment.Center

@@ -1,6 +1,7 @@
 package com.example.jetpackcomposedemo.Screen.Search
 
-import androidx.compose.foundation.background
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.ripple.rememberRipple
@@ -35,6 +35,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposedemo.R
+import com.example.jetpackcomposedemo.Screen.User.LoginUiState
+import com.example.jetpackcomposedemo.data.room.Entity.NotificationEntity
+import com.example.jetpackcomposedemo.data.room.Entity.NotificationType
+import com.example.jetpackcomposedemo.data.room.ViewModel.NotificationViewModel
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 data class SearchSubNav(
     val icon: Int,
@@ -59,8 +65,11 @@ val itemsSubNav = listOf(
         route = "bydate"
     ),
 )
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SearchTopBar(
+    notificationViewModel:NotificationViewModel,
+    loginUiState:LoginUiState,
     typeBooking:(String)->Unit,
     closeSearchScreen:()->Unit
 ) {
@@ -120,6 +129,16 @@ fun SearchTopBar(
                     SubNavItem(item,currentNavItem.value == item.route, onClick = {
                         currentNavItem.value = item.route
                         typeBooking(item.route)
+                        notificationViewModel.addNotification(
+                            NotificationEntity(
+                                userId = loginUiState.id,
+                                title = "Thông báo hành động tìm kiếm",
+                                content = "Bạn vừa chọn hình thức tìm kiếm ${item.route}",
+                                type = NotificationType.TIMELINE.type,
+                                createdDate = LocalDateTime.now().format(
+                                    DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy"))
+                            )
+                        )
                     })
                 }
             }

@@ -1,7 +1,9 @@
 package com.example.jetpackcomposedemo.Screen.BookQuickly
 
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,7 +46,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,12 +56,17 @@ import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.AppColor
 import com.example.jetpackcomposedemo.data.network.RetrofitInstance
 import com.example.jetpackcomposedemo.data.repository.UserCouponRepository
+import com.example.jetpackcomposedemo.data.room.Entity.NotificationEntity
+import com.example.jetpackcomposedemo.data.room.Entity.NotificationType
+import com.example.jetpackcomposedemo.data.room.ViewModel.NotificationViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModel
 import com.example.jetpackcomposedemo.data.viewmodel.UserCouponViewModelFactory
 import com.example.jetpackcomposedemo.helpper.Status
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -333,8 +339,10 @@ fun LineFunctions (
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun LineFunctions2 (
+    notificationViewModel: NotificationViewModel,
     localPadding: Dp = 10.dp,
     screenWidth: Dp,
     navController: NavHostController?= null,
@@ -426,7 +434,21 @@ fun LineFunctions2 (
                                 try {
                                     when (userCouponResource.value?.status) {
                                         Status.SUCCESS -> {
-                                            userCouponResource.value?.data?.let { _ ->
+                                            userCouponResource.value?.data?.let {
+                                                if(it.isNotEmpty()){
+                                                    it.forEach {item->
+                                                        notificationViewModel.addNotification(
+                                                            NotificationEntity(
+                                                                userId = userID,
+                                                                title = "Thông báo ưu đãi",
+                                                                content = "Bạn đã nhận ưu đãi \"${item.name}\" từ sự kiện \"QR liền tay săn ngay ưu đãi.\"",
+                                                                type = NotificationType.DISCOUNT.type,
+                                                                createdDate = LocalDateTime.now().format(
+                                                                    DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy"))
+                                                            )
+                                                        )
+                                                    }
+                                                }
                                                 Toast.makeText(mainActivity, "Scan Coupon Successfully", Toast.LENGTH_SHORT).show()
                                             }
                                         }
@@ -552,6 +574,7 @@ fun LineCountdown (
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DiscountScreen(
     padding: PaddingValues = PaddingValues(
@@ -560,6 +583,7 @@ fun DiscountScreen(
         end = 16.dp,   // Right padding
         bottom = 8.dp  // Bottom padding
     ),
+    notificationViewModel: NotificationViewModel,
     navController: NavHostController? = null,
     isLoggedIn: Boolean = true,
     isCheckedIn: Boolean = true,
@@ -609,6 +633,7 @@ fun DiscountScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             LineFunctions2(
+                notificationViewModel = notificationViewModel,
                 screenWidth = screenWidth,
                 navController = navController,
                 mainActivity = mainActivity,
@@ -762,9 +787,9 @@ fun DiscountScreen(
     }
 }
 
-@Preview
-@Composable
-fun demoDiscountScreen() {
-    fun doA() {}
-    DiscountScreen()
-}
+//@Preview
+//@Composable
+//fun demoDiscountScreen() {
+//    fun doA() {}
+//    DiscountScreen()
+//}

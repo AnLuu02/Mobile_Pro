@@ -16,6 +16,10 @@ interface ReminderDAO  {
     @Query("SELECT * FROM ReminderEntity")
     fun getAllReminders(): Flow<List<ReminderEntity>>
 
+    @Query("SELECT * FROM ReminderEntity WHERE user_id = :user_id ")
+    fun getRemindersByUserID(user_id:Int ): Flow<List<ReminderEntity>>
+
+
     @Delete
     suspend fun deleteReminder(reminderEntity: ReminderEntity)
 

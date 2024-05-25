@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jetpackcomposedemo.data.room.Entity.ReminderEntity
 import com.example.jetpackcomposedemo.data.room.Repository.ReminderRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class ReminderViewModel(
@@ -17,6 +18,9 @@ class ReminderViewModel(
     }
 
     val reminders = reminderRepository.getAllReminders()
+    fun getRemindersByUser_ID(user_id:Int): Flow<List<ReminderEntity>> {
+        return reminderRepository.getRemindersByUserID(user_id)
+    }
 
     fun deleteReminder(reminder: ReminderEntity){
         viewModelScope.launch {
@@ -24,7 +28,7 @@ class ReminderViewModel(
         }
     }
 
-    fun uodateReminder(reminder: ReminderEntity){
+    fun updateReminder(reminder: ReminderEntity){
         viewModelScope.launch {
             reminderRepository.updateReminderFromRoom(reminder)
         }

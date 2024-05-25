@@ -44,8 +44,8 @@ class NotifyWorker(appContext: Context, workerParams: WorkerParameters) :
         }
 
         val notification = NotificationCompat.Builder(applicationContext, "chanel_id")
-            .setContentTitle("Easy booking thông báo!!!!")
-            .setContentText("Sắp đến hạn nhận phòng. Vui lòng đến đúng hạn, chúng tôi sẽ hủy phòng của bạn sau 30 phút nếu không đến nhận và mọi chi phí sẽ không được hoàn trả.")
+            .setContentTitle("Thông báo từ EasyBookingHotel")
+            .setContentText("Bạn có đặt phòng tại khách sạn. Vui lòng kiểm tra app và đến nhận phong đúng hạn, chúng tôi sẽ hủy phòng của bạn sau 30 phút nếu không đến nhận và mọi chi phí sẽ không được hoàn trả.")
             .setSmallIcon(R.drawable.email_icon)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()

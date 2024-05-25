@@ -36,11 +36,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,22 +55,22 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
 import com.example.jetpackcomposedemo.R
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingResult
-import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.CountDownPaymentViewModel
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingScreen.PaymentScreen.StatusPayment
 import com.example.jetpackcomposedemo.Screen.CardDetails.BookingViewModel
 import com.example.jetpackcomposedemo.Screen.GlobalScreen.LoadingScreen
 import com.example.jetpackcomposedemo.Screen.Search.SearchResult.formatCurrencyVND
+import com.example.jetpackcomposedemo.components.Dialog.DialogMessage
 import com.example.jetpackcomposedemo.data.models.Booking.MyBooking
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.BookingViewModelApi
 import com.example.jetpackcomposedemo.data.viewmodel.BookingViewModelApi.StateCallApi
+import com.example.jetpackcomposedemo.handlePayment.CountDown.CountdownViewModel
 import com.example.jetpackcomposedemo.helpper.Status
-import kotlinx.coroutines.CoroutineScope
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MyBookingScreen(
-    countDownPaymentViewModel:CountDownPaymentViewModel,
+    countDownPaymentViewModel:CountdownViewModel,
     uid:String,
     bookingViewModel:BookingViewModel,
     bookingViewModelApi:BookingViewModelApi,
@@ -81,9 +81,18 @@ fun MyBookingScreen(
     LaunchedEffect(Unit) {
         bookingViewModelApi.getListMyBooking(uid)
     }
+    LaunchedEffect(key1 = bookingViewModelApi.stateCallApi.value.status) {
+       if(bookingViewModelApi.stateCallApi.value.status == 1){
+           bookingViewModelApi.getListMyBooking(uid)
+           Toast.makeText(context, "Thao tác thành công", Toast.LENGTH_SHORT).show()
+           bookingViewModelApi.setStatusCallApi(StateCallApi())
+       }
+    }
     var roomList = remember { mutableListOf<MyBooking>() }
     val resourceMyBooking = bookingViewModelApi.myBookingList.observeAsState()
     val (loading, setLoading) = remember { mutableStateOf(false) }
+    val openAlertDialogCancelBookingRoom = remember{ mutableStateOf(false) }
+    val payloadInfoBookingRoom = remember{ mutableStateOf<MyBooking?>(null) }
     when (resourceMyBooking.value?.status) {
         Status.SUCCESS -> {
             resourceMyBooking.value?.data?.let { rooms ->
@@ -99,9 +108,25 @@ fun MyBookingScreen(
         }
         null ->  Log.e("<Error>", "Roi vao null")
     }
-    if(bookingViewModelApi.stateCallApi.value.status == 1){
-        Toast.makeText(context, "Xóa thành công", Toast.LENGTH_SHORT).show()
-        bookingViewModelApi.setStatusCallApi(StateCallApi())
+
+    val doneCountDown = countDownPaymentViewModel.doneCountDown.collectAsState()
+    LaunchedEffect(key1 = doneCountDown.value) {
+        if(doneCountDown.value){
+            val booking = bookingViewModelApi.myBookingList.value?.data?.get(0)?.booking
+            val bill = bookingViewModelApi.myBookingList.value?.data?.get(0)?.bill
+            val bookingId = booking?.id
+            if (bookingId != null) {
+                bookingViewModelApi.updateStatusBooking(bookingId, StatusPayment.CANCEL.status)
+                val bedTypeId = bill?.bedTypeId
+                val roomId = bill?.roomId
+                val status = 1
+                if(bedTypeId != null && roomId != null ){
+                    bookingViewModelApi.updateBedTypeBooking(bedTypeId,roomId,status)
+                }
+            }
+            Toast.makeText(context,"Đơn đặt phòng của bạn đã bị hủy do quá thời gian thanh toán.",Toast.LENGTH_LONG).show()
+            bookingViewModelApi.getListMyBooking(uid)
+        }
     }
 
     Scaffold(
@@ -152,16 +177,47 @@ fun MyBookingScreen(
                         bookingRoom = item,
                         navController = navController,
                         bookingViewModel = bookingViewModel,
+                        payloadInfoBookingRoom = {
+                            payloadInfoBookingRoom.value = it
+                        },
                         countDownPaymentViewModel = countDownPaymentViewModel,
-                        onDeleteClicked = {bkid,billid,uid->
-                            bookingViewModelApi.deleteMyBooking(bkid,billid,uid)
+                        onDeleteClicked = {bkId,billId,uid,bedTypeId,roomId->
+                            val status = 1
+                            bookingViewModelApi.deleteMyBooking(bkId,billId,uid)
+                            bookingViewModelApi.updateBedTypeBooking(bedTypeId,roomId,status)
+
+                        },
+                        openAlertDialogCancelBookingRoom = {
+                            openAlertDialogCancelBookingRoom.value = it
                         }
                     )
                 }
             }
         }
     }
+    if(openAlertDialogCancelBookingRoom.value){
+        DialogMessage(
+            onDismissRequest = {openAlertDialogCancelBookingRoom.value = false},
+            onConfirmation = {
+                openAlertDialogCancelBookingRoom.value = false
+                val booking = payloadInfoBookingRoom.value?.booking
+                val bill = payloadInfoBookingRoom.value?.bill
+                val bookingId = booking?.id
+                if (bookingId != null) {
+                    bookingViewModelApi.updateStatusBooking(bookingId,StatusPayment.CANCEL.status)
+                    val bedTypeId = bill?.bedTypeId
+                    val roomId = bill?.roomId
+                    val status = 1
+                    if(bedTypeId != null && roomId != null ){
+                        bookingViewModelApi.updateBedTypeBooking(bedTypeId,roomId,status)
+                    }
+                }
+            },
+            dialogTitle = "Bạn muốn hủy phòng sao?.",
+            dialogText = "Sao khi đồng ý, phòng sẽ hủy và sẽ không hoàn trả bất kì chi phí nào."
+        )
 
+    }
     LoadingScreen(loading)
 }
 
@@ -170,10 +226,12 @@ fun CardMyBooKing(
     bookingRoom: MyBooking,
     navController:NavHostController,
     bookingViewModel:BookingViewModel,
-    countDownPaymentViewModel: CountDownPaymentViewModel,
-    onDeleteClicked:(Int, Int, Int)->Unit
+    payloadInfoBookingRoom:(MyBooking)->Unit,
+    countDownPaymentViewModel: CountdownViewModel,
+    onDeleteClicked:(Int, Int, Int,Int, Int)->Unit,
+    openAlertDialogCancelBookingRoom:(Boolean)->Unit
 ){
-    val timeLeftFormatted by countDownPaymentViewModel.timeLeftFormatted.observeAsState()
+    val remainingTime by countDownPaymentViewModel.remainingTime.collectAsState()
     val date = bookingRoom.booking?.timeBooking?.split(",")?.get(1)?.trim()
     val hourly = bookingRoom.booking?.timeBooking?.split(",")?.get(0)?.trim()
     val options = listOf(
@@ -211,7 +269,7 @@ fun CardMyBooKing(
         it.type.trim() == (bookingRoom.bill?.bedTypeApi?.trim() ?: "single")
     }?.get(0)
 
-    val discount = bookingViewModel.getDiscount()
+    val discount = bookingRoom.discount
     val expanded = remember { mutableStateOf(false) }
 
 
@@ -286,14 +344,12 @@ fun CardMyBooKing(
                         if(bookingRoom.booking?.status == StatusPayment.PENDING.status){
                             Spacer(modifier = Modifier.width(10.dp))
                             Box(modifier = Modifier.background(Color.LightGray.copy(0.3f), shape = RoundedCornerShape(4.dp))){
-                                timeLeftFormatted?.let {
-                                    Text(
-                                        text = it,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(10.dp)
-                                    )
-                                }
+                                Text(
+                                    text =  "${remainingTime / 60}:${"%02d".format(remainingTime % 60)}",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(10.dp)
+                                )
                             }
                         }
                     }
@@ -315,7 +371,9 @@ fun CardMyBooKing(
                     Spacer(modifier = Modifier.height(8.dp))
                     if(discount!=null){
                         Text(
-                            text = discount.name,
+                            text =  discount.name  +" Giảm ${(if (discount.amountDiscount == 0F
+                                || discount.amountDiscount == null) discount.percentDiscount.toString() + "%"
+                            else (discount.amountDiscount / 1000F).toInt().toString() + "K")}",
                             fontSize = 14.sp,
                             fontStyle = FontStyle.Italic,
                             color = Color.Red
@@ -370,7 +428,8 @@ fun CardMyBooKing(
                             totalTime = bookingRoom.bill?.duration.toString(),
                             status = bookingRoom.booking.status,
                             infoRoom = bookingRoom.room,
-                            bedType =bedTypeApi
+                            bedType =bedTypeApi,
+                            discount = discount
                         ))
                         navController.navigate("infobooking/${bookingRoom.room?.id}/${bookingRoom.booking.status}")
                     },
@@ -425,7 +484,8 @@ fun CardMyBooKing(
                                     totalTime = bookingRoom.bill?.duration.toString(),
                                     status = bookingRoom.booking?.status,
                                     infoRoom = bookingRoom.room,
-                                    bedType = bedTypeApi
+                                    bedType = bedTypeApi,
+                                    discount = discount
                                 )
                             )
                             navController.navigate("infobooking/${bookingRoom.room?.id}/${bookingRoom.booking?.status}")
@@ -453,16 +513,25 @@ fun CardMyBooKing(
                         .width(200.dp)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                         .clickable {
-                            bookingRoom.booking?.id?.let {
-                                bookingRoom.bill?.id?.let { it1 ->
-                                    bookingRoom.booking.uID?.let { it2 ->
-                                        onDeleteClicked(
-                                            it,
-                                            it1,
-                                            it2
-                                        )
-                                    }
+                            if (bookingRoom.booking?.status != StatusPayment.PAID.status
+                                && bookingRoom.booking?.status != StatusPayment.PENDING.status
+                            ) {
+                                if (bookingRoom.booking?.id != null && bookingRoom.bill?.id != null
+                                    && bookingRoom.booking.uID != null && bookingRoom.bill.bedTypeId != null
+                                    && bookingRoom.room?.id != null
+                                ) {
+                                    onDeleteClicked(
+                                        bookingRoom.booking.id,
+                                        bookingRoom.bill.id,
+                                        bookingRoom.booking.uID,
+                                        bookingRoom.bill.bedTypeId,
+                                        bookingRoom.room.id
+                                    )
                                 }
+                            } else {
+                                openAlertDialogCancelBookingRoom(true)
+                                payloadInfoBookingRoom(bookingRoom)
+                                countDownPaymentViewModel.resetCountdown()
                             }
                             expanded.value = false
                         }
@@ -474,7 +543,12 @@ fun CardMyBooKing(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Xóa", fontSize = 14.sp)
+                    if(bookingRoom.booking?.status != StatusPayment.PAID.status && bookingRoom.booking?.status != StatusPayment.PENDING.status){
+                        Text("Xóa", fontSize = 14.sp)
+                    }
+                    else{
+                        Text("Hủy đặt phòng", fontSize = 14.sp)
+                    }
 
                 }
 

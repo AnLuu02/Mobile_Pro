@@ -11,7 +11,9 @@ class ReminderRepository(
         remindersDB.reminderDAO().addReminder(reminderEntity)
     }
 
-     fun getAllReminders() = remindersDB.reminderDAO().getAllReminders()
+    fun getAllReminders() = remindersDB.reminderDAO().getAllReminders()
+
+    fun getRemindersByUserID(user_id:Int) = remindersDB.reminderDAO().getRemindersByUserID(user_id)
 
 
     suspend fun deleteReminderFromRoom(reminderEntity: ReminderEntity){
